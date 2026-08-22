@@ -1,0 +1,70 @@
+import { Note, Success } from '@/components/mdx'
+
+export const description =
+  'Detect leaked secrets in code and diffs - in the dashboard or fully offline from the CLI.'
+
+# Secret scanning
+
+Kryptic ships the gitleaks default ruleset - **222 rules** covering AWS, GitHub,
+Stripe, Slack, private keys and more - with entropy thresholds and allowlists
+for lockfiles, vendored code and generated artifacts.
+
+## In the dashboard
+
+<img className="imagewrapper-big" src="/screenshots/secret-scanning.png" alt="Secret scanning" />
+
+Paste file content, or a git patch with **Treat as a git patch** ticked to scan
+only added lines. Findings come back with the rule, severity and location, and
+every scan is kept in history.
+
+## From the CLI - fully offline
+
+```bash
+kryptic scan                 # the working directory
+kryptic scan path/to/dir     # a specific path
+kryptic scan --staged        # only lines added in the git index
+```
+
+<Success>
+  `kryptic scan` never sends anything to the platform. The ruleset is embedded in
+  the binary, so it works with no network and no sign-in.
+</Success>
+
+Findings print redacted and the exit code is non-zero:
+
+```
+settings.py:14  github-pat  ghp_************************************
+    Uncovered a GitHub Personal Access Token, potentially leading to
+    unauthorized repository access and sensitive content exposure.
+
+1 potential secret(s) found.
+```
+
+## As a pre-commit hook
+
+```bash
+cat > .git/hooks/pre-commit <<'HOOK'
+#!/bin/sh
+kryptic scan --staged
+HOOK
+chmod +x .git/hooks/pre-commit
+```
+
+The commit is blocked if anything is found. Because it scans the index rather
+than the working tree, it catches exactly what you are about to publish.
+
+## In CI
+
+```yaml
+- name: Scan for leaked secrets
+  run: kryptic scan
+```
+
+No credentials needed - scanning is local, so this step works on forks and
+untrusted pull requests where secrets are unavailable by design.
+
+<Note>
+  A finding is a *candidate*. Entropy thresholds and allowlists remove most false
+  positives, but test fixtures and documentation examples can still match. Move
+  sample values into an allowlisted path, or make them obviously fake.
+</Note>

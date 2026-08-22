@@ -1,0 +1,50 @@
+import { Note } from '@/components/mdx'
+
+export const description = 'The Kryptic Python package - inject() into os.environ.'
+
+# Python
+
+`krypticdev` injects your project's secrets into `os.environ` during development startup.
+Outside development it is a no-op, and it never raises.
+
+## Install
+
+```bash
+pip install krypticdev
+```
+
+## Use
+
+```python
+# top of manage.py / main.py / wsgi.py - before anything reads os.environ
+import krypticdev
+krypticdev.inject()
+
+import os
+db_url = os.environ["DATABASE_URL"]
+```
+
+Works with Django, Flask, FastAPI, and anything else that reads `os.environ`.
+
+## Behavior
+
+- No-op when `ENVIRONMENT`/`ENV`/`PYTHON_ENV`/`APP_ENV` is production or staging, or when `KRYPTIC_DISABLED=true`.
+- Finds `kryptic.json` by walking up from the working directory.
+- Never overwrites environment variables that are already set.
+- Returns an `InjectResult(injected, skipped, reason)`.
+- macOS/Linux via unix socket, Windows via named pipe - pure standard library.
+
+## Options
+
+```python
+krypticdev.inject(
+    environment="staging",    # default: kryptic.json defaultEnvironment
+    project_id="proj_x",      # default: kryptic.json projectId
+    timeout_ms=2000,
+)
+```
+
+<Note>
+  Environment variables override everything: `KRYPTIC_PROJECT_ID`, `KRYPTIC_ENV`,
+  `KRYPTIC_SOCKET_PATH`, `KRYPTIC_TIMEOUT_MS`, `KRYPTIC_DISABLED`, `KRYPTIC_SILENT`.
+</Note>

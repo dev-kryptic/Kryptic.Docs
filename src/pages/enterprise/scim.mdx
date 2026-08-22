@@ -1,0 +1,108 @@
+import { Note, Warning, Success } from '@/components/mdx'
+
+export const description =
+  'Automatic user and group provisioning from Okta, Entra or JumpCloud via SCIM 2.0.'
+
+# SCIM 2.0 provisioning
+
+Available on **Business** and **Enterprise** plans. Your identity provider
+creates, updates and deactivates Kryptic accounts automatically as people join,
+move and leave.
+
+Okta customers should follow [Set up Okta SAML 2.0](/enterprise/okta), which
+issues the SCIM token when you connect the app. The steps below are the generic
+API path.
+
+## Set it up
+
+**1. Issue a SCIM token** (Owner only):
+
+```bash
+curl -X POST https://<your-api-host>/api/enterprise/idp/scim/{connectionId}/token \
+  -H "Authorization: Bearer $OWNER_TOKEN"
+```
+
+```json
+{
+  "token": "…",
+  "scimBaseUrl": "https://<your-api-host>/scim/v2",
+  "note": "Copy this token now - it is stored hashed and cannot be shown again."
+}
+```
+
+**2. In your identity provider**, configure SCIM provisioning with:
+
+| Okta field | Value |
+| --- | --- |
+| SCIM connector base URL | `https://<your-api-host>/scim/v2` |
+| Unique identifier field for users | `userName` |
+| Authentication Mode | HTTP Header |
+| Authorization | the value from step 1 (no `Bearer` prefix) |
+
+Enable *Create Users*, *Update User Attributes* and *Deactivate Users*.
+
+<Success>
+  Okta's "Test Connector Configuration" should pass immediately - the
+  `/ServiceProviderConfig`, `/ResourceTypes` and `/Schemas` endpoints are all
+  implemented.
+</Success>
+
+## What is supported
+
+| Endpoint | Operations |
+| --- | --- |
+| `/Users` | `GET` (list, `userName eq`), `GET /{id}`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| `/Groups` | `GET` (list, `displayName eq`), `GET /{id}`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| `/ServiceProviderConfig`, `/ResourceTypes`, `/Schemas` | `GET` |
+
+## Behavior that matters
+
+**Deprovisioning deactivates, never deletes.** Both `DELETE /Users/{id}` and
+`PATCH {"active": false}` deactivate the account **and revoke every browser and
+daemon session immediately** - a removed employee loses secret access within
+seconds, not at the next token expiry.
+
+Accounts are never physically removed, because the audit log must keep naming
+the person who performed past actions.
+
+<Warning>
+  The **last Owner cannot be deactivated** by SCIM. An IdP misconfiguration must
+  not be able to lock an organization out of itself.
+</Warning>
+
+**Groups mirror your directory.** Push a group and its members, and grant that
+Kryptic group project access once - membership then follows your IdP. Members
+from other organizations are ignored; the org boundary holds.
+
+**Filters are honored exactly or refused.** Only `eq` is supported. A filter we
+could not evaluate correctly returns `invalidFilter` rather than a wrong result
+set, because a wrong set would mean the provider overwriting the wrong user.
+
+**Provisioned users start as Developers.** Roles are a Kryptic concept; set them
+in the dashboard.
+
+## Verifying it works
+
+After the first sync:
+
+1. **Members** shows the imported users.
+2. **Groups** shows the imported groups with their memberships.
+3. The **audit log** shows entries with actor `scim:<provider>`.
+4. The connection's *last request* timestamp updates on every sync.
+
+To test deprovisioning end to end: unassign a test user in your IdP, then
+confirm their `kryptic secrets get` fails and their dashboard session is gone.
+
+## Revoking
+
+```bash
+curl -X DELETE https://<your-api-host>/api/enterprise/idp/scim/{connectionId}/token \
+  -H "Authorization: Bearer $OWNER_TOKEN"
+```
+
+Provisioning stops immediately; existing accounts are untouched.
+
+<Note>
+  Issuing a new token invalidates the previous one. Update your IdP in the same
+  maintenance window to avoid a gap in provisioning.
+</Note>

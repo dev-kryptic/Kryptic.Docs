@@ -1,0 +1,123 @@
+import { CodeGroup, Note, Properties, Property } from '@/components/mdx'
+
+export const description =
+  'The Kryptic REST API v1 - programmatic access to projects and secrets with machine identities.'
+
+# REST API v1
+
+The public programmatic API for machine access to secrets. Base URL
+`https://secrets.kryptic.dev` (or your self-hosted Secrets API host). The complete
+OpenAPI document is served at `/openapi/v1.json`.
+
+The API is end-to-end encrypted: reads return ciphertext envelopes plus the org key
+sealed to the machine, and writes accept envelopes the caller encrypted locally. The
+server stores and delivers ciphertext it cannot open. For shell use, prefer
+`kryptic ci export`, which performs the decryption chain for you.
+
+## Authentication
+
+Create a machine identity in the dashboard (Machine identities -> New identity). You
+get a `clientId` and a one-time `clientSecret`. Exchange them for a short-lived bearer
+token:
+
+```bash
+curl -X POST https://secrets.kryptic.dev/v1/token \
+  -H 'Content-Type: application/json' \
+  -d '{ "clientId": "kmi_...", "clientSecret": "..." }'
+```
+
+```json
+{ "accessToken": "eyJ...", "expiresInSeconds": 900 }
+```
+
+Machine identities can be scoped to specific projects; an unscoped identity sees every
+project in the organization. Every read and write is audit-logged.
+
+## Projects
+
+```bash
+GET /v1/projects                          # projects the token can access
+GET /v1/projects/{publicId}/environments  # environments of one project
+```
+
+## Machine key material
+
+Before you can decrypt a bundle, fetch the machine's wrapped private key record:
+
+```bash
+GET /v1/keys/me
+Authorization: Bearer <token>
+```
+
+The response contains the machine's public key, wrapped private key, and Argon2id KDF
+salt. Derive an unwrap key from the client secret, open the private key, then open the
+`wrappedOrgKey` that arrives with each secrets response.
+
+## Secrets
+
+Read the ciphertext bundle for one environment:
+
+```bash
+GET /v1/projects/proj_x/secrets?environment=production
+Authorization: Bearer <token>
+```
+
+```json
+{
+  "projectPublicId": "proj_x",
+  "environment": "production",
+  "orgKeyId": "key_org_...",
+  "wrappedOrgKey": "sbx.v1....",
+  "secrets": [
+    {
+      "key": "DATABASE_URL",
+      "envelope": "v1.key_org_....",
+      "definitionId": "00000000-0000-0000-0000-000000000001",
+      "environmentId": "00000000-0000-0000-0000-000000000002"
+    }
+  ]
+}
+```
+
+Set (create or version) one secret by uploading an envelope you encrypted under the org
+key in your own process:
+
+```bash
+PUT /v1/projects/proj_x/secrets/DATABASE_URL
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{ "environment": "production", "envelope": "v1.key_org_...." }
+```
+
+Delete a secret definition across all environments:
+
+```bash
+DELETE /v1/projects/proj_x/secrets/DATABASE_URL
+Authorization: Bearer <token>
+```
+
+<Properties>
+  <Property name="environment" type="string" required>
+    The environment slug (`development`, `staging`, `production`, or a custom one).
+  </Property>
+  <Property name="envelope" type="string" required>
+    A ciphertext envelope in the form `v1.&lt;orgKeyId&gt;.&lt;nonce&gt;.&lt;ciphertext&gt;`,
+    encrypted under the organization's active key and bound to the project/environment row.
+  </Property>
+</Properties>
+
+## Errors
+
+| Status | Meaning |
+| --- | --- |
+| 401 | Missing/expired token, or wrong client credentials |
+| 403 | The machine identity's scopes exclude this project, or it has no org-key grant yet |
+| 404 | Unknown project public id, environment slug, or secret key |
+| 400 | Invalid secret key (must look like an environment variable name) or invalid envelope |
+
+<Note>
+  For CI jobs that just need secrets as a `.env` or shell exports, the Pipelines BFF's
+  ciphertext bundle plus `kryptic ci export` is usually simpler than implementing the
+  full decryption chain yourself.
+</Note>

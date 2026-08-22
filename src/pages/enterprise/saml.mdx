@@ -1,0 +1,95 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Connect a SAML 2.0 identity provider for organization-wide single sign-on.'
+
+# SAML 2.0 single sign-on
+
+Available on **Business** and **Enterprise** plans. Kryptic acts as a SAML 2.0
+service provider, so your identity provider stays the source of truth for who
+can sign in.
+
+## Connect your identity provider
+
+**1. Give your IdP administrator the service provider metadata.**
+
+```
+https://<your-api-host>/saml/metadata
+```
+
+It declares our entity id, the assertion consumer service URL, and that we
+require signed assertions. We do not sign AuthnRequests, so no key exchange is
+needed in that direction.
+
+**2. Paste the IdP's metadata into Kryptic and claim your email domain.**
+
+```bash
+curl -X POST https://<your-api-host>/api/enterprise/idp/saml \
+  -H "Authorization: Bearer $OWNER_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{ "domain": "acme.com", "provider": "Okta", "metadataXml": "<EntityDescriptor …>" }'
+```
+
+The metadata is parsed immediately, so a bad document is rejected while you are
+still looking at it rather than at the first login attempt. The response
+includes the signing certificate's expiry date - watch it.
+
+**3. Users sign in.**
+
+```
+https://<your-api-host>/saml/login?domain=acme.com
+```
+
+The first successful sign-in provisions the user as a **Developer**. Elevate
+roles inside Kryptic, not in the IdP.
+
+<Note>
+  The assertion's email address must be inside the domain your organization
+  claims. This means a compromised or misconfigured IdP cannot mint Kryptic
+  accounts for arbitrary addresses.
+</Note>
+
+## What we verify before trusting an assertion
+
+Every item below is an authentication bypass if it is missing. Each has an
+automated test that constructs the actual attack.
+
+| Check | Attack it closes |
+| --- | --- |
+| Every signature verifies against the certificate from your metadata, and each must cover the response or the assertion (Okta signs both, which is fine) | Forged or attacker-signed assertions |
+| The assertion used is the one the signature **covers**, and the document has exactly one assertion | XML signature wrapping |
+| SHA-1 and MD5 refused | Algorithm downgrade |
+| `InResponseTo` matches a login we started | Replay of a captured assertion |
+| `Destination` is our ACS URL | Assertion minted for a different service provider |
+| `Audience` is our entity id | Same |
+| `Issuer` is your configured IdP | Assertion from an unrelated IdP |
+| `Conditions` within `NotBefore`/`NotOnOrAfter` (±3 min skew) | Expired assertion reuse |
+| `Status` is Success before anything else is read | Treating a failed login as a success |
+| DTDs and external entities disabled | XXE |
+
+Rejections are audit-logged as `auth.saml_rejected` with the reason, so a
+misconfiguration is diagnosable without turning on debug logging.
+
+<Warning>
+  When the IdP's signing certificate expires, sign-in fails - it never degrades
+  to accepting unsigned assertions. Rotate the certificate in your IdP and paste
+  the new metadata before the expiry date shown on the connection.
+</Warning>
+
+## Disconnecting
+
+```bash
+curl -X DELETE https://<your-api-host>/api/enterprise/idp/saml/{id} \
+  -H "Authorization: Bearer $OWNER_TOKEN"
+```
+
+`/saml/login` immediately stops serving that domain. Existing sessions continue
+until they expire - revoke them from **Members** if you need access to stop now.
+
+## Next
+
+For a full walkthrough in Okta (custom app, SAML fields, SCIM, and the optional
+support questions), see [Set up Okta SAML 2.0](/enterprise/okta).
+
+Pair SSO with [SCIM provisioning](/enterprise/scim) so joiners and leavers are
+handled automatically rather than by hand.

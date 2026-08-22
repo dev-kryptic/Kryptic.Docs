@@ -1,0 +1,73 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description = 'Reference for every kryptic CLI command.'
+
+# CLI reference
+
+The `kryptic` binary is both the daemon and its CLI - one file, no dependencies,
+macOS/Linux/Windows.
+
+## Daemon lifecycle
+
+```bash
+kryptic start    # run the daemon in the foreground (the service manager calls this)
+kryptic stop     # stop the running daemon (pidfile-based, graceful)
+kryptic status   # is the daemon up, and who is signed in
+```
+
+`start` refuses to run when another daemon already holds the pidfile; `stop` cleans up
+stale pidfiles left by crashes.
+
+## Authentication
+
+```bash
+kryptic login    # browser device flow - prints a code, you approve it in the browser
+kryptic whoami   # the signed-in user and organization (asks the platform directly)
+kryptic logout   # revoke this device's session
+```
+
+`login` stores the rotating refresh token in the OS credential store: macOS Keychain,
+Windows Credential Manager, or libsecret on Linux (0600 file fallback when no store
+is available).
+
+## Secrets
+
+```bash
+kryptic secrets list                                   # projects and environments you can pull
+kryptic secrets get DATABASE_URL --project proj_x --env development
+kryptic flush                                          # drop the daemon's 5-minute cache
+```
+
+<Note>
+  `secrets get` prints the value to stdout for piping into other tools. Reads go through
+  the same server-side access checks and audit logging as every other client.
+</Note>
+
+## Secret scanning
+
+```bash
+kryptic scan               # scan the working directory
+kryptic scan path/to/dir   # scan a specific path
+kryptic scan --staged      # scan only lines added in the git index (pre-commit hook)
+```
+
+Runs the gitleaks default ruleset (222 rules) fully locally - nothing leaves your
+machine. Findings are printed redacted, and a non-zero exit code makes it a CI or
+pre-commit gate:
+
+```bash
+# .git/hooks/pre-commit
+kryptic scan --staged
+```
+
+## Updating
+
+```bash
+kryptic update    # self-update from the latest GitHub release
+kryptic version
+```
+
+<Warning>
+  `update` downloads the binary for your platform and verifies it against the release's
+  `checksums.txt` before replacing the executable - it refuses to update unverified.
+</Warning>

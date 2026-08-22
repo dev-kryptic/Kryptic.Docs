@@ -1,0 +1,48 @@
+import { Note } from '@/components/mdx'
+
+export const description = 'The Kryptic Java package - Kryptic.inject() into system properties.'
+
+# Java
+
+`dev.kryptic:krypticdev` fetches your project's secrets and exposes them as system
+properties (the JVM cannot modify its own process environment). Zero dependencies,
+Java 17+. Outside development it is a no-op, and it never throws.
+
+## Install
+
+```xml
+<dependency>
+  <groupId>dev.kryptic</groupId>
+  <artifactId>krypticdev</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
+## Use
+
+```java
+public static void main(String[] args) {
+    Kryptic.inject();   // before the framework boots
+
+    var dbUrl = System.getProperty("DATABASE_URL");
+}
+```
+
+For frameworks that want a map instead of system properties, use `Kryptic.fetch()`:
+
+```java
+Map<String, String> secrets = Kryptic.fetch();
+```
+
+## Behavior
+
+- No-op when `SPRING_PROFILES_ACTIVE`/`APP_ENV`/`ENVIRONMENT`/`ENV` indicates production or staging, or when `KRYPTIC_DISABLED=true`.
+- Finds `kryptic.json` by walking up from the working directory.
+- Never overwrites system properties or environment variables that are already set.
+- macOS/Linux via unix domain socket channels, Windows via named pipe.
+
+<Note>
+  Environment variables (or system properties with the same names) override everything:
+  `KRYPTIC_PROJECT_ID`, `KRYPTIC_ENV`, `KRYPTIC_SOCKET_PATH`, `KRYPTIC_TIMEOUT_MS`,
+  `KRYPTIC_DISABLED`, `KRYPTIC_SILENT`.
+</Note>

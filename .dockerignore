@@ -1,0 +1,10 @@
+node_modules
+.next
+.idea
+.vscode
+docker
+*.md
+.env
+.env.*
+!.env.example
+!.env.production

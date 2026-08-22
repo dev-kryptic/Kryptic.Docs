@@ -1,0 +1,82 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Credentials for CI/CD pipelines and other non-human callers.'
+
+# Machine identities
+
+A machine identity is a non-human credential: a client id (`kmi_…`) and a client
+secret. It is how a CI job, a deploy script or an internal tool reads secrets
+without a person being involved.
+
+<img className="imagewrapper-big" src="/screenshots/machine-identities.png" alt="Machine identities" />
+
+## Creating one
+
+Dashboard -> **Machine identities** -> **New identity**. Optionally scope it to
+specific projects; an unscoped identity can read every project in the
+organization.
+
+<Warning>
+  The client secret is displayed **exactly once**, at creation. It is stored only
+  as an Argon2id hash and cannot be recovered - copy it into your CI secret store
+  before closing the dialog. If you lose it, rotate the identity.
+</Warning>
+
+## Using it
+
+Exchange the credentials for a short-lived token, then pull secrets in whatever
+shape your job wants:
+
+```bash
+TOKEN=$(curl -s -X POST https://pipelines.kryptic.dev/api/token \
+  -H 'Content-Type: application/json' \
+  -d "{\"clientId\":\"$KRYPTIC_CLIENT_ID\",\"clientSecret\":\"$KRYPTIC_CLIENT_SECRET\"}" \
+  | jq -r .accessToken)
+
+curl -s "https://pipelines.kryptic.dev/api/secrets/export?projectPublicId=proj_x&environment=production&format=dotenv" \
+  -H "Authorization: Bearer $TOKEN" > .env
+```
+
+`format` accepts:
+
+| Value | Output |
+| --- | --- |
+| `dotenv` (default) | `KEY=value` lines, quoted where needed |
+| `shell` | `export KEY='value'` lines, correctly escaped |
+| `json` | A flat JSON object |
+
+## GitHub Actions
+
+```yaml
+- name: Load secrets from Kryptic
+  env:
+    KRYPTIC_CLIENT_ID: ${{ secrets.KRYPTIC_CLIENT_ID }}
+    KRYPTIC_CLIENT_SECRET: ${{ secrets.KRYPTIC_CLIENT_SECRET }}
+  run: |
+    TOKEN=$(curl -s -X POST https://pipelines.kryptic.dev/api/token \
+      -H 'Content-Type: application/json' \
+      -d "{\"clientId\":\"$KRYPTIC_CLIENT_ID\",\"clientSecret\":\"$KRYPTIC_CLIENT_SECRET\"}" \
+      | jq -r .accessToken)
+    curl -s "https://pipelines.kryptic.dev/api/secrets/export?projectPublicId=proj_x&environment=production&format=shell" \
+      -H "Authorization: Bearer $TOKEN" >> "$GITHUB_ENV"
+```
+
+The dashboard generates this snippet pre-filled for GitHub Actions, GitLab CI
+and plain shell.
+
+## Lifecycle
+
+| Action | Effect |
+| --- | --- |
+| **Rotate** | Issues a new secret and **invalidates the old one immediately** |
+| **Deactivate** | Token exchange starts returning 401 |
+| **Scope** | Restricts which projects the identity can read |
+
+Every read is audit-logged with the machine identity as the actor, so a CI
+pipeline's access is as reviewable as a person's.
+
+<Note>
+  For Kubernetes, prefer the [operator](/kubernetes) over calling the API from an
+  init container - it handles refresh, drift and failure modes for you.
+</Note>

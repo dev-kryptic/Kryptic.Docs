@@ -1,0 +1,180 @@
+import { Note, Warning, Success } from '@/components/mdx'
+
+export const description =
+  'Set up Okta SAML 2.0 single sign-on and SCIM provisioning with Kryptic.'
+
+# Set up Okta SAML 2.0
+
+Available on **Business** and **Enterprise**. Okta is the identity provider.
+Kryptic is the service provider. Sign-in uses SAML 2.0. Joiners and leavers use
+SCIM 2.0, issued when you connect Okta in the dashboard.
+
+Create a **custom SAML 2.0 app** in your Okta org. Do not submit Kryptic to the
+Okta Integration Network for a first setup. OIN is a catalog review. You need
+**Applications → Create App Integration** in the Admin Console.
+
+Cloud hosts used below:
+
+| What | URL |
+| --- | --- |
+| Dashboard | `https://app.kryptic.dev` |
+| SAML metadata (entity id) | `https://api.kryptic.dev/saml/metadata` |
+| Assertion consumer service | `https://api.kryptic.dev/saml/acs` |
+| SCIM base | `https://api.kryptic.dev/scim/v2` |
+| SP-initiated sign-in | `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+
+Self-hosted: replace `https://api.kryptic.dev` with your Management API origin
+(`PUBLIC_API_URL`). The ACS and entity id must match that host exactly.
+
+## 1. Create the app in Okta
+
+In the **Okta Admin Console**:
+
+1. **Applications → Applications → Create App Integration**.
+2. Choose **SAML 2.0**, not OpenID Connect. Kryptic's Okta path is SAML plus SCIM.
+3. App name: `Kryptic`.
+
+If Okta then asks which extra integrations to attach:
+
+- Leave **Universal Logout / Global Token Revocation** off.
+- Turn **SCIM** on if the wizard offers Identity Lifecycle Management.
+- Leave **Entitlement Management** off.
+- Leave **API Service** and **Identity Verification** off.
+
+If you landed on an OIN "Create your app" flow with **Add Integration Details**
+and an OIN team review, cancel it. That is not a test app in your org.
+
+## 2. SAML settings
+
+On **Configure SAML**:
+
+| Field | Value |
+| --- | --- |
+| Single sign-on URL | `https://api.kryptic.dev/saml/acs` |
+| Use this for Recipient URL and Destination URL | checked |
+| Audience URI (SP Entity ID) | `https://api.kryptic.dev/saml/metadata` |
+| Default RelayState | leave empty |
+| Name ID format | **EmailAddress** |
+| Application username | **Email** (not Okta username) |
+| Update application username on | Create and update |
+
+Leave Advanced Settings closed unless you are mapping extra attributes. NameID
+as email is enough. We also read `email`, `emailaddress`, and `mail` if present.
+
+## 3. Okta's optional support questions
+
+The last wizard step asks how you configured the app so Okta Support can help
+later. Select **This is an internal app that we have created**. Leave "contact
+the vendor to enable SAML" unchecked.
+
+If they ask which pages you consulted, or for SAML docs, point here:
+
+```
+https://docs.kryptic.dev/enterprise/okta
+```
+
+Related pages: [SAML 2.0 SSO](/enterprise/saml) and [SCIM provisioning](/enterprise/scim).
+
+Click **Finish**.
+
+## 4. Copy Okta's metadata into Kryptic
+
+On the new app, open **Sign On**. Copy the **Identity Provider metadata** XML
+(or download it from the IdP metadata URL).
+
+In Kryptic, as an **Owner**:
+
+1. Open [app.kryptic.dev](https://app.kryptic.dev) → **Integrations → Single sign-on**.
+2. **Connect Okta**.
+3. Email domain: the domain your people use (for example `asml.com`). Assertions
+   outside that domain are rejected.
+4. Paste the IdP metadata XML.
+5. **Connect SSO and SCIM**.
+
+Connecting Okta issues a **SCIM bearer token in the same step**. Copy it now.
+It is stored hashed and cannot be shown again.
+
+<Note>
+  The first successful SAML sign-in still creates a **Developer** if SCIM has
+  not provisioned them yet. Raise roles in Kryptic, not in Okta.
+</Note>
+
+## 5. Turn on SCIM in Okta
+
+A custom SAML app does not show **Provisioning** until SCIM is enabled. Still
+in the Kryptic app:
+
+1. Open **General → App Settings → Edit**.
+2. Set **Provisioning** to **SCIM**, then **Save**. Refresh if the tab does not
+   appear.
+3. Open **Provisioning → Integration → Configure API Integration**.
+4. Enable API integration.
+5. Fill **SCIM Connection** using Okta's field names:
+
+| Okta field | Value |
+| --- | --- |
+| SCIM version | `2.0` |
+| SCIM connector base URL | `https://api.kryptic.dev/scim/v2` |
+| Unique identifier field for users | `userName` |
+| Import New Users and Profile Updates | leave off |
+| Push New Users | checked |
+| Push Profile Updates | checked |
+| Push Groups | checked |
+| Import Groups | leave off |
+| Authentication Mode | **HTTP Header** (not Basic Auth, not OAuth 2) |
+| Authorization | the token Kryptic showed once (no `Bearer` prefix) |
+
+6. **Test Connector Configuration**, then **Save**.
+7. Open **Provisioning → To App** and enable **Create Users**, **Update User
+   Attributes**, and **Deactivate Users**.
+8. **Assignments**: assign people or groups to the Kryptic app.
+
+**Push New Users** on the Integration screen is not enough. Okta will not
+create anyone until **Provisioning → To App → Create Users** is on. If
+Assignments shows *Matching user not found*, that is Okta saying the person
+does not exist in Kryptic yet and create is still off. Turn Create Users on,
+then retry the assignment (or unassign and assign again).
+
+If Okta System Log shows *Unrecognized token 'Temporary'*, Okta followed an
+`http://` SCIM Location into a redirect. The connector base URL must be
+`https://api.kryptic.dev/scim/v2`. After that is deployed, assign the person
+again so Okta stores the HTTPS Location, then deactivate.
+
+If **Provisioning** is missing from App Settings as well, the Okta org does not
+have Lifecycle Management. Integrator Free Plan orgs usually have it. Paid orgs
+sometimes need it enabled by Okta Support.
+
+Okta then pushes joiners and leavers. Unassign, deactivate, or delete in Okta
+deactivates the Kryptic account and revokes browser and daemon sessions
+immediately. Accounts are not physically deleted, so the audit log still names
+them.
+
+<Warning>
+  SAML without SCIM leaves offboarded people with access. The dashboard warns
+  if SSO is live and no SCIM request has arrived yet.
+</Warning>
+
+## 6. Sign in
+
+On [app.kryptic.dev/login](https://app.kryptic.dev/login), type your work
+email. When its domain has a SAML connection, a **Continue with Okta** button
+appears; no password needed. Direct link, if you want to bookmark one:
+
+```
+https://api.kryptic.dev/saml/login?domain=your-domain.com
+```
+
+## Rotating certificates or the SCIM token
+
+When Okta's signing certificate is close to expiry, paste the new IdP metadata
+with **Reconnect**. Reconnect does not re-issue the SCIM token, so provisioning
+keeps working.
+
+To rotate the SCIM token, revoke it in Kryptic and enable SCIM again, then
+update Okta in the same window. Issuing a new token invalidates the previous
+one immediately.
+
+## See also
+
+- [SAML 2.0 SSO](/enterprise/saml): what we verify on every assertion
+- [SCIM provisioning](/enterprise/scim): endpoints, groups, and deprovisioning rules

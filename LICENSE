@@ -1,0 +1,110 @@
+Kryptic Documentation — Licensing
+Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C.
+
+This repository contains two kinds of material, under two different licences.
+Which licence applies depends on the path.
+
+
+================================================================================
+PART 1 — DOCUMENTATION CONTENT: BSD 3-Clause License
+================================================================================
+
+Applies to the written documentation only:
+
+  src/pages/**/*.mdx
+  public/llms/**
+  public/llms.txt
+
+public/llms/ and public/llms.txt are generated from the .mdx sources by
+`npm run gen:llm` and carry the same licence as the prose they are built from.
+Edit the .mdx, not the generated output.
+
+Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C.
+All rights reserved.
+
+Redistribution and use of these files, with or without modification, are
+permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Clause 3 above is a condition of this licence: "Kryptic" and the Kryptic logo
+are trademarks of Kryptic by Theka.dev SINGLE MEMBER P.C. Nothing here grants
+any trademark licence.
+
+
+================================================================================
+PART 2 — EVERYTHING ELSE: Proprietary, all rights reserved
+================================================================================
+
+Applies to every path not listed in Part 1, including but not limited to:
+
+  src/components/**, src/lib/**, src/hooks/**, src/styles/**
+  src/pages/_app.jsx and src/pages/_document.jsx
+  mdx/**            (the MDX build pipeline)
+  scripts/**        (build-time generators)
+  all build and configuration files
+  public/logo.png
+  public/screenshots/**
+
+This material is proprietary. It is not open source and it is not
+source-available. Publishing it here grants no licence to use, copy, modify,
+merge, publish, distribute, sublicense, or sell any part of it.
+
+Two parts of this are closed for reasons beyond a simple reservation of rights:
+
+  - public/screenshots/** depict the Kryptic Platform dashboard, which is
+    proprietary and unpublished.
+
+  - src/styles/kryptic-tokens.css is a copy of the colour and typography tokens
+    from @krypticdev/design-system, a proprietary Kryptic package published to a
+    restricted npm scope and otherwise used only by the closed Kryptic clients.
+
+The rest is simply reserved. Nothing in this section should be read as an
+invitation to negotiate over individual files.
+
+Forking this repository on GitHub in order to prepare a pull request is
+expressly permitted, and so is running the site locally for that purpose. Any
+other use of Part 2 material requires written permission.
+
+
+================================================================================
+CONTRIBUTIONS
+================================================================================
+
+Pull requests are welcome for the documentation content in Part 1. By
+submitting a contribution you agree that it is licensed to the project and to
+everyone else under the BSD 3-Clause License in Part 1, and that you have the
+right to grant that licence. See CONTRIBUTING.md.
+
+
+================================================================================
+OTHER KRYPTIC COMPONENTS
+================================================================================
+
+Separate, and unaffected by this file: the Kryptic encryption engine and the
+language packages are Apache-2.0; the daemon and CLI are GPL-3.0; the
+Kubernetes operator is Apache-2.0; the enterprise module is source-available
+under the Kryptic Enterprise License. See DOCUMENTATION.md section 11 for the
+full component licensing breakdown.
+
+Questions: hello@kryptic.dev

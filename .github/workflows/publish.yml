@@ -1,0 +1,53 @@
+name: Build and push image
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Build and push kryptic/docs
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker login
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$DOCKER_REGISTRY" \
+            -u "$DOCKER_REGISTRY_USER" --password-stdin
+
+      - name: Build and push
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+        run: |
+          set -euo pipefail
+
+          trim() { printf '%s' "$1" | tr -d '\r\n' | sed 's/[[:space:]]*$//; s/^[[:space:]]*//'; }
+
+          IMAGE="$(trim "${DOCKER_REGISTRY}")/docker/kryptic/docs"
+          TAG="$(git rev-parse --short=7 HEAD)"
+
+          docker build \
+            --progress=plain \
+            -f Dockerfile \
+            -t "${IMAGE}:${TAG}" \
+            -t "${IMAGE}:latest" \
+            .
+
+          docker push "${IMAGE}:${TAG}"
+          docker push "${IMAGE}:latest"

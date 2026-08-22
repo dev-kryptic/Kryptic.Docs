@@ -1,0 +1,81 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Roles, per-environment grants, groups and access requests - how Kryptic decides who can read a secret.'
+
+# Access control
+
+Two mechanisms compose: **roles**, which are organization-wide, and **grants**,
+which are per project and per environment.
+
+## Roles
+
+| Role | Can |
+| --- | --- |
+| **Owner** | Everything, including billing, organization settings, key rotation, and deleting the organization |
+| **Admin** | Manage members, projects, groups and machine identities; export secrets; read the audit log |
+| **Developer** | Work with the projects they are granted; request access to others |
+| **Viewer** | Read-only within granted projects |
+
+Roles alone do not grant access to a project's secrets - a Developer with no
+grant sees no projects at all.
+
+## Grants
+
+<img className="imagewrapper-big" src="/screenshots/project-access.png" alt="Project access tab" />
+
+A grant ties a **user or a group** to a **project**, with a level chosen **per
+environment**. The common shape:
+
+| Environment | Everyone | Senior engineers | Release managers |
+| --- | --- | --- | --- |
+| development | read | read/write | read/write |
+| staging | - | read | read/write |
+| production | - | read | read/write |
+
+Effective access resolves in order: role -> direct grant -> group grant. The
+dashboard has an effective-access preview so an administrator can answer "what
+can this person actually see?" before it becomes an incident.
+
+## Groups
+
+Granting access to a group instead of a person is what makes access survive
+staff changes. Add someone to "Backend Team" and they inherit every grant that
+group holds; remove them and the access disappears immediately.
+
+Groups can also be populated automatically from your identity provider - see
+[SCIM provisioning](/enterprise/scim) and Entra directory import.
+
+## Access requests
+
+Developers and Viewers can request access to a project they cannot see, choosing
+environments, level and a reason. Administrators approve or deny from the
+dashboard; approving creates the grant and notifies the requester.
+
+This keeps the default posture tight without turning every onboarding into a
+support ticket.
+
+## Organization isolation
+
+<Warning>
+  Organizations are hard boundaries. A caller from one organization asking for
+  another's project receives **404, not 403** - the existence of the resource is
+  not disclosed. This holds across the dashboard API, the daemon BFF, the
+  pipelines BFF and the public REST API.
+</Warning>
+
+## Sessions and revocation
+
+| Control | Effect |
+| --- | --- |
+| Deactivate a member | Immediately revokes their browser and daemon sessions; login refused |
+| Revoke all sessions | Same, without deactivating the account |
+| Revoke one daemon | That machine stops receiving secrets |
+| Session expiry policy | Caps the absolute age of any login, regardless of refreshes |
+| SCIM deprovisioning | Deactivates and revokes everything, driven by your IdP |
+
+<Note>
+  Access changes take effect on the daemon's next fetch. Secrets are cached in
+  daemon memory for five minutes; `kryptic flush` clears the cache immediately if
+  you need to confirm a change during testing.
+</Note>

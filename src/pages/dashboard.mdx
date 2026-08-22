@@ -1,0 +1,145 @@
+import { Note } from '@/components/mdx'
+
+export const description =
+  'A tour of the Kryptic management dashboard - every screen and what it is for.'
+
+# The dashboard
+
+The management dashboard is where an organization is run: projects and secrets,
+who can see what, machine credentials, audit history, and billing. Click any
+screenshot to enlarge it.
+
+## Signing in
+
+<img className="imagewrapper-big" src="/screenshots/login.png" alt="Kryptic sign-in page" />
+
+Sign in with email and password, or with any SSO provider your organization has
+enabled - those buttons appear only for providers that are actually configured.
+
+## Overview
+
+<img className="imagewrapper-big" src="/screenshots/dashboard.png" alt="Kryptic dashboard" />
+
+The dashboard is the operational summary: member, project, secret and active
+daemon counts; a live activity monitor; trials and invitations that are about to
+expire; access requests you can approve without leaving the page; and a CI
+client generator that emits ready-to-paste GitHub Actions, GitLab CI or shell
+snippets.
+
+The top bar carries a jump-to-project search, a notifications bell, and the
+theme toggle.
+
+## Projects
+
+<img className="imagewrapper-big" src="/screenshots/projects.png" alt="Projects list" />
+
+A project maps to a repository. Creating one auto-creates the `development`,
+`staging` and `production` environments and shows the `kryptic.json` to commit.
+
+### Secrets
+
+<img className="imagewrapper-big" src="/screenshots/project-secrets.png" alt="Secrets matrix" />
+
+Rows are keys, columns are environments. **Values are never sent to the browser
+by default** - cells are masked, and revealing one is an explicit, audit-logged
+call to a dedicated endpoint.
+
+<img className="imagewrapper-big" src="/screenshots/project-secret-revealed.png" alt="A revealed secret" />
+
+Each cell offers reveal, copy, version history with restore, and delete. The
+toolbar handles `.env` import and per-environment export.
+
+### Environments
+
+<img className="imagewrapper-big" src="/screenshots/project-environments.png" alt="Environments tab" />
+
+Add custom environments such as `qa` or `preview` within your plan's limit. You
+cannot delete the last environment, and deleting one cleans up its values.
+
+### Access
+
+<img className="imagewrapper-big" src="/screenshots/project-access.png" alt="Project access tab" />
+
+Grants tie a user *or a group* to this project with a level **per environment**.
+See [Access control](/access-control) for how grants and roles combine.
+
+### Settings
+
+<img className="imagewrapper-big" src="/screenshots/project-settings.png" alt="Project settings tab" />
+
+Rename the project, copy its `kryptic.json`, or delete it - deletion requires
+typing the project name.
+
+## Members
+
+<img className="imagewrapper-big" src="/screenshots/members.png" alt="Members" />
+
+Invite by email (several at once), change roles, deactivate or reactivate
+people, and revoke sessions. Pending invitations can be resent - which issues a
+fresh token and invalidates the old one - or cancelled.
+
+## Groups
+
+<img className="imagewrapper-big" src="/screenshots/groups.png" alt="Groups" />
+
+Groups hold project access grants. Granting "Backend Team" access to a project
+survives staff changes: you manage membership, not a dozen individual grants.
+
+## Machine identities
+
+<img className="imagewrapper-big" src="/screenshots/machine-identities.png" alt="Machine identities" />
+
+Credentials for CI/CD and other non-human callers. The client secret is shown
+**exactly once** at creation and stored only as an Argon2id hash. Identities can
+be scoped to specific projects, rotated, and deactivated.
+
+## Daemon sessions
+
+<img className="imagewrapper-big" src="/screenshots/daemon-sessions.png" alt="Daemon sessions" />
+
+Every signed-in developer machine: device, platform, version, IP and last seen.
+Admins see the whole organization and can revoke any session - this is the
+"someone lost their laptop" control. Non-admins see only their own devices.
+
+## Audit log
+
+<img className="imagewrapper-big" src="/screenshots/audit-log.png" alt="Audit log" />
+
+Every mutation and every secret read, filterable by action, target type and date
+range, exportable to CSV. The rule is **audit the action, never the value**: a
+reveal entry names the key and environment, never the secret.
+
+## Secret scanning
+
+<img className="imagewrapper-big" src="/screenshots/secret-scanning.png" alt="Secret scanning" />
+
+Paste file content or a git patch and scan it against 222 gitleaks rules. The
+same engine runs fully offline in the CLI - see [`kryptic scan`](/cli#secret-scanning).
+
+## Settings
+
+<img className="imagewrapper-big" src="/screenshots/settings-general.png" alt="Organization settings" />
+
+Organization profile, billing email, and the session expiry policy that caps how
+long any login stays valid regardless of refreshes.
+
+### Identity providers
+
+<img className="imagewrapper-big" src="/screenshots/settings-idp.png" alt="Identity providers" />
+
+Connect your organization's own IdP, claim an email domain for
+auto-provisioning, and (for Microsoft Entra) import users and groups from the
+directory. The stored OAuth client secret is encrypted with your organization's
+data key.
+
+### Plans and billing
+
+<img className="imagewrapper-big" src="/screenshots/settings-billing.png" alt="Plans and billing" />
+
+Plan and seat usage, 14-day trials with no card, Stripe checkout (monthly or
+annual, VAT handled), seat adjustment with proration, and downloadable invoices.
+
+<Note>
+  Self-hosted deployments without Stripe configured show a sales pointer instead
+  of a broken checkout - nothing in the dashboard depends on billing being set up.
+</Note>

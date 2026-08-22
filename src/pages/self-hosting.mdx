@@ -1,0 +1,86 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description = 'Run the full Kryptic platform yourself with Docker Compose.'
+
+# Self-hosting
+
+The whole platform - PostgreSQL, Redis, four API hosts, and the management dashboard -
+runs from one `docker-compose.yml`.
+
+Self-hosting requires a **Business or Enterprise licence key**. There is no free
+self-hosted tier: the Free and Team plans are cloud-only. If you are still evaluating,
+try Kryptic on a cloud plan first - self-hosting is bought, not trialled.
+
+## Prerequisites
+
+- Docker with Compose v2
+- A host with 2 GB of RAM to spare
+- (production) A reverse proxy terminating TLS in front of the exposed ports
+
+## 1. Configure
+
+```bash
+cp .env.example .env
+```
+
+```bash
+# .env
+POSTGRES_PASSWORD=$(openssl rand -hex 24)
+TOKEN_KEY=$(openssl rand -hex 48)          # JWT signing key, 64+ chars
+MASTER_KEY=$(openssl rand -base64 32)      # encryption master key, exactly 32 bytes
+MASTER_KEY_ID=key_master_v1
+DEPLOYMENT_SELFHOSTED=true
+LICENSING__LICENSEKEY=KRYPTIC-...                # your Business or Enterprise key
+MANAGEMENT_CLIENT_URL=https://kryptic.example.com
+PUBLIC_API_URL=https://api.kryptic.example.com
+PUBLIC_DAEMON_BFF_URL=https://daemon.kryptic.example.com
+```
+
+<Warning>
+  Back up `MASTER_KEY` somewhere safe. Secrets are encrypted under it (via per-org data
+  keys) - losing it means losing every stored secret. Rotation is supported: set a new
+  `MASTER_KEY`, move the old one to `OldMasterKeys__<keyId>`, restart, and the platform
+  rewraps all org keys automatically.
+</Warning>
+
+## 2. Start
+
+```bash
+docker compose up -d
+```
+
+| Service | Port | Purpose |
+| --- | --- | --- |
+| management client | 8080 | The dashboard your team signs into |
+| Management API | 5210 | Serves the dashboard |
+| Daemon BFF | 5211 | What developer daemons talk to |
+| Pipelines BFF | 5212 | CI/CD machine identities |
+| Secrets API | 5213 | Public REST API v1 |
+
+The Management API runs database migrations on startup; the other hosts wait for it.
+
+## 3. Create your organization
+
+Open the dashboard, register the first organization, invite your team. Then point
+developer daemons at your deployment:
+
+```bash
+KRYPTIC_API=https://daemon.kryptic.example.com kryptic login
+```
+
+## Operations
+
+- **Backups** - PostgreSQL is the only stateful service (`pgdata` volume). Standard
+  `pg_dump` on your schedule.
+- **Upgrades** - `docker compose pull && docker compose up -d`. Migrations apply
+  automatically.
+- **Licence expiry** - on expiry the deployment keeps working for a 30-day grace window,
+  then goes read-only: secrets stay readable, writes are refused. Reads never stop, in any
+  state. The grace month is billed on renewal.
+- **Multi-instance** - the Daemon BFF uses Redis for device logins and rate limits, so
+  API hosts can scale horizontally behind your proxy.
+
+<Note>
+  A Helm chart with the same topology is available for Kubernetes deployments - see the
+  repository's `helm/` directory.
+</Note>

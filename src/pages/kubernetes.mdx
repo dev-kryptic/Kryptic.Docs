@@ -1,0 +1,103 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Sync Kryptic secrets into native Kubernetes Secrets with the KrypticSecret operator.'
+
+# Kubernetes operator
+
+Declare a `KrypticSecret` and the operator keeps a native Kubernetes `Secret` in
+sync with a Kryptic project environment. No init containers, no sidecars, and no
+secrets in your manifests.
+
+## Install
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/operator.yaml
+```
+
+Create a [machine identity](/machine-identities) in the dashboard, then store
+its credentials in the namespace where your `KrypticSecret`s will live:
+
+```bash
+kubectl create secret generic kryptic-machine-credentials \
+  --from-literal=clientId=kmi_xxxxxxxxxxxxxxxx \
+  --from-literal=clientSecret=<the one-time secret>
+```
+
+Self-hosted platforms add `--from-literal=apiUrl=https://pipelines.kryptic.example.com`.
+
+## Declare a secret
+
+```yaml
+apiVersion: kryptic.dev/v1
+kind: KrypticSecret
+metadata:
+  name: backend-secrets
+spec:
+  projectId: proj_a1b2c3d4e5f6
+  environment: production
+  secretName: backend-env
+  refreshInterval: 5m
+  auth:
+    secretRef:
+      name: kryptic-machine-credentials
+```
+
+Consume it like any other Secret:
+
+```yaml
+envFrom:
+  - secretRef:
+      name: backend-env
+```
+
+## Checking status
+
+```bash
+kubectl get krypticsecrets
+```
+
+```
+NAME              PROJECT             ENVIRONMENT   SECRET        KEYS   READY   AGE
+backend-secrets   proj_a1b2c3d4e5f6   production    backend-env   3      True    2m
+```
+
+When `READY` is `False`, the `Ready` condition carries the reason:
+
+```bash
+kubectl get krypticsecret backend-secrets -o jsonpath='{.status.conditions[0]}'
+```
+
+## Behavior you can rely on
+
+| Situation | What happens |
+| --- | --- |
+| You delete the `KrypticSecret` | The Secret is garbage-collected with it (owner reference) |
+| A key is deleted in Kryptic | It disappears from the Secret on the next sync |
+| The platform is unreachable | The Secret keeps its **last known good values** - a running workload is never emptied by an outage |
+| Bad credentials or unknown project | Not Ready with `ConfigurationError`, backing off 10 minutes instead of hammering the API |
+| A Secret with that name already exists | The operator **refuses to overwrite it** and reports why |
+
+<Warning>
+  Kubernetes Secrets are base64-encoded, not encrypted, unless you have enabled
+  encryption at rest in etcd. The operator delivers your secrets into the
+  cluster's own storage model - harden etcd accordingly.
+</Warning>
+
+## Options
+
+| Field | Default | Notes |
+| --- | --- | --- |
+| `spec.projectId` | required | Project public id from `kryptic.json` |
+| `spec.environment` | required | Environment slug |
+| `spec.secretName` | resource name | Target Kubernetes Secret |
+| `spec.refreshInterval` | `5m` | Values below 30s are ignored |
+| `spec.keys` | all | Restrict which keys are synced |
+| `spec.template.type` | `Opaque` | Type of the produced Secret |
+| `spec.template.labels` / `.annotations` | - | Merged onto the produced Secret |
+
+<Note>
+  The operator watches every namespace by default. Set `WATCH_NAMESPACE` on the
+  deployment to scope it to one.
+</Note>
