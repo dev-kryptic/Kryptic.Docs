@@ -1,0 +1,71 @@
+import { Note, Properties, Property } from '@/components/mdx'
+
+export const description = 'kryptic.json schema and the environment variables every package honors.'
+
+# Configuration reference
+
+## kryptic.json
+
+The per-repository project file. It contains no secrets and is committed to version
+control. Every package finds it by walking up from the current working directory, so it
+also works from subdirectories and monorepo packages.
+
+```json
+{
+  "projectId": "proj_a1b2c3d4e5f6",
+  "defaultEnvironment": "development"
+}
+```
+
+<Properties>
+  <Property name="projectId" type="string" required>
+    The project's public id (`proj_` + 12 hex characters), shown on the project page in
+    the dashboard. Identifies which project's secrets to fetch.
+  </Property>
+  <Property name="defaultEnvironment" type="string">
+    The environment the daemon serves when nothing overrides it. Defaults to
+    `development`.
+  </Property>
+</Properties>
+
+## Environment variables
+
+Every package honors the same set - environment variables always win over
+`kryptic.json` and over options passed in code.
+
+<Properties>
+  <Property name="KRYPTIC_PROJECT_ID" type="string">
+    Override the project id from kryptic.json.
+  </Property>
+  <Property name="KRYPTIC_ENV" type="string">
+    Override the environment to fetch (e.g. `staging`).
+  </Property>
+  <Property name="KRYPTIC_SOCKET_PATH" type="string">
+    Override the daemon endpoint. Default: `/tmp/kryptic-daemon.sock` on macOS,
+    `$XDG_RUNTIME_DIR/kryptic-daemon.sock` on Linux, `\\.\pipe\kryptic-daemon` on
+    Windows. Tests use this to point packages at a mock daemon.
+  </Property>
+  <Property name="KRYPTIC_TIMEOUT_MS" type="number">
+    Daemon connection timeout in milliseconds. Default `2000`.
+  </Property>
+  <Property name="KRYPTIC_DISABLED" type="boolean">
+    `true` force-disables injection everywhere, before any socket I/O.
+  </Property>
+  <Property name="KRYPTIC_SILENT" type="boolean">
+    `true` suppresses the one-line warning when the daemon is absent.
+  </Property>
+</Properties>
+
+<Note>
+  Packages are development-only by design: each one checks its runtime's idiomatic
+  environment signal (`NODE_ENV`, `ASPNETCORE_ENVIRONMENT`, `RAILS_ENV`, `CPP_ENV`, …) and becomes
+  a no-op in production and staging.
+</Note>
+
+## Daemon variables
+
+<Properties>
+  <Property name="KRYPTIC_API" type="string">
+    Point the daemon at a self-hosted platform (default `https://daemon.kryptic.dev`).
+  </Property>
+</Properties>

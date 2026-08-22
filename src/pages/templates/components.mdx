@@ -1,0 +1,148 @@
+import {
+  Note,
+  Warning,
+  Success,
+  Row,
+  Col,
+  Properties,
+  Property,
+  Badge,
+  CodeGroup,
+} from '@/components/mdx'
+import { Tiles } from '@/components/Tiles'
+import { Button } from '@/components/Button'
+import { Tag } from '@/components/Tag'
+
+export const description =
+  'Reference for all MDX components available in Kryptic docs.'
+
+# Component reference
+
+Copy patterns from this page when writing new documentation.
+
+## Alerts
+
+<Note>
+  **Note** - informational content with the Kryptic accent theme.
+</Note>
+
+<Warning>
+  **Warning** - important cautions, breaking changes, or security considerations.
+</Warning>
+
+<Success>
+  **Success** - confirmations and completed steps.
+</Success>
+
+## Buttons
+
+<div className="not-prose flex flex-wrap gap-3 my-6">
+  <Button href="https://kryptic.dev/" arrow="right">Primary</Button>
+  <Button href="/get-started" variant="outline-arrow" arrow="right">Outline</Button>
+  <Button href="/" variant="secondary">Secondary</Button>
+  <Button href="/" variant="text" arrow="right">Text link</Button>
+</div>
+
+## Tiles (cards)
+
+Hover the cards to see the Kryptic accent glow.
+
+<Tiles
+  title="Example tile grid"
+  id="example-tiles"
+  items={[
+    {
+      href: '/get-started',
+      name: 'Quickstart',
+      description: 'Step-by-step guide template with code blocks and callouts.',
+    },
+    {
+      href: '/',
+      name: 'Introduction',
+      description: 'Landing page template with hero buttons and tile navigation.',
+    },
+  ]}
+/>
+
+## Code blocks
+
+Inline `code` and fenced blocks with syntax highlighting:
+
+```bash
+kryptic status
+kryptic secrets list
+```
+
+<CodeGroup>
+```bash title="Install (.NET)"
+dotnet add package krypticdev
+```
+
+```bash title="Install (Node.js)"
+npm install --save-dev krypticdev
+```
+</CodeGroup>
+
+## Two-column layout
+
+<Row>
+  <Col>
+    ### Left column
+
+    Use `Row` and `Col` for side-by-side content. Add `sticky` to `Col` for a pinned sidebar column on wide screens.
+  </Col>
+  <Col sticky>
+    ```json
+    {
+      "projectId": "proj_example",
+      "defaultEnvironment": "development"
+    }
+    ```
+  </Col>
+</Row>
+
+## API-style properties
+
+Useful for config reference and API endpoint docs.
+
+<Properties>
+  <Property name="projectId" type="string" required>
+    Your Kryptic project identifier from the dashboard.
+  </Property>
+  <Property name="defaultEnvironment" type="string">
+  Environment to fetch secrets from when `KRYPTIC_ENV` is not set.
+  </Property>
+  <Property name="timeout" type="number" min={100} max={10000}>
+    Daemon connection timeout in milliseconds.
+  </Property>
+</Properties>
+
+## Badges
+
+<div className="not-prose flex flex-wrap gap-2 my-6">
+  <Badge status="cloud-only" text="Cloud" hoverText="Available on Kryptic Cloud" />
+  <Badge status="experimental" text="Experimental" />
+  <Badge status="warning" text="Beta" />
+  <Badge status="info" text="Info" />
+</div>
+
+## HTTP method tags
+
+Used in API reference pages:
+
+<div className="not-prose flex flex-wrap gap-2 my-6">
+  <Tag>GET</Tag>
+  <Tag>POST</Tag>
+  <Tag>PUT</Tag>
+  <Tag>DELETE</Tag>
+</div>
+
+## Headings with annotations
+
+Headings support MDX annotations for API docs. In your `.mdx` file, write:
+
+```mdx
+## Create a secret { tag: 'POST', label: '/v1/secrets' }
+```
+
+That renders a heading with an HTTP method badge - useful when you add API documentation later.

@@ -1,0 +1,73 @@
+import { Tiles } from '@/components/Tiles'
+import { Button } from '@/components/Button'
+
+export const description =
+  'Documentation for Kryptic - secrets management for developers.'
+
+# Introduction to Kryptic
+
+Kryptic is a developer secrets platform that injects environment variables at runtime - no `.env` files in your repo, no secrets in CI config.
+
+A local daemon authenticates once via your browser, then your apps pull secrets over a local socket at startup. Add a `kryptic.json` to your repo root and one package line - that is the entire integration. Works on macOS, Linux, and Windows.
+
+<div className="not-prose mb-10 mt-6 flex gap-3">
+  <Button href="/get-started" arrow="right">Quickstart</Button>
+  <Button href="https://kryptic.dev/download" variant="outline-arrow" arrow="right">Download the daemon</Button>
+</div>
+
+<img className="imagewrapper-big" src="/screenshots/dashboard.png" alt="The Kryptic dashboard" />
+
+Your team manages projects, environments, access and audit history from the
+dashboard; developers never leave their editor.
+
+<Tiles
+  title="Documentation"
+  id="documentation"
+  items={[
+    {
+      href: '/get-started',
+      name: 'Quickstart',
+      description: 'Install the daemon, sign in once, run your app - about three minutes.',
+    },
+    {
+      href: '/packages/node',
+      name: 'Language packages',
+      description: 'Thin MIT-licensed clients for .NET, Node.js, Python, Java, Go, Ruby, and C++.',
+    },
+    {
+      href: '/cli',
+      name: 'CLI reference',
+      description: 'Every kryptic command: lifecycle, auth, secrets, scanning, self-update.',
+    },
+    {
+      href: '/configuration',
+      name: 'Configuration',
+      description: 'The kryptic.json schema and the environment variables every package honors.',
+    },
+    {
+      href: '/dashboard',
+      name: 'The dashboard',
+      description: 'A tour of every screen: projects, secrets, members, audit and billing.',
+    },
+    {
+      href: '/access-control',
+      name: 'Access control',
+      description: 'Roles, per-environment grants, groups and access requests.',
+    },
+    {
+      href: '/self-hosting',
+      name: 'Self-hosting',
+      description: 'Run the full platform yourself with Docker Compose or Helm.',
+    },
+    {
+      href: '/rest-api',
+      name: 'REST API v1',
+      description: 'Programmatic access to projects and secrets with machine identities.',
+    },
+    {
+      href: '/enterprise/saml',
+      name: 'Enterprise SSO',
+      description: 'SAML 2.0 single sign-on and SCIM 2.0 user provisioning.',
+    },
+  ]}
+/>

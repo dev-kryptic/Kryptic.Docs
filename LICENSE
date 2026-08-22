@@ -1,0 +1,25 @@
+Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C. All rights reserved.
+
+This directory ("the Documentation Site") is proprietary software. It is not open
+source and it is not source-available. No licence to use, copy, modify, merge,
+publish, distribute, sublicense, or sell any part of it is granted by its presence
+in this repository.
+
+The published documentation content served by this site may be read and quoted for
+the purpose of using Kryptic. That permission does not extend to the site's source
+code, its design system, or its assets.
+
+Separate, and unaffected by this notice: the Kryptic encryption engine, the daemon
+and CLI, and the language packages are MIT-licensed open source. The enterprise
+module is source-available under the Kryptic Enterprise License. See DOCUMENTATION.md
+section 11 for the full component licensing breakdown.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Questions: hello@kryptic.dev
