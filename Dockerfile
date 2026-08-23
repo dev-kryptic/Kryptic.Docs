@@ -7,8 +7,7 @@ COPY package.json ./
 RUN npm install
 
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAADcuzyq12TUmiIkX
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 FROM node:22-alpine AS runtime
