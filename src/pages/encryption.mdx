@@ -1,0 +1,74 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'How Kryptic encrypts secrets, what the server can see, and where the open-source engines live.'
+
+# Encryption
+
+Kryptic is a **blind store**. Secret values are encrypted on the client (browser,
+daemon, or CI runner) under a 256-bit organization key that exists in plaintext
+only on clients. The server stores and serves ciphertext it has no path to open.
+
+This is the licensing boundary as well: anything that can see a secret in
+plaintext is open source. The server platform is proprietary
+because it never holds a key that would let it read your values.
+
+## What the server can and cannot see
+
+| Material | Who can open it |
+| --- | --- |
+| Secret envelopes (`v1.<orgKeyId>.…`) | Anyone holding the org key: an unlocked browser vault, an approved daemon device, a granted machine identity |
+| Org-key grants (P-256 sealed boxes) | The recipient whose public key the grant was sealed to |
+| Operational ciphertexts (SSO IdP client secrets, directory credentials) | The server, under a separate data key wrapped by `MASTER_KEY` |
+
+Losing `MASTER_KEY` on a self-hosted install breaks those operational
+ciphertexts (SSO secrets and similar). It does **not** decrypt, or prevent
+clients from decrypting, customer secret values. Those live under the org key.
+Back `MASTER_KEY` up anyway: without it you cannot re-read the platform's own
+stored IdP credentials.
+
+## Organization key
+
+An Owner or Admin initializes encryption in **Settings → Encryption**. The
+browser generates the org key, wraps a copy to the admin's vault, and shows a
+one-time recovery code (Emergency Kit). Later recipients (other members' vaults,
+approved daemon devices, machine identities) receive the org key as a sealed-box
+grant. An admin approves pending grants from the same page.
+
+Rotation is client-side: the admin's browser generates a fresh key, re-encrypts
+current values locally, and re-grants active recipients atomically. Recommended
+after removing a member.
+
+## The three engines
+
+The wire formats (AES-256-GCM envelopes, P-256 sealed boxes, Argon2id) are
+implemented three times so every runtime that touches plaintext uses the same
+bytes. A format change must land in all three repositories in the same release;
+`interop-vectors/` in each repo is the contract.
+
+| Repository | Runtime | Consumed by | Package |
+| --- | --- | --- | --- |
+| [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | .NET | Kryptic Platform (operational ciphertexts only) | NuGet `Kryptic.Encryption` |
+| [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | TypeScript / WebCrypto | Management dashboard | npm `@kryptic-dev/encryption` |
+| [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go | Daemon, CLI (`kryptic ci export`), Kubernetes operator | Go module of the same name |
+
+No custom primitives. AES-256-GCM and P-256 ECDH come from platform cryptography
+(.NET `System.Security.Cryptography`, browser WebCrypto, Go `crypto/ecdh`).
+Argon2id comes from proven libraries. Each engine ships a `SECURITY.md` describing
+the key hierarchy.
+
+Language packages never decrypt. They ask the local daemon over a unix socket or
+named pipe; the daemon already holds plaintext in memory after opening the
+bundle with the Go engine.
+
+<Warning>
+  Do not send secret values to the REST API or Pipelines BFF as plaintext. Writes
+  accept envelopes you encrypted locally. Reads return envelopes plus a
+  `wrappedOrgKey` sealed to the caller. See [REST API v1](/rest-api) and
+  [`kryptic ci export`](/cli#ci-export).
+</Warning>
+
+<Note>
+  An independent third-party review of the encryption engine is planned before
+  general availability. Findings will be published.
+</Note>

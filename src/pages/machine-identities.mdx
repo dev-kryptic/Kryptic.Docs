@@ -15,7 +15,9 @@ without a person being involved.
 
 Dashboard -> **Machine identities** -> **New identity**. Optionally scope it to
 specific projects; an unscoped identity can read every project in the
-organization.
+organization. After creation, an admin grants it the organization key under
+**Settings → Encryption** (the identity cannot decrypt bundles until that grant
+exists).
 
 <Warning>
   The client secret is displayed **exactly once**, at creation. It is stored only
@@ -25,26 +27,33 @@ organization.
 
 ## Using it
 
-Exchange the credentials for a short-lived token, then pull secrets in whatever
-shape your job wants:
+Kryptic is a [blind store](/encryption): the Pipelines BFF returns ciphertext,
+never plaintext. `kryptic ci export` runs the decryption chain on the runner
+(client secret unwraps the machine private key, which opens the org key, which
+opens each envelope) and prints dotenv, shell, or JSON.
 
 ```bash
-TOKEN=$(curl -s -X POST https://pipelines.kryptic.dev/api/token \
-  -H 'Content-Type: application/json' \
-  -d "{\"clientId\":\"$KRYPTIC_CLIENT_ID\",\"clientSecret\":\"$KRYPTIC_CLIENT_SECRET\"}" \
-  | jq -r .accessToken)
+export KRYPTIC_CLIENT_ID=kmi_...
+export KRYPTIC_CLIENT_SECRET=...
+# optional, self-hosted:
+# export KRYPTIC_PIPELINES_API=https://pipelines.kryptic.example.com
 
-curl -s "https://pipelines.kryptic.dev/api/secrets/export?projectPublicId=proj_x&environment=production&format=dotenv" \
-  -H "Authorization: Bearer $TOKEN" > .env
+kryptic ci export --project proj_x --env production --format dotenv > .env
 ```
 
-`format` accepts:
+`--format` accepts:
 
 | Value | Output |
 | --- | --- |
 | `dotenv` (default) | `KEY=value` lines, quoted where needed |
 | `shell` | `export KEY='value'` lines, correctly escaped |
 | `json` | A flat JSON object |
+
+If you are implementing your own client instead of the CLI, exchange credentials
+at `POST https://pipelines.kryptic.dev/api/token`, fetch `GET /api/keys/me` and
+`GET /api/secrets/bundle?projectPublicId=proj_x&environment=production`, then
+decrypt with the [Go encryption engine](https://github.com/dev-kryptic/Kryptic.Encryption.Go).
+The [REST API v1](/rest-api) is the same shape on `https://secrets.kryptic.dev`.
 
 ## GitHub Actions
 
@@ -54,16 +63,13 @@ curl -s "https://pipelines.kryptic.dev/api/secrets/export?projectPublicId=proj_x
     KRYPTIC_CLIENT_ID: ${{ secrets.KRYPTIC_CLIENT_ID }}
     KRYPTIC_CLIENT_SECRET: ${{ secrets.KRYPTIC_CLIENT_SECRET }}
   run: |
-    TOKEN=$(curl -s -X POST https://pipelines.kryptic.dev/api/token \
-      -H 'Content-Type: application/json' \
-      -d "{\"clientId\":\"$KRYPTIC_CLIENT_ID\",\"clientSecret\":\"$KRYPTIC_CLIENT_SECRET\"}" \
-      | jq -r .accessToken)
-    curl -s "https://pipelines.kryptic.dev/api/secrets/export?projectPublicId=proj_x&environment=production&format=shell" \
-      -H "Authorization: Bearer $TOKEN" >> "$GITHUB_ENV"
+    curl -fsSL https://kryptic.dev/install.sh | sh
+    eval "$(kryptic ci export --project proj_x --env production --format shell)"
 ```
 
-The dashboard generates this snippet pre-filled for GitHub Actions, GitLab CI
-and plain shell.
+The dashboard can generate a GitHub Actions, GitLab CI or shell snippet pre-filled
+with the project id. Prefer `kryptic ci export` over calling the bundle endpoint
+yourself: it is the path that actually decrypts.
 
 ## Lifecycle
 

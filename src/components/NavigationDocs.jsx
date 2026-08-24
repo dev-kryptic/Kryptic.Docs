@@ -34,6 +34,7 @@ export const docsNavigation = [
       { title: 'Go', href: '/packages/go' },
       { title: 'Ruby', href: '/packages/ruby' },
       { title: 'C++', href: '/packages/cpp' },
+      { title: 'Rust', href: '/packages/rust' },
     ],
   },
   {
@@ -56,6 +57,7 @@ export const docsNavigation = [
   {
     title: 'PLATFORM',
     links: [
+      { title: 'Encryption', href: '/encryption' },
       { title: 'Self-hosting', href: '/self-hosting' },
       { title: 'Kubernetes operator', href: '/kubernetes' },
     ],
@@ -76,6 +78,7 @@ export function NavigationDocs({ className }) {
       <ul role="list">
         <TopLevelNavItem href="https://kryptic.dev/">Home</TopLevelNavItem>
         <TopLevelNavItem href="/">Docs</TopLevelNavItem>
+        <TopLevelNavItem href="https://kryptic.dev/download">Download</TopLevelNavItem>
         <TopLevelNavItem href="https://kryptic.dev/features">Features</TopLevelNavItem>
         <TopLevelNavItem href="https://kryptic.dev/pricing">Pricing</TopLevelNavItem>
         <TopLevelNavItem href="https://github.com/dev-kryptic">

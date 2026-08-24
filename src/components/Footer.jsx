@@ -1,4 +1,4 @@
-import {forwardRef, Fragment, useEffect, useRef, useState} from 'react'
+import {forwardRef, Fragment, useEffect, useState} from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
@@ -7,7 +7,6 @@ import { Button } from '@/components/Button'
 import { docsNavigation } from '@/components/NavigationDocs'
 import { flattenNavItems } from '@/components/NavigationShared'
 import { publicApiUrl } from '@/lib/public-api'
-import { loadTurnstile, turnstileSiteKey } from '@/lib/turnstile'
 
 function CheckIcon(props) {
   return (
@@ -71,7 +70,7 @@ function storageKey(path) {
   return `docs-feedback:${path}`
 }
 
-function sendFeedback({ pageName, pageUrl, helpful, comment, token }) {
+function sendFeedback({ pageName, pageUrl, helpful, comment }) {
   return fetch(`${publicApiUrl()}/api/feedback`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -80,7 +79,6 @@ function sendFeedback({ pageName, pageUrl, helpful, comment, token }) {
       pageUrl,
       helpful,
       ...(comment ? { comment } : {}),
-      'cf-turnstile-response': token,
     }),
   })
 }
@@ -89,8 +87,6 @@ function Feedback({ path, pageTitle }) {
   let [submitted, setSubmitted] = useState(false)
   let [askComment, setAskComment] = useState(false)
   let [comment, setComment] = useState('')
-  let host = useRef(null)
-  let widgetId = useRef(null)
 
   useEffect(() => {
     try {
@@ -101,37 +97,6 @@ function Feedback({ path, pageTitle }) {
       // Ignore private-mode storage failures.
     }
   }, [path])
-
-  useEffect(() => {
-    if (!turnstileSiteKey || submitted) return
-    let cancelled = false
-    loadTurnstile()
-      .then(() => {
-        if (cancelled || !host.current || !window.turnstile || widgetId.current) return
-        widgetId.current = window.turnstile.render(host.current, {
-          sitekey: turnstileSiteKey,
-          action: 'feedback',
-        })
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-      if (widgetId.current && window.turnstile) {
-        window.turnstile.remove(widgetId.current)
-        widgetId.current = null
-      }
-    }
-  }, [path, submitted])
-
-  function token() {
-    return window.turnstile?.getResponse(widgetId.current ?? undefined) || ''
-  }
-
-  function resetTurnstile() {
-    if (widgetId.current && window.turnstile) {
-      window.turnstile.reset(widgetId.current)
-    }
-  }
 
   function finish() {
     setAskComment(false)
@@ -144,18 +109,12 @@ function Feedback({ path, pageTitle }) {
   }
 
   function submitVote(helpful, note) {
-    const response = token()
-    if (turnstileSiteKey && !response) {
-      resetTurnstile()
-      return
-    }
     finish()
     sendFeedback({
       pageName: pageTitle || path,
       pageUrl: path,
       helpful,
       comment: note,
-      token: response,
     }).catch(() => {
       // Storage is best-effort; the thanks state still stands.
     })
@@ -228,9 +187,6 @@ function Feedback({ path, pageTitle }) {
       >
         <FeedbackThanks />
       </Transition>
-      {!submitted && turnstileSiteKey ? (
-        <div ref={host} className="pt-3" />
-      ) : null}
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 Documentation site for [Kryptic](https://kryptic.dev), built with [Next.js](https://nextjs.org/) and MDX.
 The production URL is [docs.kryptic.dev](https://docs.kryptic.dev).
+Source: [github.com/dev-kryptic/Kryptic.Docs](https://github.com/dev-kryptic/Kryptic.Docs).
 
 ## GitHub secrets
 

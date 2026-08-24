@@ -28,9 +28,9 @@ also works from subdirectories and monorepo packages.
   </Property>
 </Properties>
 
-## Environment variables
+## Environment variables (packages)
 
-Every package honors the same set - environment variables always win over
+Every language package honors the same set. Environment variables always win over
 `kryptic.json` and over options passed in code.
 
 <Properties>
@@ -57,15 +57,32 @@ Every package honors the same set - environment variables always win over
 </Properties>
 
 <Note>
-  Packages are development-only by design: each one checks its runtime's idiomatic
-  environment signal (`NODE_ENV`, `ASPNETCORE_ENVIRONMENT`, `RAILS_ENV`, `CPP_ENV`, …) and becomes
-  a no-op in production and staging.
+  Packages are development-only by design. Each one checks its runtime's idiomatic
+  environment signal and becomes a no-op outside development:
+
+  - **Node.js:** `NODE_ENV` set to anything other than `development`
+  - **.NET:** `ASPNETCORE_ENVIRONMENT` / `DOTNET_ENVIRONMENT` not `Development`
+  - **Python / Go / Ruby / C++ / Rust / Java:** `production`, `prod`, or `staging` in
+    the language's usual env vars (`RAILS_ENV`, `GO_ENV`, `RUST_ENV`, `SPRING_PROFILES_ACTIVE`, …)
 </Note>
 
-## Daemon variables
+## Daemon and CLI
 
 <Properties>
   <Property name="KRYPTIC_API" type="string">
-    Point the daemon at a self-hosted platform (default `https://daemon.kryptic.dev`).
+    Point the daemon at a self-hosted (or local) Daemon BFF. Overrides the URL saved
+    by `kryptic config set-api`. Default `https://daemon.kryptic.dev`. Local compose
+    uses `http://localhost:5211`.
+  </Property>
+  <Property name="KRYPTIC_CLIENT_ID" type="string">
+    Machine identity client id (`kmi_…`). Required by `kryptic ci export`.
+  </Property>
+  <Property name="KRYPTIC_CLIENT_SECRET" type="string">
+    Machine identity client secret. Required by `kryptic ci export`. Shown once at
+    creation in the dashboard.
+  </Property>
+  <Property name="KRYPTIC_PIPELINES_API" type="string">
+    Override the Pipelines BFF URL used by `kryptic ci export`. Default
+    `https://pipelines.kryptic.dev`. Self-hosted compose uses `http://localhost:5212`.
   </Property>
 </Properties>

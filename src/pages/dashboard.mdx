@@ -23,8 +23,9 @@ enabled - those buttons appear only for providers that are actually configured.
 The dashboard is the operational summary: member, project, secret and active
 daemon counts; a live activity monitor; trials and invitations that are about to
 expire; access requests you can approve without leaving the page; and a CI
-client generator that emits ready-to-paste GitHub Actions, GitLab CI or shell
-snippets.
+client generator for GitHub Actions, GitLab CI or shell. Prefer
+[`kryptic ci export`](/cli#ci-export) in those snippets: the
+platform serves ciphertext, and the CLI decrypts on the runner.
 
 The top bar carries a jump-to-project search, a notifications bell, and the
 theme toggle.
@@ -42,12 +43,13 @@ A project maps to a repository. Creating one auto-creates the `development`,
 
 Rows are keys, columns are environments. **Values are never sent to the browser
 by default** - cells are masked, and revealing one is an explicit, audit-logged
-call to a dedicated endpoint.
+call that decrypts in the browser under the org key.
 
 <img className="imagewrapper-big" src="/screenshots/project-secret-revealed.png" alt="A revealed secret" />
 
 Each cell offers reveal, copy, version history with restore, and delete. The
-toolbar handles `.env` import and per-environment export.
+toolbar handles `.env` import and per-environment export. Import encrypts in
+the browser before upload.
 
 ### Environments
 
@@ -91,7 +93,8 @@ survives staff changes: you manage membership, not a dozen individual grants.
 
 Credentials for CI/CD and other non-human callers. The client secret is shown
 **exactly once** at creation and stored only as an Argon2id hash. Identities can
-be scoped to specific projects, rotated, and deactivated.
+be scoped to specific projects, rotated, and deactivated. After creation they
+need an org-key grant from **Settings → Encryption** before they can decrypt.
 
 ## Daemon sessions
 
@@ -116,21 +119,34 @@ reveal entry names the key and environment, never the secret.
 Paste file content or a git patch and scan it against 222 gitleaks rules. The
 same engine runs fully offline in the CLI - see [`kryptic scan`](/cli#secret-scanning).
 
+## Integrations
+
+OAuth, SAML and SCIM live under **Integrations**, not Settings.
+
+<img className="imagewrapper-big" src="/screenshots/settings-idp.png" alt="Identity providers" />
+
+- **Single sign-on** - connect the organization's own OAuth apps (Google,
+  Microsoft, GitHub) and claim an email domain for auto-provisioning.
+- **Directory import** - pull users and groups from Microsoft Entra (and Google
+  Workspace when configured).
+- **SAML 2.0** - Okta, JumpCloud, or a generic SAML 2.0 provider. Connecting
+  Okta issues a SCIM token in the same step. See [Set up Okta](/enterprise/okta).
+- **Provisioning** - SCIM 2.0 token issue and revoke. See [SCIM](/enterprise/scim).
+
+The stored OAuth client secret is encrypted with the organization's operational
+data key, not the client-held org key.
+
 ## Settings
 
 <img className="imagewrapper-big" src="/screenshots/settings-general.png" alt="Organization settings" />
 
-Organization profile, billing email, and the session expiry policy that caps how
-long any login stays valid regardless of refreshes.
+**General** holds the organization profile, billing email, and the session expiry
+policy that caps how long any login stays valid regardless of refreshes.
 
-### Identity providers
-
-<img className="imagewrapper-big" src="/screenshots/settings-idp.png" alt="Identity providers" />
-
-Connect your organization's own IdP, claim an email domain for
-auto-provisioning, and (for Microsoft Entra) import users and groups from the
-directory. The stored OAuth client secret is encrypted with your organization's
-data key.
+**Encryption** is where an Owner or Admin initializes the org key, downloads the
+Emergency Kit, unlocks the vault, rotates the key, and approves pending grants
+to members, devices and machine identities. Every cryptographic operation runs
+in the browser. See [Encryption](/encryption).
 
 ### Plans and billing
 

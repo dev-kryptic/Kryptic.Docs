@@ -5,7 +5,10 @@ export const description = 'Reference for every kryptic CLI command.'
 # CLI reference
 
 The `kryptic` binary is both the daemon and its CLI - one file, no dependencies,
-macOS/Linux/Windows.
+macOS/Linux/Windows. Source:
+[github.com/dev-kryptic/Kryptic.Daemon](https://github.com/dev-kryptic/Kryptic.Daemon).
+Install it from [kryptic.dev/download](https://kryptic.dev/download).
+Linux can also run `curl -fsSL https://kryptic.dev/install.sh | sh`. Then `kryptic login`.
 
 ## Daemon lifecycle
 
@@ -13,10 +16,12 @@ macOS/Linux/Windows.
 kryptic start    # run the daemon in the foreground (the service manager calls this)
 kryptic stop     # stop the running daemon (pidfile-based, graceful)
 kryptic status   # is the daemon up, and who is signed in
+kryptic flush    # drop the daemon's 5-minute in-memory secrets cache
 ```
 
 `start` refuses to run when another daemon already holds the pidfile; `stop` cleans up
-stale pidfiles left by crashes.
+stale pidfiles left by crashes. `flush` is what you want after rotating a secret and
+needing the next local run to see it immediately.
 
 ## Authentication
 
@@ -30,18 +35,48 @@ kryptic logout   # revoke this device's session
 Windows Credential Manager, or libsecret on Linux (0600 file fallback when no store
 is available).
 
+## Server URL
+
+```bash
+kryptic config                 # show the Daemon BFF URL and where it came from
+kryptic config set-api URL     # point this machine at a self-hosted (or local) BFF
+kryptic config reset-api       # return to https://daemon.kryptic.dev
+```
+
+Changing the saved URL signs you out, because tokens belong to one server.
+`KRYPTIC_API` overrides the saved value without writing it, which is how local
+development points at `http://localhost:5211`.
+
 ## Secrets
 
 ```bash
 kryptic secrets list                                   # projects and environments you can pull
 kryptic secrets get DATABASE_URL --project proj_x --env development
-kryptic flush                                          # drop the daemon's 5-minute cache
+kryptic secrets export --project proj_x --env development   # dotenv on stdout, decrypted locally
 ```
 
 <Note>
-  `secrets get` prints the value to stdout for piping into other tools. Reads go through
-  the same server-side access checks and audit logging as every other client.
+  `secrets get` prints the value to stdout for piping into other tools. `secrets export`
+  prints a dotenv of the whole environment. Both go through the running daemon: the
+  platform only ever served ciphertext, and decryption happened on this machine.
+  Reads use the same server-side access checks and audit logging as every other client.
 </Note>
+
+## CI export
+
+Pipelines do not talk to the daemon. They authenticate as a
+[machine identity](/machine-identities) and decrypt locally:
+
+```bash
+export KRYPTIC_CLIENT_ID=kmi_...
+export KRYPTIC_CLIENT_SECRET=...
+kryptic ci export --project proj_x --env production [--format dotenv|shell|json]
+```
+
+`KRYPTIC_PIPELINES_API` overrides the Pipelines BFF URL (default
+`https://pipelines.kryptic.dev`). There is no server-side plaintext export: the BFF
+returns ciphertext plus the machine's sealed org-key grant, and `kryptic ci` opens
+them with the [Go encryption engine](/encryption).
 
 ## Secret scanning
 
@@ -63,11 +98,15 @@ kryptic scan --staged
 ## Updating
 
 ```bash
-kryptic update    # self-update from the latest GitHub release
 kryptic version
+kryptic update              # replace this binary with the latest published build
+kryptic update --check      # report whether a newer release exists (exit 2 if so)
+kryptic update --installer  # download the signed installer and open it
 ```
 
 <Warning>
-  `update` downloads the binary for your platform and verifies it against the release's
-  `checksums.txt` before replacing the executable - it refuses to update unverified.
+  `update` replaces this binary with the latest published build and verifies it against
+  `checksums.txt` before swapping the file. If you installed with the macOS `.pkg` or the
+  Windows setup, prefer [kryptic.dev/download](https://kryptic.dev/download) or
+  `kryptic update --installer` instead.
 </Warning>

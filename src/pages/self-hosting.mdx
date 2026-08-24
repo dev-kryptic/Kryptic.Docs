@@ -1,11 +1,12 @@
 import { Note, Warning } from '@/components/mdx'
 
-export const description = 'Run the full Kryptic platform yourself with Docker Compose.'
+export const description = 'Run the full Kryptic platform yourself with Docker Compose or Helm.'
 
 # Self-hosting
 
-The whole platform - PostgreSQL, Redis, four API hosts, and the management dashboard -
-runs from one `docker-compose.yml`.
+The whole platform - PostgreSQL, Redis, the API hosts, the management dashboard,
+and the public site - runs from one `docker-compose.yml`. Images for Kubernetes
+are published at `ghcr.io/dev-kryptic`.
 
 Self-hosting requires a **Business or Enterprise licence key**. There is no free
 self-hosted tier: the Free and Team plans are cloud-only. If you are still evaluating,
@@ -27,20 +28,32 @@ cp .env.example .env
 # .env
 POSTGRES_PASSWORD=$(openssl rand -hex 24)
 TOKEN_KEY=$(openssl rand -hex 48)          # JWT signing key, 64+ chars
-MASTER_KEY=$(openssl rand -base64 32)      # encryption master key, exactly 32 bytes
+MASTER_KEY=$(openssl rand -base64 32)      # operational master key, exactly 32 bytes
 MASTER_KEY_ID=key_master_v1
-DEPLOYMENT_SELFHOSTED=true
-LICENSING__LICENSEKEY=KRYPTIC-...                # your Business or Enterprise key
 MANAGEMENT_CLIENT_URL=https://kryptic.example.com
 PUBLIC_API_URL=https://api.kryptic.example.com
 PUBLIC_DAEMON_BFF_URL=https://daemon.kryptic.example.com
 ```
 
+On every API host, also set the self-host gate (ASP.NET Core nested config, so
+double underscores):
+
+```bash
+Deployment__SelfHosted=true
+Licensing__LicenseKey=KRYPTIC-...          # your Business or Enterprise key
+```
+
+A deployment with no valid key does not fall back to the Free plan. It goes
+read-only: secrets stay readable, writes are refused. Reads never stop.
+
 <Warning>
-  Back up `MASTER_KEY` somewhere safe. Secrets are encrypted under it (via per-org data
-  keys) - losing it means losing every stored secret. Rotation is supported: set a new
-  `MASTER_KEY`, move the old one to `OldMasterKeys__<keyId>`, restart, and the platform
-  rewraps all org keys automatically.
+  Back up `MASTER_KEY`. It wraps the platform's operational data keys (SSO IdP
+  credentials, directory-sync secrets). Losing it means those settings cannot be
+  read back. Customer secret *values* are end-to-end encrypted under a
+  client-held organization key and are not recoverable via `MASTER_KEY` - see
+  [Encryption](/encryption). Rotation is supported: set a new `MASTER_KEY`, move
+  the old one to `OldMasterKeys__<keyId>`, restart, and the platform rewraps
+  operational data keys automatically.
 </Warning>
 
 ## 2. Start
@@ -51,27 +64,41 @@ docker compose up -d
 
 | Service | Port | Purpose |
 | --- | --- | --- |
+| public site | 3000 | Marketing site and daemon download redirects |
 | management client | 8080 | The dashboard your team signs into |
-| Management API | 5210 | Serves the dashboard |
+| Management API | 5210 | Serves the dashboard; runs migrations on startup |
 | Daemon BFF | 5211 | What developer daemons talk to |
 | Pipelines BFF | 5212 | CI/CD machine identities |
 | Secrets API | 5213 | Public REST API v1 |
+| Public API | 5214 | Anonymous docs feedback, newsletter, contact |
 
-The Management API runs database migrations on startup; the other hosts wait for it.
+The other API hosts wait for the Management API. Because the Daemon BFF keeps
+device logins and rate-limit state in Redis, API hosts can scale horizontally
+behind your proxy.
 
 ## 3. Create your organization
 
-Open the dashboard, register the first organization, invite your team. Then point
-developer daemons at your deployment:
+Open the dashboard, register the first organization, then initialize encryption
+under **Settings → Encryption** before anyone stores secrets. Invite your team.
+Point developer daemons at your deployment:
 
 ```bash
-KRYPTIC_API=https://daemon.kryptic.example.com kryptic login
+kryptic config set-api https://daemon.kryptic.example.com
+kryptic login
 ```
+
+`KRYPTIC_API` overrides the saved URL without writing it, which is useful for a
+one-off local BFF (`http://localhost:5211`). Changing the saved URL signs you
+out, because tokens belong to one server.
+
+CI runners use `KRYPTIC_PIPELINES_API` (compose: `http://localhost:5212`) with
+[`kryptic ci export`](/cli#ci-export).
 
 ## Operations
 
 - **Backups** - PostgreSQL is the only stateful service (`pgdata` volume). Standard
-  `pg_dump` on your schedule.
+  `pg_dump` on your schedule. Also back up `MASTER_KEY` and the Emergency Kit
+  shown at org-key setup, in two different places.
 - **Upgrades** - `docker compose pull && docker compose up -d`. Migrations apply
   automatically.
 - **Licence expiry** - on expiry the deployment keeps working for a 30-day grace window,
@@ -80,7 +107,27 @@ KRYPTIC_API=https://daemon.kryptic.example.com kryptic login
 - **Multi-instance** - the Daemon BFF uses Redis for device logins and rate limits, so
   API hosts can scale horizontally behind your proxy.
 
+## Helm
+
+A Helm chart with the same topology lives in the platform's `helm/` directory.
+Images default to `ghcr.io/dev-kryptic`. It routes:
+
+| Host | Service |
+| --- | --- |
+| `kryptic.example.com` | management dashboard |
+| `api.kryptic.example.com` | Management API |
+| `daemon.kryptic.example.com` | Daemon BFF |
+| `pipelines.kryptic.example.com` | Pipelines BFF |
+| `secrets.kryptic.example.com` | Secrets API v1 |
+| `public-api.kryptic.example.com` | Public API |
+
+Pass `Deployment__SelfHosted` and `Licensing__LicenseKey` through `extraEnv` on
+the API hosts. External PostgreSQL and Redis are supported by disabling the
+in-chart databases.
+
 <Note>
-  A Helm chart with the same topology is available for Kubernetes deployments - see the
-  repository's `helm/` directory.
+  The Terraform module and the air-gapped installation bundle are not shipped
+  yet. Offline licence validation already works: the key is self-contained and
+  verified against an embedded public key, so an online install and an
+  air-gapped one run the identical routine.
 </Note>
