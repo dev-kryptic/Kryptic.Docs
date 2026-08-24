@@ -4,20 +4,24 @@ export const description = 'The Kryptic Ruby package - Kryptic.inject! into ENV.
 
 # Ruby
 
-The `krypticdev` gem injects your project's secrets into `ENV` during development
-startup. Outside development it is a no-op, and it never raises.
+The `kryptic-daemon-client` gem injects your project's secrets into `ENV` during
+development startup. Outside development it is a no-op, and it never raises.
+
+Source: [github.com/dev-kryptic/Kryptic.Ruby](https://github.com/dev-kryptic/Kryptic.Ruby).
+`require "kryptic"` loads the `Kryptic` module.
 
 ## Install
 
 ```ruby
 # Gemfile
-gem "krypticdev", group: :development
+gem "kryptic-daemon-client", group: :development
 ```
 
 ## Use
 
 ```ruby
 # config/application.rb (Rails) or the top of your entry point
+require "kryptic"
 Kryptic.inject! if Rails.env.development?
 
 ENV["DATABASE_URL"]

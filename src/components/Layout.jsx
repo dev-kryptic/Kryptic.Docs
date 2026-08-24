@@ -138,7 +138,7 @@ export function Layout({ children, tableOfContents, title }) {
             <li key="edit-on-github">
               <Link
                 href={
-                  'https://github.com/dev-kryptic/docs/tree/main/src/pages' +
+                  'https://github.com/dev-kryptic/Kryptic.Docs/tree/main/src/pages' +
                   (EDIT_ON_GITHUB_INDEX_ROUTES.has(router.pathname)
                     ? router.pathname + '/index.mdx'
                     : router.pathname + '.mdx')

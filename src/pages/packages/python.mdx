@@ -4,21 +4,24 @@ export const description = 'The Kryptic Python package - inject() into os.enviro
 
 # Python
 
-`krypticdev` injects your project's secrets into `os.environ` during development startup.
-Outside development it is a no-op, and it never raises.
+`kryptic-daemon-client` injects your project's secrets into `os.environ` during
+development startup. Outside development it is a no-op, and it never raises.
+
+Source: [github.com/dev-kryptic/Kryptic.Python](https://github.com/dev-kryptic/Kryptic.Python).
+The import name is `kryptic`.
 
 ## Install
 
 ```bash
-pip install krypticdev
+pip install kryptic-daemon-client
 ```
 
 ## Use
 
 ```python
 # top of manage.py / main.py / wsgi.py - before anything reads os.environ
-import krypticdev
-krypticdev.inject()
+import kryptic
+kryptic.inject()
 
 import os
 db_url = os.environ["DATABASE_URL"]
@@ -37,7 +40,7 @@ Works with Django, Flask, FastAPI, and anything else that reads `os.environ`.
 ## Options
 
 ```python
-krypticdev.inject(
+kryptic.inject(
     environment="staging",    # default: kryptic.json defaultEnvironment
     project_id="proj_x",      # default: kryptic.json projectId
     timeout_ms=2000,

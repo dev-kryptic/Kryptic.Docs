@@ -41,6 +41,9 @@ function stripJsx(content) {
   // Handle multi-line JSX blocks
   result = result.replace(/<([A-Z][a-zA-Z]*)[^>]*>[\s\S]*?<\/\1>/g, (match, tagName) => {
     // For Note components, try to extract the text content
+    if (tagName === 'CodeGroup') {
+      return match.replace(/^<CodeGroup[^>]*>/, '').replace(/<\/CodeGroup>\s*$/, '');
+    }
     if (tagName === 'Note' || tagName === 'Warning' || tagName === 'Info') {
       const innerContent = match.replace(/<[^>]+>/g, '').trim();
       if (innerContent) {
@@ -190,7 +193,7 @@ function generateLlmsTxt(pages) {
 
 - Website: https://kryptic.dev
 - Documentation: ${BASE_URL}
-- GitHub: https://github.com/krypticdev
+- GitHub: https://github.com/dev-kryptic
 
 ## Documentation Index
 

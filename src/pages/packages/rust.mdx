@@ -1,0 +1,46 @@
+import { Note } from '@/components/mdx'
+
+export const description = 'The Kryptic Rust package - inject() into the process environment.'
+
+# Rust
+
+`kryptic-daemon-client` injects your project's secrets into the process environment
+during development startup. Outside development it is a no-op, and it never panics.
+
+Source: [github.com/dev-kryptic/Kryptic.Rust](https://github.com/dev-kryptic/Kryptic.Rust).
+The crate name is `kryptic-daemon-client`. The library is named `kryptic`, so you
+call `kryptic::inject()`.
+
+## Install
+
+```toml
+# Cargo.toml
+[dependencies]
+kryptic-daemon-client = "0.1"
+```
+
+## Use
+
+```rust
+fn main() {
+    kryptic::inject(); // call before any env reads
+
+    let db_url = std::env::var("DATABASE_URL").ok();
+}
+```
+
+`inject()` returns an `InjectResult { injected, skipped, reason }`. Existing
+environment variables are never overwritten.
+
+## Behavior
+
+- No-op when `RUST_ENV`/`APP_ENV`/`ENVIRONMENT`/`ENV` is production, prod, or staging, or when `KRYPTIC_DISABLED=true`.
+- Finds `kryptic.json` by walking up from the working directory.
+- Never overwrites environment variables that are already set.
+- macOS/Linux via unix socket, Windows via named pipe.
+
+<Note>
+  Environment variables override everything: `KRYPTIC_PROJECT_ID`, `KRYPTIC_ENV`,
+  `KRYPTIC_SOCKET_PATH`, `KRYPTIC_TIMEOUT_MS`, `KRYPTIC_DISABLED`, `KRYPTIC_SILENT`.
+  See the [configuration reference](/configuration).
+</Note>

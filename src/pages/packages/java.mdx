@@ -4,16 +4,18 @@ export const description = 'The Kryptic Java package - Kryptic.inject() into sys
 
 # Java
 
-`dev.kryptic:krypticdev` fetches your project's secrets and exposes them as system
+`dev.kryptic:daemon-client` fetches your project's secrets and exposes them as system
 properties (the JVM cannot modify its own process environment). Zero dependencies,
 Java 17+. Outside development it is a no-op, and it never throws.
+
+Source: [github.com/dev-kryptic/Kryptic.Java](https://github.com/dev-kryptic/Kryptic.Java).
 
 ## Install
 
 ```xml
 <dependency>
   <groupId>dev.kryptic</groupId>
-  <artifactId>krypticdev</artifactId>
+  <artifactId>daemon-client</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
@@ -21,6 +23,8 @@ Java 17+. Outside development it is a no-op, and it never throws.
 ## Use
 
 ```java
+import dev.kryptic.Kryptic;
+
 public static void main(String[] args) {
     Kryptic.inject();   // before the framework boots
 

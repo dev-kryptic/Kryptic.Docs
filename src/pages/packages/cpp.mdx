@@ -4,9 +4,11 @@ export const description = 'The Kryptic C++ package - inject() into the process 
 
 # C++
 
-`krypticdev` injects your project's secrets into the process environment with
+`kryptic-daemon-client` injects your project's secrets into the process environment with
 `setenv` (POSIX) or `_putenv_s` (Windows) during development startup. Zero
 dependencies, C++17. Outside development it is a no-op, and it never throws.
+
+Source: [github.com/dev-kryptic/Kryptic.Cpp](https://github.com/dev-kryptic/Kryptic.Cpp).
 
 ## Install
 
@@ -15,36 +17,44 @@ CMake FetchContent:
 ```cmake
 include(FetchContent)
 FetchContent_Declare(
-  krypticdev
-  GIT_REPOSITORY https://github.com/dev-kryptic/krypticdev-cpp.git
+  kryptic-daemon-client
+  GIT_REPOSITORY https://github.com/dev-kryptic/Kryptic.Cpp.git
   GIT_TAG v0.1.0
 )
-FetchContent_MakeAvailable(krypticdev)
-target_link_libraries(your_app PRIVATE krypticdev)
+FetchContent_MakeAvailable(kryptic-daemon-client)
+target_link_libraries(your_app PRIVATE kryptic-daemon-client)
 ```
 
 Or add the sources as a subdirectory:
 
 ```cmake
-add_subdirectory(path/to/krypticdev-cpp)
-target_link_libraries(your_app PRIVATE krypticdev)
+add_subdirectory(path/to/Kryptic.Cpp)
+target_link_libraries(your_app PRIVATE kryptic-daemon-client)
 ```
 
 ## Use
 
 ```cpp
-#include <krypticdev/krypticdev.hpp>
+#include <kryptic/kryptic.hpp>
 #include <cstdlib>
 
 int main() {
-    krypticdev::inject();  // before anything reads the environment
+    kryptic::inject();  // before anything reads the environment
 
     const char* db_url = std::getenv("DATABASE_URL");
 }
 ```
 
 `inject()` returns a `Result{injected, skipped, reason}`. Existing environment
-variables are never overwritten.
+variables are never overwritten. Optional overrides:
+
+```cpp
+kryptic::Options options;
+options.environment = "staging";
+options.project_id = "proj_x";
+options.timeout_ms = 2000;
+kryptic::inject(options);
+```
 
 ## Behavior
 

@@ -4,23 +4,26 @@ export const description = 'The Kryptic Go package - Inject() into the process e
 
 # Go
 
-`github.com/dev-kryptic/krypticdev` injects your project's secrets into the process
+`github.com/dev-kryptic/Kryptic.Go` injects your project's secrets into the process
 environment with `os.Setenv` during development startup. Outside development it is a
 no-op, and it never panics.
+
+Source: [github.com/dev-kryptic/Kryptic.Go](https://github.com/dev-kryptic/Kryptic.Go).
+The import path and the Go package name are both `kryptic`.
 
 ## Install
 
 ```bash
-go get github.com/dev-kryptic/krypticdev
+go get github.com/dev-kryptic/Kryptic.Go
 ```
 
 ## Use
 
 ```go
-import "github.com/dev-kryptic/krypticdev"
+import "github.com/dev-kryptic/Kryptic.Go"
 
 func main() {
-    krypticdev.Inject() // before anything reads the environment
+    kryptic.Inject() // before anything reads the environment
 
     dbURL := os.Getenv("DATABASE_URL")
 }

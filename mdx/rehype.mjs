@@ -67,11 +67,17 @@ function rehypeInsertLastUpdated() {
 function rehypeParseCodeBlocks() {
   return (tree) => {
     visit(tree, 'element', (node, _nodeIndex, parentNode) => {
-      if (node.tagName === 'code' && node.properties.className) {
+      if (node.tagName !== 'code' || parentNode?.tagName !== 'pre') return
+      // mdast-util-to-hast puts fence meta (title, language class) on <code>,
+      // but CodeGroup reads props from the wrapping <pre>.
+      if (node.properties.className) {
         parentNode.properties.language = node.properties.className[0]?.replace(
           /^language-/,
           ''
         )
+      }
+      if (node.properties.title && !parentNode.properties.title) {
+        parentNode.properties.title = node.properties.title
       }
     })
   }

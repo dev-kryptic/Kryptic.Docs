@@ -84,15 +84,13 @@ On the new app, open **Sign On**. Copy the **Identity Provider metadata** XML
 
 In Kryptic, as an **Owner**:
 
-1. Open [app.kryptic.dev](https://app.kryptic.dev) → **Integrations → Single sign-on**.
-2. **Connect Okta**.
-3. Email domain: the domain your people use (for example `asml.com`). Assertions
+1. Open [app.kryptic.dev](https://app.kryptic.dev) → **Integrations → SAML 2.0**.
+2. On the Okta card, **Connect**.
+3. Email domain: the domain your people use (for example `acme.com`). Assertions
    outside that domain are rejected.
 4. Paste the IdP metadata XML.
-5. **Connect SSO and SCIM**.
-
-Connecting Okta issues a **SCIM bearer token in the same step**. Copy it now.
-It is stored hashed and cannot be shown again.
+5. Save. Connecting Okta issues a **SCIM bearer token in the same step**. Copy it now.
+   It is stored hashed and cannot be shown again.
 
 <Note>
   The first successful SAML sign-in still creates a **Developer** if SCIM has

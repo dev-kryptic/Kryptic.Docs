@@ -10,35 +10,49 @@ Get Kryptic running locally in four steps. Total time: about three minutes.
 
 ## 1. Install the daemon
 
-Download the binary for your platform from the [download page](https://kryptic.dev/download),
-or grab it straight from [GitHub releases](https://github.com/dev-kryptic/daemon/releases).
-The install scripts register the daemon to start at login (LaunchAgent on macOS, systemd user
-service on Linux, tray app on Windows).
+Open the [download page](https://kryptic.dev/download). It detects your OS and architecture
+and serves the current installer from kryptic.dev.
 
-<CodeGroup title="Install the daemon">
-```bash title="macOS"
-curl -LO https://github.com/dev-kryptic/daemon/releases/latest/download/kryptic_darwin_arm64
-chmod +x kryptic_darwin_arm64
-./install.sh kryptic_darwin_arm64
+<div className="not-prose mb-6 mt-4 flex gap-3">
+  <Button href="https://kryptic.dev/download" arrow="right">Download the daemon</Button>
+</div>
+
+- **macOS:** signed `.pkg` for Apple Silicon or Intel. Puts Kryptic in Applications and starts it at login.
+- **Windows:** signed setup `.exe`. Installs the CLI, starts the tray app, and adds Kryptic to PATH.
+- **Linux:** the one-liner below, or a `.deb` from the download page. Registers a systemd user service.
+
+After the installer finishes, open a new terminal and sign in (or use the menu bar / tray):
+
+```bash
 kryptic login
+```
+
+Approve the code in your browser. The rotating session token is stored in your OS credential
+store (Keychain, Credential Manager, or libsecret). Access tokens live in daemon memory only.
+
+Optional, download from the terminal instead:
+
+<CodeGroup title="Install from the terminal">
+```bash title="macOS"
+# Apple Silicon. Intel: https://kryptic.dev/dl/macos-intel.pkg
+curl -fL -o Kryptic.pkg https://kryptic.dev/dl/macos-apple-silicon.pkg
+open Kryptic.pkg
 ```
 
 ```bash title="Linux"
-curl -LO https://github.com/dev-kryptic/daemon/releases/latest/download/kryptic_linux_amd64
-chmod +x kryptic_linux_amd64
-./install.sh kryptic_linux_amd64
-kryptic login
+curl -fsSL https://kryptic.dev/install.sh | sh
 ```
 
 ```powershell title="Windows"
-Invoke-WebRequest https://github.com/dev-kryptic/daemon/releases/latest/download/kryptic_windows_amd64.exe -OutFile kryptic_windows_amd64.exe
-powershell -ExecutionPolicy Bypass -File install.ps1
-kryptic login
+curl.exe -fL -o Kryptic-Setup.exe https://kryptic.dev/dl/windows-amd64.exe
+Start-Process .\Kryptic-Setup.exe
 ```
 </CodeGroup>
 
-The rotating session token is stored in your OS credential store (Keychain, Credential
-Manager, or libsecret). Access tokens live in daemon memory only.
+<Note>
+  On Linux without `dpkg`, the one-liner installs to `~/.local/bin`. Add that directory
+  to your `PATH` if `kryptic` is not found after install.
+</Note>
 
 ## 2. Add kryptic.json
 
@@ -56,54 +70,60 @@ one click to copy.
 ## 3. Add the package for your language
 
 One dev dependency, one line at startup. Every package is a thin MIT-licensed client that
-asks the daemon for your secrets over a local socket - see the per-language pages for
-.NET, Node.js, Python, Java, Go, Ruby, and C++.
+asks the daemon for your secrets over a local socket. Published names are
+`Kryptic.Daemon.Client` (.NET) and `kryptic-daemon-client` everywhere else.
 
 <CodeGroup title="Install package">
 ```bash title=".NET"
-dotnet add package krypticdev
+dotnet add package Kryptic.Daemon.Client
 ```
 
 ```bash title="Node.js"
-npm install --save-dev krypticdev
+npm install --save-dev kryptic-daemon-client
 ```
 
 ```bash title="Python"
-pip install krypticdev
+pip install kryptic-daemon-client
 ```
 
 ```xml title="Java"
 <dependency>
   <groupId>dev.kryptic</groupId>
-  <artifactId>krypticdev</artifactId>
+  <artifactId>daemon-client</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
 ```bash title="Go"
-go get github.com/dev-kryptic/krypticdev
+go get github.com/dev-kryptic/Kryptic.Go
 ```
 
 ```ruby title="Ruby"
 # Gemfile
-gem "krypticdev", group: :development
+gem "kryptic-daemon-client", group: :development
 ```
 
 ```cmake title="C++"
 include(FetchContent)
 FetchContent_Declare(
-  krypticdev
-  GIT_REPOSITORY https://github.com/dev-kryptic/krypticdev-cpp.git
+  kryptic-daemon-client
+  GIT_REPOSITORY https://github.com/dev-kryptic/Kryptic.Cpp.git
   GIT_TAG v0.1.0
 )
-FetchContent_MakeAvailable(krypticdev)
-target_link_libraries(your_app PRIVATE krypticdev)
+FetchContent_MakeAvailable(kryptic-daemon-client)
+target_link_libraries(your_app PRIVATE kryptic-daemon-client)
+```
+
+```toml title="Rust"
+# Cargo.toml
+[dependencies]
+kryptic-daemon-client = "0.1"
 ```
 </CodeGroup>
 
 <CodeGroup title="Startup code">
 ```csharp title=".NET"
-using KrypticDev;
+using Kryptic;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddKryptic();
@@ -111,33 +131,46 @@ builder.Configuration.AddKryptic();
 
 ```js title="Node.js"
 // top of your entry point
-require('krypticdev').inject();
+require('kryptic-daemon-client').inject();
 ```
 
 ```python title="Python"
-import krypticdev
-krypticdev.inject()
+import kryptic
+kryptic.inject()
 ```
 
 ```java title="Java"
+import dev.kryptic.Kryptic;
+
 public static void main(String[] args) {
     Kryptic.inject();
 }
 ```
 
 ```go title="Go"
+import "github.com/dev-kryptic/Kryptic.Go"
+
 func main() {
-    krypticdev.Inject()
+    kryptic.Inject()
 }
 ```
 
 ```ruby title="Ruby"
+require "kryptic"
 Kryptic.inject! if Rails.env.development?
 ```
 
 ```cpp title="C++"
+#include <kryptic/kryptic.hpp>
+
 int main() {
   kryptic::inject();
+}
+```
+
+```rust title="Rust"
+fn main() {
+    kryptic::inject();
 }
 ```
 </CodeGroup>
@@ -171,6 +204,10 @@ bin/dev
 
 ```bash title="C++"
 cmake --build build && ./build/your_app
+```
+
+```bash title="Rust"
+cargo run
 ```
 </CodeGroup>
 
