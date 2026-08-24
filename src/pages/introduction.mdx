@@ -20,6 +20,25 @@ A local daemon authenticates once via your browser, then your apps pull secrets 
 Your team manages projects, environments, access and audit history from the
 dashboard; developers never leave their editor.
 
+## Open-source clients
+
+Anything that can see a secret in plaintext is MIT-licensed and lives under
+[github.com/dev-kryptic](https://github.com/dev-kryptic). The server platform is
+proprietary: it stores ciphertext it has no path to open. See
+[Encryption](/encryption).
+
+| What | GitHub | Published as |
+| --- | --- | --- |
+| Daemon and CLI | [Kryptic.Daemon](https://github.com/dev-kryptic/Kryptic.Daemon) | `kryptic` binary |
+| Encryption engine (.NET) | [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | NuGet `Kryptic.Encryption` |
+| Encryption engine (TypeScript) | [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | npm `@kryptic-dev/encryption` |
+| Encryption engine (Go) | [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go module of the same name |
+| Kubernetes operator | [k8s-operator](https://github.com/dev-kryptic/k8s-operator) | Apache 2.0 |
+| Language packages | [Kryptic.Net](https://github.com/dev-kryptic/Kryptic.Net), [Node](https://github.com/dev-kryptic/Kryptic.Node), [Python](https://github.com/dev-kryptic/Kryptic.Python), [Java](https://github.com/dev-kryptic/Kryptic.Java), [Go](https://github.com/dev-kryptic/Kryptic.Go), [Ruby](https://github.com/dev-kryptic/Kryptic.Ruby), [Cpp](https://github.com/dev-kryptic/Kryptic.Cpp), [Rust](https://github.com/dev-kryptic/Kryptic.Rust) | `Kryptic.Daemon.Client` / `kryptic-daemon-client` |
+
+Every language package is a thin daemon client, not an SDK: one entry point that
+asks the local daemon for the current project's secrets.
+
 <Tiles
   title="Documentation"
   id="documentation"
@@ -32,12 +51,12 @@ dashboard; developers never leave their editor.
     {
       href: '/packages/node',
       name: 'Language packages',
-      description: 'Thin MIT-licensed clients for .NET, Node.js, Python, Java, Go, Ruby, and C++.',
+      description: 'Thin MIT-licensed clients for .NET, Node.js, Python, Java, Go, Ruby, C++, and Rust.',
     },
     {
       href: '/cli',
       name: 'CLI reference',
-      description: 'Every kryptic command: lifecycle, auth, secrets, scanning, self-update.',
+      description: 'Every kryptic command: lifecycle, auth, secrets, CI export, scanning, self-update.',
     },
     {
       href: '/configuration',
@@ -53,6 +72,11 @@ dashboard; developers never leave their editor.
       href: '/access-control',
       name: 'Access control',
       description: 'Roles, per-environment grants, groups and access requests.',
+    },
+    {
+      href: '/encryption',
+      name: 'Encryption',
+      description: 'Blind store, organization key, and the three public encryption-engine repos.',
     },
     {
       href: '/self-hosting',

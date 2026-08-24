@@ -12,7 +12,10 @@ OpenAPI document is served at `/openapi/v1.json`.
 The API is end-to-end encrypted: reads return ciphertext envelopes plus the org key
 sealed to the machine, and writes accept envelopes the caller encrypted locally. The
 server stores and delivers ciphertext it cannot open. For shell use, prefer
-`kryptic ci export`, which performs the decryption chain for you.
+[`kryptic ci export`](/cli#ci-export), which performs the decryption
+chain for you with [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go).
+Do not expect a plaintext `/export` endpoint. The dashboard, the daemon, CI and this
+API all speak envelopes.
 
 ## Authentication
 

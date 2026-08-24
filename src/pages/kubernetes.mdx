@@ -9,6 +9,12 @@ Declare a `KrypticSecret` and the operator keeps a native Kubernetes `Secret` in
 sync with a Kryptic project environment. No init containers, no sidecars, and no
 secrets in your manifests.
 
+Source: [github.com/dev-kryptic/k8s-operator](https://github.com/dev-kryptic/k8s-operator)
+(Apache 2.0). The operator decrypts **inside the cluster** with
+[Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go):
+the platform serves ciphertext, the machine client secret unwraps the operator's
+private key, that key opens the org key, and the org key opens each envelope.
+
 ## Install
 
 ```bash
@@ -16,8 +22,9 @@ kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main
 kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/operator.yaml
 ```
 
-Create a [machine identity](/machine-identities) in the dashboard, then store
-its credentials in the namespace where your `KrypticSecret`s will live:
+Create a [machine identity](/machine-identities) in the dashboard, grant it the
+organization key under **Settings → Encryption**, then store its credentials in
+the namespace where your `KrypticSecret`s will live:
 
 ```bash
 kubectl create secret generic kryptic-machine-credentials \

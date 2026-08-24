@@ -4,20 +4,23 @@ export const description = 'The Kryptic .NET package - AddKryptic() configuratio
 
 # .NET
 
-`krypticdev` plugs into the standard configuration system: one call on your builder
-and every secret is available through `IConfiguration`, options binding, and DI. Outside
-development it is a no-op, and it never throws.
+`Kryptic.Daemon.Client` plugs into the standard configuration system: one call on your
+builder and every secret is available through `IConfiguration`, options binding, and DI.
+Outside development it is a no-op, and it never throws.
+
+Source: [github.com/dev-kryptic/Kryptic.Net](https://github.com/dev-kryptic/Kryptic.Net).
+Targets `netstandard2.0`, `net6.0` and `net8.0`.
 
 ## Install
 
 ```bash
-dotnet add package krypticdev
+dotnet add package Kryptic.Daemon.Client
 ```
 
 ## Use
 
 ```csharp
-using KrypticDev;
+using Kryptic;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddKryptic();   // that's the entire integration

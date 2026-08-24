@@ -58,6 +58,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
           <ul role="list" className="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none">
             <TopLevelNavItem href="https://kryptic.dev/">Home</TopLevelNavItem>
             <TopLevelNavItem href="/">Docs</TopLevelNavItem>
+            <TopLevelNavItem href="https://kryptic.dev/download">Download</TopLevelNavItem>
             <TopLevelNavItem href="https://kryptic.dev/features">Features</TopLevelNavItem>
             <TopLevelNavItem href="https://kryptic.dev/pricing">Pricing</TopLevelNavItem>
             <TopLevelNavItem href="https://github.com/dev-kryptic">Github</TopLevelNavItem>
@@ -68,7 +69,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
           <ModeToggle />
         </div>
         <div className="hidden min-[416px]:contents">
-          <Button href="https://kryptic.dev/" target="_blank" className="!py-1.5 !px-3 text-xs">
+          <Button href="/get-started" className="!py-1.5 !px-3 text-xs">
             Get started
           </Button>
         </div>
