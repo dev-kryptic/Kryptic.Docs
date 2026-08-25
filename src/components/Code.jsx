@@ -38,6 +38,7 @@ const languageNames = {
   yaml: 'YAML',
   yml: 'YAML',
   rust: 'Rust',
+  toml: 'TOML',
   dockerfile: 'Dockerfile',
 }
 

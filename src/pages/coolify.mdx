@@ -1,0 +1,241 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Inject Kryptic secrets into a Coolify app at container start with a machine identity.'
+
+# Coolify
+
+Coolify has no native Kryptic connector. The platform cannot push plaintext into
+Coolify's environment-variable UI: it never holds values it could send. What you
+do instead is the same pattern as CI: a [machine identity](/machine-identities)
+inside the container fetches the ciphertext bundle, decrypts it locally with
+`kryptic ci export`, and execs your process with those variables in the
+environment.
+
+Coolify only stores the bootstrap credential. Your application secrets stay in
+Kryptic.
+
+<Warning>
+  Language packages (`inject()`, `AddKryptic()`, and so on) talk to a local
+  daemon and are a **no-op outside development**. They will not load secrets in a
+  Coolify container. Use `kryptic ci export`.
+</Warning>
+
+## How it works
+
+1. You create a machine identity and grant it the organization key.
+2. The image contains the `kryptic` CLI and an entrypoint that runs
+   `kryptic ci export` before your app.
+3. Coolify injects `KRYPTIC_CLIENT_ID` and `KRYPTIC_CLIENT_SECRET` as **runtime**
+   environment variables (not build-time). On every start, the container pulls a
+   fresh bundle from the [Pipelines BFF](/machine-identities).
+
+Rotation in Kryptic is visible on the next container start. Coolify does not
+watch Kryptic, so restart or redeploy the application after you change a value
+you need immediately.
+
+## 1. Create a machine identity
+
+In the dashboard: **Machine identities** -> **New identity**. Scope it to the
+project this Coolify app belongs to. Then grant it the organization key under
+**Settings → Encryption**. Until that grant exists, export fails when it tries
+to unwrap the org key.
+
+<Warning>
+  The client secret is shown **exactly once**. Copy it into Coolify before you
+  close the dialog. If you lose it, rotate the identity.
+</Warning>
+
+Use a dedicated identity per Coolify application (or per Coolify environment:
+production vs staging). Do not reuse a CI identity that can also read unrelated
+projects.
+
+## 2. Add an entrypoint
+
+Commit these two files next to your Dockerfile. The script fails the container
+if export fails, so you never boot with an empty environment.
+
+```bash title="entrypoint.sh"
+#!/bin/sh
+set -eu
+
+PROJECT="${KRYPTIC_PROJECT_ID:?KRYPTIC_PROJECT_ID is not set}"
+ENV_NAME="${KRYPTIC_ENV:-production}"
+
+eval "$(kryptic ci export --project "$PROJECT" --env "$ENV_NAME" --format shell)"
+unset KRYPTIC_CLIENT_ID KRYPTIC_CLIENT_SECRET
+
+exec "$@"
+```
+
+`--format shell` prints `export KEY='value'` lines, escaped correctly, so values
+with spaces, quotes or newlines survive `eval`. Secrets stay in the process
+environment. Do not write a `.env` file onto the container filesystem.
+
+The Linux CLI is a static Go binary (`CGO_ENABLED=0`). It runs on Debian, Alpine
+and most other images. The final image still needs `/bin/sh` so this entrypoint
+can run. Distroless images do not have a shell.
+
+```dockerfile title="Dockerfile"
+ARG TARGETARCH=amd64
+
+# … your existing build stages …
+
+ADD https://kryptic.dev/dl/kryptic-linux-${TARGETARCH} /usr/local/bin/kryptic
+RUN chmod +x /usr/local/bin/kryptic
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["node", "dist/index.js"]
+```
+
+Replace the `CMD` with whatever starts your app (`python -m gunicorn …`,
+`dotnet YourApp.dll`, `java -jar app.jar`). Coolify's **Custom Start Command**
+overrides `CMD` only. Keep `ENTRYPOINT` in exec form (`["/entrypoint.sh"]`) so
+that override is passed through as `"$@"` and still goes through the export.
+
+`TARGETARCH` is `amd64` or `arm64`. Coolify builds on the destination server, so
+the default of `amd64` is correct for most VPS hosts. On Ampere or Raspberry Pi
+servers, set it to `arm64` (or enable Buildx so Docker injects `TARGETARCH`).
+
+<Note>
+  `/dl/kryptic-linux-*` always resolves to the latest published CLI. The same
+  URLs are used by [install.sh](https://kryptic.dev/install.sh). Do not run
+  `install.sh` inside the image: it tries to configure a systemd user service.
+</Note>
+
+## 3. Set bootstrap variables in Coolify
+
+Open the application → **Environment Variables**. Add the following as **Runtime
+Variable** only. Turn **Build Variable** off so the client secret is not passed
+as a Docker build-arg and does not land in image metadata. Lock them (Normal
+view) and enable **Literal** on the secret so Coolify does not expand `$` inside
+the value.
+
+| Variable | Example | Required |
+| --- | --- | --- |
+| `KRYPTIC_CLIENT_ID` | `kmi_…` | yes |
+| `KRYPTIC_CLIENT_SECRET` | the one-time secret | yes |
+| `KRYPTIC_PROJECT_ID` | `proj_a1b2c3d4e5f6` | yes |
+| `KRYPTIC_ENV` | `production` | no (defaults to `production` in the entrypoint) |
+| `KRYPTIC_PIPELINES_API` | `https://pipelines.kryptic.example.com` | self-hosted only |
+
+Do not paste your application secrets (`DATABASE_URL`, API keys, and so on) into
+Coolify. Those come from Kryptic at start.
+
+Map each Coolify application to a Kryptic environment with `KRYPTIC_ENV`. A
+Coolify staging app should use `staging`, not the production bundle.
+
+<Note>
+  Coolify can also define these at the shared **environment** or **project**
+  level and reference them from the application. The client secret should still
+  be locked.
+</Note>
+
+## 4. Deploy
+
+Redeploy so Coolify rebuilds the image with the CLI and entrypoint. Then watch
+the container logs.
+
+A healthy start is silent: `kryptic ci export` prints export lines to the
+entrypoint, which evals them, then `exec` replaces the shell with your app.
+You should see your application logs, not a dotenv dump.
+
+If export fails, the container exits before the app starts. Typical causes:
+
+| Error | Fix |
+| --- | --- |
+| `set KRYPTIC_CLIENT_ID and KRYPTIC_CLIENT_SECRET` | Variables are missing, build-only, or not marked Runtime |
+| `credential exchange failed` / 401 | Wrong secret, identity deactivated, or you need to rotate |
+| `fetching secrets bundle` / 403 | Identity is not scoped to this project |
+| `could not unwrap the org key` | Grant the identity the organization key under **Settings → Encryption** |
+| `KRYPTIC_PROJECT_ID is not set` | Missing from Coolify, or the start command is not going through the entrypoint |
+| connection / TLS errors | The container cannot reach `https://pipelines.kryptic.dev` (or your `KRYPTIC_PIPELINES_API`) on port 443 |
+
+## Nixpacks
+
+Nixpacks images do not include the Kryptic CLI. Switch the Coolify build pack to
+**Dockerfile** and use the files above.
+
+If you must stay on Nixpacks, install the binary in `nixpacks.toml` and wrap
+the start command so it still evals the export. The Dockerfile path is the one
+we support.
+
+```toml title="nixpacks.toml"
+[phases.setup]
+nixPkgs = ["curl"]
+
+[phases.post-install]
+cmds = [
+  "curl -fsSL https://kryptic.dev/dl/kryptic-linux-amd64 -o /usr/local/bin/kryptic",
+  "chmod +x /usr/local/bin/kryptic",
+]
+```
+
+Then set Coolify's start command to something that evals first:
+
+```bash
+eval "$(kryptic ci export --project "$KRYPTIC_PROJECT_ID" --env "${KRYPTIC_ENV:-production}" --format shell)" && unset KRYPTIC_CLIENT_ID KRYPTIC_CLIENT_SECRET && exec node dist/index.js
+```
+
+Change the `exec` target to your real start command. Pin `amd64` vs `arm64` to
+the Coolify server.
+
+## Docker Compose
+
+Coolify reads `${VAR}` references from the compose file and shows them in the
+application's environment editor. Put only the bootstrap variables there. The
+image still needs the same `ENTRYPOINT`.
+
+```yaml title="docker-compose.yml"
+services:
+  app:
+    build: .
+    environment:
+      KRYPTIC_CLIENT_ID: ${KRYPTIC_CLIENT_ID}
+      KRYPTIC_CLIENT_SECRET: ${KRYPTIC_CLIENT_SECRET}
+      KRYPTIC_PROJECT_ID: ${KRYPTIC_PROJECT_ID}
+      KRYPTIC_ENV: ${KRYPTIC_ENV:-production}
+```
+
+Each service that needs secrets must use an image with the entrypoint. Sidecars
+that do not (a Redis, a Postgres) should not get the machine identity.
+
+## Self-hosted Kryptic
+
+Set `KRYPTIC_PIPELINES_API` to the **public** Pipelines BFF URL, the one this
+container can resolve and reach over TLS. `http://localhost:5212` is the
+dashboard host, not the app container.
+
+```bash
+KRYPTIC_PIPELINES_API=https://pipelines.kryptic.example.com
+```
+
+See [Self-hosting](/self-hosting) for the compose ports. The Pipelines BFF is
+port 5212.
+
+## Build-time secrets
+
+This guide injects at **container start**. If a framework needs a secret while
+the image is building (`NEXT_PUBLIC_*` inlined by Next.js, Prisma generate
+against a live database, and similar), `kryptic ci export` in the entrypoint is
+too late.
+
+For those keys, either:
+
+- set that specific key as a Coolify **Build Variable**, or
+- run `kryptic ci export` in a Docker build stage with Coolify's **Use Docker
+  Build Secrets** so the client secret is a BuildKit secret, not a build-arg.
+
+Keep runtime secrets on the entrypoint path. Do not bake production credentials
+into image layers.
+
+## What this does not do
+
+- Coolify's Environment Variables page is not synced from Kryptic. Changing a
+  secret in the dashboard does not edit Coolify, and Coolify will not redeploy
+  on its own. This entrypoint is the supported integration.
+- For Kubernetes workloads, use the [operator](/kubernetes) instead of this
+  script.
