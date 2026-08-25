@@ -39,3 +39,15 @@ The image listens on port `3000`.
 1. Create an `.mdx` file under `src/pages/`.
 2. Add the route to `src/components/NavigationDocs.jsx`.
 3. Run `npm run build` to verify.
+
+## Contributing
+
+Pull requests are welcome for the documentation pages themselves. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for what is in scope and how to run the checks.
+
+## Licence
+
+Split licence, by path — see [LICENSE](LICENSE):
+
+- **Documentation content** (`src/pages/**/*.mdx`, `guides/`, `public/llms/`) — BSD 3-Clause.
+- **Everything else** (site source, `public/logo.png`, `public/screenshots/`) — proprietary, all rights reserved.
