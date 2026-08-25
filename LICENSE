@@ -1,25 +1,102 @@
-Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C. All rights reserved.
+Kryptic Documentation — Licensing
+Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C.
 
-This directory ("the Documentation Site") is proprietary software. It is not open
-source and it is not source-available. No licence to use, copy, modify, merge,
-publish, distribute, sublicense, or sell any part of it is granted by its presence
-in this repository.
+This repository contains two kinds of material, under two different licences.
+Which licence applies depends on the path.
 
-The published documentation content served by this site may be read and quoted for
-the purpose of using Kryptic. That permission does not extend to the site's source
-code, its design system, or its assets.
 
-Separate, and unaffected by this notice: the Kryptic encryption engine, the daemon
-and CLI, and the language packages are MIT-licensed open source. The enterprise
-module is source-available under the Kryptic Enterprise License. See DOCUMENTATION.md
-section 11 for the full component licensing breakdown.
+================================================================================
+PART 1 — DOCUMENTATION CONTENT: BSD 3-Clause License
+================================================================================
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Applies to the written documentation only:
+
+  src/pages/**/*.mdx
+  guides/**
+  public/llms/**
+  public/llms.txt
+
+Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C.
+All rights reserved.
+
+Redistribution and use of these files, with or without modification, are
+permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Clause 3 above is a condition of this licence: "Kryptic" and the Kryptic logo
+are trademarks of Kryptic by Theka.dev SINGLE MEMBER P.C. Nothing here grants
+any trademark licence.
+
+
+================================================================================
+PART 2 — EVERYTHING ELSE: Proprietary, all rights reserved
+================================================================================
+
+Applies to every path not listed in Part 1, including but not limited to:
+
+  src/app/**, src/components/**, src/chrome/**, src/lib/**, src/hooks/**,
+  src/mdx/**, src/catalog/**, src/styles/**
+  scripts/**, tooling/**, and all build and configuration files
+  public/logo.png
+  public/screenshots/**
+
+This material is proprietary. It is not open source and it is not
+source-available. Publishing it here grants no licence to use, copy, modify,
+merge, publish, distribute, sublicense, or sell any part of it.
+
+Two specific reasons this carve-out exists and cannot be narrowed:
+
+  - Parts of the site source derive from a commercially licensed third-party
+    UI template. Those rights are not ours to pass on, so the site source
+    cannot be relicensed permissively.
+
+  - public/screenshots/** depict the Kryptic Platform dashboard, which is
+    proprietary and unpublished.
+
+Forking this repository on GitHub in order to prepare a pull request is
+expressly permitted, and so is running the site locally for that purpose. Any
+other use of Part 2 material requires written permission.
+
+
+================================================================================
+CONTRIBUTIONS
+================================================================================
+
+Pull requests are welcome for the documentation content in Part 1. By
+submitting a contribution you agree that it is licensed to the project and to
+everyone else under the BSD 3-Clause License in Part 1, and that you have the
+right to grant that licence. See CONTRIBUTING.md.
+
+
+================================================================================
+OTHER KRYPTIC COMPONENTS
+================================================================================
+
+Separate, and unaffected by this file: the Kryptic encryption engine, the
+daemon and CLI, and the language packages are MIT-licensed open source; the
+Kubernetes operator is Apache-2.0; the enterprise module is source-available
+under the Kryptic Enterprise License. See DOCUMENTATION.md section 11 for the
+full component licensing breakdown.
 
 Questions: hello@kryptic.dev
