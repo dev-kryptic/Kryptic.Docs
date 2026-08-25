@@ -58,6 +58,7 @@ export const docsNavigation = [
     title: 'PLATFORM',
     links: [
       { title: 'Encryption', href: '/encryption' },
+      { title: 'Vulnerability disclosure', href: '/security' },
       { title: 'Self-hosting', href: '/self-hosting' },
       { title: 'Kubernetes operator', href: '/kubernetes' },
       { title: 'Coolify', href: '/coolify' },

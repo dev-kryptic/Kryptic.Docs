@@ -1,0 +1,46 @@
+export const description =
+  'How to report a security issue, and how Kryptic requests CVE IDs.'
+
+# Vulnerability disclosure
+
+The canonical policy is
+[kryptic.dev/security/disclosure](https://kryptic.dev/security/disclosure).
+RFC 9116 `security.txt` is at
+[kryptic.dev/.well-known/security.txt](https://kryptic.dev/.well-known/security.txt).
+
+## Report
+
+Email **security@kryptic.dev**. Do not open a public GitHub issue, pull request,
+or discussion.
+
+Include the product (cloud, daemon, encryption engine, language package,
+operator), a version or commit if you have one, why it matters, and steps that
+do not harm other customers.
+
+## What we will not promise
+
+- There is no paid bug bounty.
+- Acknowledgement within five business days is a **target**, not an SLA.
+- Kryptic is **not** a CVE Numbering Authority. We do not assign CVE IDs.
+
+## CVE coordination
+
+When a confirmed issue in a **released, supported** component warrants a CVE:
+
+- Open source (engines, daemon, packages, operator): we open a GitHub Security
+  Advisory and request a CVE through GitHub. GitHub's CNA assigns the ID.
+- Cloud platform: we request a CVE from MITRE or another CNA that will take it.
+
+We do not request CVEs for unreleased code, theoretical findings with no
+practical impact, third-party software we do not ship, or self-hosted
+misconfiguration.
+
+We ask that you wait until a fix is published, or 90 days after our first
+acknowledgement, whichever comes first. If we go silent, you are not bound by
+that request.
+
+## Encryption
+
+The key hierarchy is in [Encryption](/encryption) and in `SECURITY.md` in each
+engine repository. We do not use the phrase "zero-knowledge" until an
+independent cryptographic review is published.
