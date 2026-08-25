@@ -48,6 +48,7 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+        <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
       </Head>
       <body className="antialiased">
         <Main />
