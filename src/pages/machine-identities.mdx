@@ -9,6 +9,10 @@ A machine identity is a non-human credential: a client id (`kmi_…`) and a clie
 secret. It is how a CI job, a deploy script or an internal tool reads secrets
 without a person being involved.
 
+Machine identities do not consume developer seats. A CI job, pipeline run, or
+secret retrieval is not itself a machine identity and does not count toward any
+allowance.
+
 <img className="imagewrapper-big" src="/screenshots/machine-identities.png" alt="Machine identities" />
 
 ## Creating one
@@ -81,6 +85,23 @@ yourself: it is the path that actually decrypts.
 
 Every read is audit-logged with the machine identity as the actor, so a CI
 pipeline's access is as reviewable as a person's.
+
+## Licensing
+
+Seats are people. Machine identities do not consume developer seats.
+
+On Free, Team, and Business, machine identities are unlimited. On Enterprise,
+included usage is ten active machine identities per active developer seat,
+calculated across the organization (not ten assigned to each person). Only
+active identities count. Disabled or revoked identities do not. CI/CD
+executions, pipeline runs, jobs, and secret retrieval operations do not count
+toward the allowance.
+
+Usage above that threshold is Exceptional Scale Usage. It does not automatically
+create a fixed overage charge. Kryptic may review the deployment and require
+additional licensing or an Enterprise capacity agreement where appropriate,
+including for unusually machine-heavy organizations and large automated
+infrastructures.
 
 <Note>
   For Kubernetes, prefer the [operator](/kubernetes) over calling the API from an
