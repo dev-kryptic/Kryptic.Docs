@@ -49,5 +49,5 @@ Pull requests are welcome for the documentation pages themselves. See
 
 Split licence, by path — see [LICENSE](LICENSE):
 
-- **Documentation content** (`src/pages/**/*.mdx`, `guides/`, `public/llms/`) — BSD 3-Clause.
+- **Documentation content** (`src/pages/**/*.mdx`, `public/llms/`) — BSD 3-Clause.
 - **Everything else** (site source, `public/logo.png`, `public/screenshots/`) — proprietary, all rights reserved.

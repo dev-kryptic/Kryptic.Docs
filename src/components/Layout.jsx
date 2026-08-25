@@ -107,7 +107,7 @@ export function Layout({ children, tableOfContents, title }) {
     <>
       <div className="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80">
         <header className="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex">
-          <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#0a0d0c]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll">
+          <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-edge lg:px-6 lg:pb-8 lg:pt-4 lg:bg-canvas/90 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll">
             <div className="hidden lg:flex">
               <Link href="/" aria-label="Home">
                 <Logo className="h-6" />
@@ -129,7 +129,7 @@ export function Layout({ children, tableOfContents, title }) {
               <button
                 style={buttonStyle}
                 onClick={copyToClipboard}
-                className="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal'"
+                className="font-normal text-ink-muted transition hover:text-ink"
               >
                 <FontAwesomeIcon icon={faPaperclip} style={iconStyle} className="icon pr-1" />
                 <span>Copy link</span>
@@ -143,7 +143,7 @@ export function Layout({ children, tableOfContents, title }) {
                     ? router.pathname + '/index.mdx'
                     : router.pathname + '.mdx')
                 }
-                className="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal'"
+                className="font-normal text-ink-muted transition hover:text-ink"
                 style={{ display: 'flex', alignItems: 'center' }}
               >
                 <FontAwesomeIcon icon={faGithub} style={iconStyle} className="icon pr-1" />
@@ -157,14 +157,14 @@ export function Layout({ children, tableOfContents, title }) {
                 <div className="flex items-center justify-between mb-4">
                   <h2
                     id="on-this-page-title"
-                    className="font-display text-sm font-medium text-slate-900 dark:text-white"
+                    className="font-display text-sm font-medium text-ink"
                   >
                     On this page
                   </h2>
                   {showJumpToTop && (
                     <button
                       onClick={scrollToTop}
-                      className="text-xs text-slate-500 hover:text-kryptic dark:text-slate-400 dark:hover:text-kryptic transition-colors flex items-center gap-1"
+                      className="flex items-center gap-1 text-xs text-ink-muted transition-colors hover:text-accent-text"
                       aria-label="Jump to top"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,8 +187,8 @@ export function Layout({ children, tableOfContents, title }) {
                           href={`#${section.id}`}
                           className={clsx(
                             isActive(section)
-                              ? 'text-kryptic'
-                              : 'font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+                              ? 'text-accent-text'
+                              : 'font-normal text-ink-muted transition hover:text-ink'
                           )}
                         >
                           {section.title}
@@ -197,7 +197,7 @@ export function Layout({ children, tableOfContents, title }) {
                       {section.children.length > 0 && (
                         <ol
                           role="list"
-                          className="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"
+                          className="mt-2 space-y-3 pl-5 text-ink-muted"
                         >
                           {section.children.map((subSection) => (
                             <li key={subSection.id}>
@@ -205,8 +205,8 @@ export function Layout({ children, tableOfContents, title }) {
                                 href={`#${subSection.id}`}
                                 className={
                                   isActive(subSection)
-                                    ? 'text-kryptic'
-                                    : 'hover:text-slate-600 dark:hover:text-slate-300'
+                                    ? 'text-accent-text'
+                                    : 'transition hover:text-ink'
                                 }
                               >
                                 {subSection.title}

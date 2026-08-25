@@ -1,37 +1,34 @@
 import { Head, Html, Main, NextScript } from 'next/document'
 
 const modeScript = `
+  // Runs before paint so the correct theme is in place on first frame.
+  // Sets both the .dark class (Tailwind) and data-theme (design tokens).
   let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-  updateMode()
-  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
-  window.addEventListener('storage', updateModeWithoutTransitions)
+  applyMode()
+  darkModeMediaQuery.addEventListener('change', applyModeWithoutTransitions)
+  window.addEventListener('storage', applyModeWithoutTransitions)
 
-  function updateMode() {
-    let isSystemDarkMode = darkModeMediaQuery.matches
-    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+  function applyMode() {
+    let systemPrefersDark = darkModeMediaQuery.matches
+    let stored = window.localStorage.isDarkMode
+    let isDarkMode = stored === 'true' || (stored === undefined && systemPrefersDark)
 
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    document.documentElement.classList.toggle('dark', isDarkMode)
+    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light'
 
-    if (isDarkMode === isSystemDarkMode) {
+    // Stop tracking an explicit choice once it matches the OS again.
+    if (isDarkMode === systemPrefersDark) {
       delete window.localStorage.isDarkMode
     }
   }
 
-  function disableTransitionsTemporarily() {
+  function applyModeWithoutTransitions() {
     document.documentElement.classList.add('[&_*]:!transition-none')
-    window.setTimeout(() => {
+    window.setTimeout(function () {
       document.documentElement.classList.remove('[&_*]:!transition-none')
     }, 0)
-  }
-
-  function updateModeWithoutTransitions() {
-    disableTransitionsTemporarily()
-    updateMode()
+    applyMode()
   }
 `
 
@@ -48,7 +45,6 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
       </Head>
       <body className="antialiased">
         <Main />

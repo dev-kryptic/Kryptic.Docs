@@ -8,7 +8,6 @@ import { useMobileNavigationStore } from '@/components/MobileNavigation'
 import '@/styles/tailwind.css'
 import 'focus-visible'
 import { Layout } from '@/components/Layout'
-import { slugifyWithCounter } from '@sindresorhus/slugify'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { dom } from '@fortawesome/fontawesome-svg-core'
@@ -47,34 +46,23 @@ export default function App({ Component, pageProps }) {
   )
 }
 
-function collectHeadings(sections, slugify = slugifyWithCounter()) {
+/* Build the "On this page" tree from the flat `sections` array that
+   mdx/rehype.mjs exports for each page. h2s become top-level entries and any
+   h3s that follow are nested under the most recent one; deeper levels are
+   present in `sections` but are not surfaced in the nav. */
+function collectHeadings(sections) {
   let output = []
 
-  if (sections === undefined) {
-    return []
-  }
-  for (let section of sections) {
-    if (section.tagName === 'h2' || section.tagName === 'h3') {
-      let title = section.title
-      let id = section.id
-      let tag = section.tag
-      if (section.tagName === 'h3') {
-        if (!output[output.length - 1]) {
-          throw new Error(
-            'Cannot add `h3` to table of contents without a preceding `h2`'
-          )
-        }
-        output[output.length - 1].children.push({
-          id,
-          title,
-          tag,
-        })
-      } else {
-        output.push({ id, title, tag, children: [] })
-      }
-    }
+  for (let section of sections ?? []) {
+    let { id, title, tag, tagName } = section
 
-    output.push(...collectHeadings(output.children ?? [], slugify))
+    if (tagName === 'h2') {
+      output.push({ id, title, tag, children: [] })
+    } else if (tagName === 'h3') {
+      // An h3 with no preceding h2 has nowhere to attach. The MDX heading
+      // linter (npm run lint:mdx) catches this before it reaches a build.
+      output[output.length - 1]?.children.push({ id, title, tag })
+    }
   }
 
   return output

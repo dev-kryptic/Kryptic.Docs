@@ -1,62 +1,32 @@
-import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useInView } from 'framer-motion'
 
-import { useSectionStore } from '@/components/SectionProvider'
 import { Tag } from '@/components/Tag'
-import { remToPx } from '@/lib/remToPx'
 
-function AnchorIcon(props) {
+/* Section heading with an optional self-link.
+ *
+ * The link renders inline, immediately after the text, and fades in on hover or
+ * keyboard focus. It stays in the flow rather than being positioned out into the
+ * margin, so it behaves the same at every breakpoint and needs no measurement.
+ */
+
+function HashIcon(props) {
   return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="m6.5 11.5-.964-.964a3.535 3.535 0 1 1 5-5l.964.964m2 2 .964.964a3.536 3.536 0 0 1-5 5L8.5 13.5m0-5 3 3" />
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M6.6 2.2a.75.75 0 0 1 .65.84L6.98 5h2.49l.3-2.16a.75.75 0 1 1 1.49.2L10.98 5h1.77a.75.75 0 0 1 0 1.5h-1.98l-.28 2h1.76a.75.75 0 0 1 0 1.5h-1.97l-.3 2.16a.75.75 0 1 1-1.49-.2L8.77 10H6.28l-.3 2.16a.75.75 0 1 1-1.49-.2L4.77 10H3a.75.75 0 0 1 0-1.5h1.98l.28-2H3.5a.75.75 0 0 1 0-1.5h1.97l.3-2.16a.75.75 0 0 1 .83-.64ZM6.77 6.5l-.28 2h2.49l.28-2H6.77Z" />
     </svg>
   )
 }
 
 function Eyebrow({ tag, label }) {
-  if (!tag && !label) {
-    return null
-  }
+  if (!tag && !label) return null
 
   return (
     <div className="flex items-center gap-x-3">
       {tag && <Tag>{tag}</Tag>}
-      {tag && label && (
-        <span className="h-0.5 w-0.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-      )}
-      {label && (
-        <span className="font-mono text-xs text-zinc-400">{label}</span>
-      )}
+      {tag && label && <span className="h-1 w-1 rounded-pill bg-edge-lift" />}
+      {label && <span className="font-mono text-2xs text-ink-faint">{label}</span>}
     </div>
-  )
-}
-
-function Anchor({ id, inView, children }) {
-  const router = useRouter()
-  const pathname = router.pathname
-
-  return (
-    <Link
-      href={`${pathname}#${id}`}
-      className="group text-inherit no-underline hover:text-inherit"
-    >
-      {inView && (
-        <div className="absolute ml-[calc(-1*var(--width))] mt-1 hidden w-[var(--width)] opacity-0 transition [--width:calc(2.625rem+0.5px+50%-min(50%,calc(theme(maxWidth.lg)+theme(spacing.8))))] group-hover:opacity-100 group-focus:opacity-100 md:block lg:z-50 2xl:[--width:theme(spacing.10)]">
-          <div className="group/anchor block h-5 w-5 rounded-lg bg-zinc-50 ring-1 ring-inset ring-zinc-300 transition hover:ring-zinc-500 dark:bg-zinc-800 dark:ring-zinc-700 dark:hover:bg-zinc-700 dark:hover:ring-zinc-600">
-            <AnchorIcon className="h-5 w-5 stroke-zinc-500 transition dark:stroke-zinc-400 dark:group-hover/anchor:stroke-white" />
-          </div>
-        </div>
-      )}
-      <div>{children}</div>
-    </Link>
   )
 }
 
@@ -70,37 +40,37 @@ export function Heading({
   ...props
 }) {
   let Component = `h${level}`
-  let ref = useRef()
-  // let registerHeading = useSectionStore((s) => s.registerHeading)
-
-  let inView = useInView(ref, {
-    margin: `${remToPx(-3.5)}px 0px 0px 0px`,
-    amount: 'all',
-  })
-
-  // useEffect(() => {
-  //   if (level === 2) {
-  //     registerHeading({ id, ref, offsetRem: tag || label ? 8 : 6 })
-  //   }
-  // })
+  let router = useRouter()
 
   return (
     <>
       <Eyebrow tag={tag} label={label} />
       <Component
-        ref={ref}
         id={anchor ? id : undefined}
-        className={tag || label ? 'mt-2 scroll-mt-32' : 'scroll-mt-24'}
+        className={clsxScroll(tag || label)}
         {...props}
       >
-        {anchor ? (
-          <Anchor id={id} inView={inView}>
+        {anchor && id ? (
+          <span className="group inline-flex items-baseline gap-1.5">
             {children}
-          </Anchor>
+            <Link
+              href={`${router.pathname}#${id}`}
+              aria-label="Link to this section"
+              className="text-ink-faint no-underline opacity-0 transition hover:text-accent-text focus:opacity-100 group-hover:opacity-100"
+            >
+              <HashIcon className="h-3.5 w-3.5" />
+            </Link>
+          </span>
         ) : (
           children
         )}
       </Component>
     </>
   )
+}
+
+/* Headings with an eyebrow need extra scroll offset so the eyebrow is not
+   clipped under the sticky header when jumping to an anchor. */
+function clsxScroll(hasEyebrow) {
+  return hasEyebrow ? 'mt-2 scroll-mt-32' : 'scroll-mt-24'
 }

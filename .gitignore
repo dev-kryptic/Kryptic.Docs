@@ -45,3 +45,4 @@ package-lock.json
 
 # Playwright MCP run artifacts (snapshots, console logs)
 /.playwright-mcp/
+.claude/

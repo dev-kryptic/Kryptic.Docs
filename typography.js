@@ -1,417 +1,165 @@
+/* Prose styling for MDX pages.
+ *
+ * Only the token-driven colours and a handful of structural choices live here;
+ * @tailwindcss/typography merges this over its own defaults, so list markers,
+ * table scaffolding and the rest come from the plugin rather than being
+ * redeclared. Colours resolve to src/styles/kryptic-tokens.css.
+ *
+ * Custom variables beyond the plugin's set (consumed by components):
+ *   --tw-prose-links-hover, --tw-prose-links-underline,
+ *   --tw-prose-code-bg, --tw-prose-code-ring
+ */
+
 module.exports = ({ theme }) => ({
   DEFAULT: {
     css: {
-      '--tw-prose-body': theme('colors.zinc.700'),
-      '--tw-prose-headings': theme('colors.zinc.900'),
-      '--tw-prose-links': theme('colors.kryptic.light'),
-      '--tw-prose-links-hover': theme('colors.kryptic.800'),
-      '--tw-prose-links-underline': theme('colors.kryptic.light / 0.3'),
-      '--tw-prose-bold': theme('colors.zinc.900'),
-      '--tw-prose-counters': theme('colors.zinc.500'),
-      '--tw-prose-bullets': theme('colors.zinc.300'),
-      '--tw-prose-hr': theme('colors.zinc.900 / 0.05'),
-      '--tw-prose-quotes': theme('colors.zinc.900'),
-      '--tw-prose-quote-borders': theme('colors.zinc.200'),
-      '--tw-prose-captions': theme('colors.zinc.500'),
-      '--tw-prose-code': theme('colors.zinc.900'),
-      '--tw-prose-code-bg': theme('colors.zinc.100'),
-      '--tw-prose-code-ring': theme('colors.zinc.300'),
-      '--tw-prose-th-borders': theme('colors.zinc.300'),
-      '--tw-prose-td-borders': theme('colors.zinc.200'),
-      '--tw-prose-th-bg': theme('colors.zinc.100'),
-      '--tw-prose-td-bg': theme('colors.zinc.50 / 0.5'),
+      '--tw-prose-body': 'var(--text-2)',
+      '--tw-prose-headings': 'var(--text)',
+      '--tw-prose-lead': 'var(--text-2)',
+      '--tw-prose-links': 'var(--accent-ink)',
+      '--tw-prose-links-hover': 'var(--accent-2)',
+      '--tw-prose-links-underline': 'var(--accent-border)',
+      '--tw-prose-bold': 'var(--text)',
+      '--tw-prose-counters': 'var(--text-3)',
+      '--tw-prose-bullets': 'var(--border-lift)',
+      '--tw-prose-hr': 'var(--border-soft)',
+      '--tw-prose-quotes': 'var(--text)',
+      '--tw-prose-quote-borders': 'var(--border)',
+      '--tw-prose-captions': 'var(--text-3)',
+      '--tw-prose-code': 'var(--text)',
+      '--tw-prose-code-bg': 'var(--surface-2)',
+      '--tw-prose-code-ring': 'var(--border)',
+      '--tw-prose-th-borders': 'var(--border-lift)',
+      '--tw-prose-td-borders': 'var(--border-soft)',
 
-      '--tw-prose-invert-body': theme('colors.zinc.400'),
-      '--tw-prose-invert-headings': theme('colors.white'),
-      '--tw-prose-invert-links': theme('colors.kryptic.DEFAULT'),
-      '--tw-prose-invert-links-hover': theme('colors.kryptic.300'),
-      '--tw-prose-invert-links-underline': theme('colors.kryptic.DEFAULT / 0.3'),
-      '--tw-prose-invert-bold': theme('colors.white'),
-      '--tw-prose-invert-counters': theme('colors.zinc.400'),
-      '--tw-prose-invert-bullets': theme('colors.zinc.600'),
-      '--tw-prose-invert-hr': theme('colors.white / 0.05'),
-      '--tw-prose-invert-quotes': theme('colors.zinc.100'),
-      '--tw-prose-invert-quote-borders': theme('colors.zinc.700'),
-      '--tw-prose-invert-captions': theme('colors.zinc.400'),
-      '--tw-prose-invert-code': theme('colors.white'),
-      '--tw-prose-invert-code-bg': theme('colors.zinc.700 / 0.15'),
-      '--tw-prose-invert-code-ring': theme('colors.white / 0.1'),
-      '--tw-prose-invert-th-borders': theme('colors.zinc.600'),
-      '--tw-prose-invert-td-borders': theme('colors.zinc.700'),
-      '--tw-prose-invert-th-bg': theme('colors.zinc.800 / 0.5'),
-      '--tw-prose-invert-td-bg': theme('colors.zinc.800 / 0.2'),
-
-      // Base
+      maxWidth: 'none',
       color: 'var(--tw-prose-body)',
       fontSize: theme('fontSize.sm')[0],
       lineHeight: theme('lineHeight.7'),
 
-      // Layout
-      '> *': {
-        maxWidth: theme('maxWidth.2xl'),
-        marginLeft: 10,
-        marginRight: 'auto',
-        '@screen lg': {
-          maxWidth: theme('maxWidth.3xl'),
-          marginLeft: 10,
-          marginRight: `calc(50% - min(50%, ${theme('maxWidth.lg')}))`,
-        },
+      // Headings sit on the display face; the token file owns the family.
+      ':is(h1, h2, h3, h4)': {
+        fontFamily: 'var(--display)',
+        fontWeight: '600',
+        letterSpacing: '-0.01em',
+        color: 'var(--tw-prose-headings)',
       },
-
-      // Text
-      p: {
-        marginTop: theme('spacing.6'),
-        marginBottom: theme('spacing.6'),
-      },
-      '[class~="lead"]': {
-        fontSize: theme('fontSize.base')[0],
-        ...theme('fontSize.base')[1],
-      },
-
-      // Lists
-      ol: {
-        listStyleType: 'decimal',
-        marginTop: theme('spacing.6'),
-        marginBottom: theme('spacing.6'),
-        paddingLeft: '1.625rem',
-      },
-      'ol[type="A"]': {
-        listStyleType: 'upper-alpha',
-      },
-      'ol[type="a"]': {
-        listStyleType: 'lower-alpha',
-      },
-      'ol[type="A" s]': {
-        listStyleType: 'upper-alpha',
-      },
-      'ol[type="a" s]': {
-        listStyleType: 'lower-alpha',
-      },
-      'ol[type="I"]': {
-        listStyleType: 'upper-roman',
-      },
-      'ol[type="i"]': {
-        listStyleType: 'lower-roman',
-      },
-      'ol[type="I" s]': {
-        listStyleType: 'upper-roman',
-      },
-      'ol[type="i" s]': {
-        listStyleType: 'lower-roman',
-      },
-      'ol[type="1"]': {
-        listStyleType: 'decimal',
-      },
-      ul: {
-        listStyleType: 'disc',
-        marginTop: theme('spacing.6'),
-        marginBottom: theme('spacing.6'),
-        paddingLeft: '1.625rem',
-      },
-      li: {
-        marginTop: theme('spacing.3'),
-        marginBottom: theme('spacing.3'),
-      },
-      ':is(ol, ul) > li': {
-        paddingLeft: theme('spacing[1.5]'),
-        lineHeight: theme('lineHeight.7'),
-      },
-      'ol > li::marker': {
-        fontWeight: '400',
-        color: 'var(--tw-prose-counters)',
-      },
-      'ul > li::marker': {
-        color: 'var(--tw-prose-bullets)',
-      },
-      '> ul > li p': {
-        marginTop: theme('spacing.3'),
-        marginBottom: theme('spacing.3'),
-      },
-      '> ul > li > *:first-child': {
-        marginTop: theme('spacing.5'),
-      },
-      '> ul > li > *:last-child': {
-        marginBottom: theme('spacing.5'),
-      },
-      '> ol > li > *:first-child': {
-        marginTop: theme('spacing.5'),
-      },
-      '> ol > li > *:last-child': {
-        marginBottom: theme('spacing.5'),
-      },
-      'ul ul, ul ol, ol ul, ol ol': {
-        marginTop: theme('spacing.4'),
+      h1: { fontSize: theme('fontSize.3xl')[0], marginBottom: theme('spacing.6') },
+      h2: {
+        fontSize: theme('fontSize.xl')[0],
+        marginTop: theme('spacing.12'),
         marginBottom: theme('spacing.4'),
       },
-
-      // Horizontal rules
-      hr: {
-        borderColor: 'var(--tw-prose-hr)',
-        borderTopWidth: 1,
-        marginTop: theme('spacing.16'),
-        marginBottom: theme('spacing.16'),
-        maxWidth: 'none',
-        marginLeft: `calc(-1 * ${theme('spacing.4')})`,
-        marginRight: `calc(-1 * ${theme('spacing.4')})`,
-        '@screen sm': {
-          marginLeft: `calc(-1 * ${theme('spacing.6')})`,
-          marginRight: `calc(-1 * ${theme('spacing.6')})`,
-        },
-        '@screen lg': {
-          marginLeft: `calc(-1 * ${theme('spacing.8')})`,
-          marginRight: `calc(-1 * ${theme('spacing.8')})`,
-        },
-      },
-
-      // Quotes
-      blockquote: {
-        fontWeight: '500',
-        fontStyle: 'italic',
-        color: 'var(--tw-prose-quotes)',
-        borderLeftWidth: '0.375rem',
-        borderLeftColor: theme('colors.kryptic.light'),
-        backgroundColor: theme('colors.kryptic.50 / 0.3'),
-        quotes: '"\\201C""\\201D""\\2018""\\2019"',
-        marginTop: theme('spacing.8'),
-        marginBottom: theme('spacing.8'),
-        paddingTop: theme('spacing.4'),
-        paddingRight: theme('spacing.4'),
-        paddingBottom: theme('spacing.4'),
-        paddingLeft: theme('spacing.5'),
-        borderRadius: theme('borderRadius.md'),
-      },
-      'blockquote p:first-of-type::before': {
-        content: 'open-quote',
-      },
-      'blockquote p:last-of-type::after': {
-        content: 'close-quote',
-      },
-
-      // Headings
-      h1: {
-        color: 'var(--tw-prose-headings)',
-        fontWeight: '700',
-        fontSize: theme('fontSize.2xl')[0],
-        ...theme('fontSize.2xl')[1],
-        marginBottom: theme('spacing.2'),
-      },
-      h2: {
-        color: 'var(--tw-prose-headings)',
-        fontWeight: '600',
-        fontSize: theme('fontSize.lg')[0],
-        ...theme('fontSize.lg')[1],
-        marginTop: theme('spacing.16'),
-        marginBottom: theme('spacing.2'),
-      },
       h3: {
-        color: 'var(--tw-prose-headings)',
         fontSize: theme('fontSize.base')[0],
-        ...theme('fontSize.base')[1],
-        fontWeight: '600',
         marginTop: theme('spacing.10'),
-        marginBottom: theme('spacing.2'),
+        marginBottom: theme('spacing.3'),
       },
       h4: {
-        color: 'var(--tw-prose-headings)',
-        fontSize: theme('fontSize.base')[0],
-        ...theme('fontSize.base')[1],
-        fontWeight: '600',
+        fontSize: theme('fontSize.sm')[0],
         marginTop: theme('spacing.8'),
-        marginBottom: theme('spacing.3'),
-      },
-      h5: {
-        color: 'var(--tw-prose-headings)',
-        fontSize: theme('fontSize.sm')[0],
-        ...theme('fontSize.sm')[1],
-        fontWeight: '600',
-        marginTop: theme('spacing.6'),
-        marginBottom: theme('spacing.3'),
-      },
-      h6: {
-        color: 'var(--tw-prose-headings)',
-        fontSize: theme('fontSize.sm')[0],
-        ...theme('fontSize.sm')[1],
-        fontWeight: '600',
-        marginTop: theme('spacing.6'),
-        marginBottom: theme('spacing.3'),
+        marginBottom: theme('spacing.2'),
       },
 
-      // Media
-      'img, video, figure': {
-        marginTop: theme('spacing.8'),
-        marginBottom: theme('spacing.8'),
-      },
-      'figure > *': {
-        marginTop: '0',
-        marginBottom: '0',
-      },
-      figcaption: {
-        color: 'var(--tw-prose-captions)',
-        fontSize: theme('fontSize.xs')[0],
-        ...theme('fontSize.xs')[1],
-        marginTop: theme('spacing.2'),
-      },
-
-      // Tables
-      table: {
-        width: '100%',
-        tableLayout: 'auto',
-        textAlign: 'left',
-        marginTop: theme('spacing.8'),
-        marginBottom: theme('spacing.8'),
-        lineHeight: theme('lineHeight.6'),
-        borderRadius: theme('borderRadius.lg'),
-        overflow: 'hidden',
-        borderWidth: '1px',
-        borderColor: 'var(--tw-prose-th-borders)',
-        boxShadow: theme('boxShadow.sm'),
-      },
-      thead: {
-        backgroundColor: 'var(--tw-prose-th-bg)',
-        borderBottomWidth: '2px',
-        borderBottomColor: 'var(--tw-prose-th-borders)',
-      },
-      'thead th': {
-        color: 'var(--tw-prose-headings)',
-        fontWeight: '600',
-        verticalAlign: 'bottom',
-        paddingTop: theme('spacing.4'),
-        paddingRight: theme('spacing.4'),
-        paddingBottom: theme('spacing.4'),
-        paddingLeft: theme('spacing.4'),
-        fontSize: theme('fontSize.sm')[0],
-        textTransform: 'uppercase',
-        letterSpacing: theme('letterSpacing.wide'),
-      },
-      'thead th:first-child': {
-        paddingLeft: theme('spacing.4'),
-      },
-      'thead th:last-child': {
-        paddingRight: theme('spacing.4'),
-      },
-      'tbody tr': {
-        borderBottomWidth: '1px',
-        borderBottomColor: 'var(--tw-prose-td-borders)',
-        transitionProperty: 'background-color',
-        transitionDuration: theme('transitionDuration.DEFAULT'),
-        transitionTimingFunction: theme('transitionTimingFunction.DEFAULT'),
-        '&:hover': {
-          backgroundColor: 'var(--tw-prose-td-bg)',
-        },
-        '&:nth-child(even)': {
-          backgroundColor: 'var(--tw-prose-td-bg)',
-        },
-      },
-      'tbody tr:last-child': {
-        borderBottomWidth: '0',
-      },
-      'tbody td': {
-        verticalAlign: 'middle',
-      },
-      tfoot: {
-        borderTopWidth: '2px',
-        borderTopColor: 'var(--tw-prose-th-borders)',
-        backgroundColor: 'var(--tw-prose-td-bg)',
-      },
-      'tfoot td': {
-        verticalAlign: 'top',
-      },
-      ':is(tbody, tfoot) td': {
-        paddingTop: theme('spacing.4'),
-        paddingRight: theme('spacing.4'),
-        paddingBottom: theme('spacing.4'),
-        paddingLeft: theme('spacing.4'),
-      },
-      ':is(tbody, tfoot) td:first-child': {
-        paddingLeft: theme('spacing.4'),
-      },
-      ':is(tbody, tfoot) td:last-child': {
-        paddingRight: theme('spacing.4'),
-      },
-
-      // Inline elements
+      // Links: coloured, with a token-tinted underline that firms up on hover.
       a: {
         color: 'var(--tw-prose-links)',
-        textDecoration: 'underline transparent',
         fontWeight: '500',
+        textDecoration: 'underline',
+        textDecorationColor: 'var(--tw-prose-links-underline)',
+        textUnderlineOffset: '3px',
         transitionProperty: 'color, text-decoration-color',
-        transitionDuration: theme('transitionDuration.DEFAULT'),
-        transitionTimingFunction: theme('transitionTimingFunction.DEFAULT'),
-        '&:hover': {
-          color: 'var(--tw-prose-links-hover)',
-          textDecorationColor: 'var(--tw-prose-links-underline)',
-        },
+        transitionDuration: '150ms',
       },
-      ':is(h1, h2, h3) a': {
-        fontWeight: 'inherit',
-      },
-      strong: {
-        color: 'var(--tw-prose-bold)',
-        fontWeight: '600',
-      },
-      ':is(a, blockquote, thead th) strong': {
-        color: 'inherit',
-      },
-      code: {
-        color: 'var(--tw-prose-code)',
-        borderRadius: theme('borderRadius.lg'),
-        paddingTop: theme('padding.1'),
-        paddingRight: theme('padding[1.5]'),
-        paddingBottom: theme('padding.1'),
-        paddingLeft: theme('padding[1.5]'),
-        boxShadow: 'inset 0 0 0 1px var(--tw-prose-code-ring)',
-        backgroundColor: 'var(--tw-prose-code-bg)',
-        fontSize: theme('fontSize.2xs'),
-      },
-      ':is(a, h1, h2, h3, blockquote, thead th) code': {
-        color: 'inherit',
-      },
-      'h2 code': {
-        fontSize: theme('fontSize.base')[0],
-        fontWeight: 'inherit',
-      },
-      'h3 code': {
-        fontSize: theme('fontSize.sm')[0],
-        fontWeight: 'inherit',
+      'a:hover': {
+        color: 'var(--tw-prose-links-hover)',
+        textDecorationColor: 'var(--tw-prose-links-hover)',
       },
 
-      // Overrides
-      ':is(h1, h2, h3) + *': {
-        marginTop: '0',
+      // Inline code: a tinted chip. Block code is handled by <CodeGroup>.
+      code: {
+        fontFamily: 'var(--mono)',
+        fontSize: theme('fontSize.2xs')[0],
+        fontWeight: '500',
+        color: 'var(--tw-prose-code)',
+        backgroundColor: 'var(--tw-prose-code-bg)',
+        borderRadius: 'var(--radius-sm)',
+        paddingInline: '0.375rem',
+        paddingBlock: '0.125rem',
+        boxShadow: 'inset 0 0 0 1px var(--tw-prose-code-ring)',
       },
-      '> :first-child': {
-        marginTop: '0 !important',
+      'code::before': { content: 'none' },
+      'code::after': { content: 'none' },
+      // Inside links and headings, code inherits rather than fighting the colour.
+      ':is(a, h1, h2, h3, h4, blockquote, thead th) code': {
+        color: 'inherit',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        paddingInline: '0',
       },
-      '> :last-child': {
-        marginBottom: '0 !important',
+
+      // <CodeGroup> renders its own frame; strip the prose <pre> chrome.
+      pre: {
+        margin: '0',
+        padding: '0',
+        backgroundColor: 'transparent',
+        color: 'inherit',
+        borderRadius: '0',
+        fontSize: 'inherit',
+        lineHeight: 'inherit',
       },
+      'pre code': {
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        padding: '0',
+        fontSize: 'inherit',
+      },
+
+      hr: { borderColor: 'var(--tw-prose-hr)', marginBlock: theme('spacing.12') },
+
+      blockquote: {
+        fontStyle: 'normal',
+        fontWeight: '400',
+        color: 'var(--tw-prose-quotes)',
+        borderInlineStartWidth: '2px',
+        borderInlineStartColor: 'var(--tw-prose-quote-borders)',
+        paddingInlineStart: theme('spacing.5'),
+      },
+      'blockquote p:first-of-type::before': { content: 'none' },
+      'blockquote p:last-of-type::after': { content: 'none' },
+
+      // Tables: rules only, no zebra - reads better for reference material.
+      thead: { borderBottomColor: 'var(--tw-prose-th-borders)' },
+      'thead th': {
+        fontFamily: 'var(--body)',
+        fontWeight: '600',
+        color: 'var(--tw-prose-headings)',
+        fontSize: theme('fontSize.2xs')[0],
+        textTransform: 'uppercase',
+        letterSpacing: '0.04em',
+        paddingBlock: theme('spacing.2'),
+      },
+      'tbody tr': { borderBottomColor: 'var(--tw-prose-td-borders)' },
+      'tbody td': { paddingBlock: theme('spacing.3'), verticalAlign: 'baseline' },
+
+      'img, video, figure': { borderRadius: 'var(--radius-md)' },
     },
   },
+
+  // Dark is the primary theme, so `prose-invert` only has to re-point the
+  // handful of variables that are not already token-driven. The tokens
+  // themselves flip with the .dark class, so most values need no override.
   invert: {
     css: {
-      '--tw-prose-body': 'var(--tw-prose-invert-body)',
-      '--tw-prose-headings': 'var(--tw-prose-invert-headings)',
-      '--tw-prose-links': 'var(--tw-prose-invert-links)',
-      '--tw-prose-links-hover': 'var(--tw-prose-invert-links-hover)',
-      '--tw-prose-links-underline': 'var(--tw-prose-invert-links-underline)',
-      '--tw-prose-bold': 'var(--tw-prose-invert-bold)',
-      '--tw-prose-counters': 'var(--tw-prose-invert-counters)',
-      '--tw-prose-bullets': 'var(--tw-prose-invert-bullets)',
-      '--tw-prose-hr': 'var(--tw-prose-invert-hr)',
-      '--tw-prose-quotes': 'var(--tw-prose-invert-quotes)',
-      '--tw-prose-quote-borders': 'var(--tw-prose-invert-quote-borders)',
-      '--tw-prose-captions': 'var(--tw-prose-invert-captions)',
-      '--tw-prose-code': 'var(--tw-prose-invert-code)',
-      '--tw-prose-code-bg': 'var(--tw-prose-invert-code-bg)',
-      '--tw-prose-code-ring': 'var(--tw-prose-invert-code-ring)',
-      '--tw-prose-th-borders': 'var(--tw-prose-invert-th-borders)',
-      '--tw-prose-td-borders': 'var(--tw-prose-invert-td-borders)',
-      '--tw-prose-th-bg': 'var(--tw-prose-invert-th-bg)',
-      '--tw-prose-td-bg': 'var(--tw-prose-invert-td-bg)',
-      blockquote: {
-        borderLeftColor: theme('colors.kryptic.DEFAULT'),
-        backgroundColor: theme('colors.kryptic.900 / 0.2'),
-      },
+      '--tw-prose-body': 'var(--text-2)',
+      '--tw-prose-headings': 'var(--text)',
+      '--tw-prose-links': 'var(--accent)',
+      '--tw-prose-links-hover': 'var(--accent)',
+      '--tw-prose-links-underline': 'var(--accent-border)',
+      '--tw-prose-bold': 'var(--text)',
+      '--tw-prose-code': 'var(--text)',
+      '--tw-prose-code-bg': 'var(--surface-2)',
+      '--tw-prose-code-ring': 'var(--border)',
     },
   },
 })
