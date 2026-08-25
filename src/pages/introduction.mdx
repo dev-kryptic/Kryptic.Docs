@@ -8,7 +8,7 @@ export const description =
 
 Kryptic is a developer secrets platform that injects environment variables at runtime - no `.env` files in your repo, no secrets in CI config.
 
-A local daemon authenticates once via your browser, then your apps pull secrets over a local socket at startup. Add a `kryptic.json` to your repo root and one package line - that is the entire integration. Works on macOS, Linux, and Windows.
+A local daemon authenticates once via your browser, then your apps pull secrets over a local socket at startup. Add a `kryptic.json` to your repo root and one SDK line - that is the entire integration. Works on macOS, Linux, and Windows.
 
 <div className="not-prose mb-10 mt-6 flex gap-3">
   <Button href="/get-started" arrow="right">Quickstart</Button>
@@ -27,17 +27,17 @@ Anything that can see a secret in plaintext is open source and lives under
 proprietary: it stores ciphertext it has no path to open. See
 [Encryption](/encryption).
 
-| What | GitHub | Published as |
-| --- | --- | --- |
-| Daemon and CLI | [Kryptic.Daemon](https://github.com/dev-kryptic/Kryptic.Daemon) | `kryptic` binary |
-| Encryption engine (.NET) | [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | NuGet `Kryptic.Encryption` |
-| Encryption engine (TypeScript) | [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | npm `@krypticdev/encryption` |
-| Encryption engine (Go) | [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go module of the same name |
-| Kubernetes operator | [k8s-operator](https://github.com/dev-kryptic/k8s-operator) | Apache 2.0 |
-| Language packages | [Kryptic.Net](https://github.com/dev-kryptic/Kryptic.Net), [Node](https://github.com/dev-kryptic/Kryptic.Node), [Python](https://github.com/dev-kryptic/Kryptic.Python), [Java](https://github.com/dev-kryptic/Kryptic.Java), [Go](https://github.com/dev-kryptic/Kryptic.Go), [Ruby](https://github.com/dev-kryptic/Kryptic.Ruby), [Cpp](https://github.com/dev-kryptic/Kryptic.Cpp), [Rust](https://github.com/dev-kryptic/Kryptic.Rust) | `Kryptic.Daemon.Client` / `@krypticdev/daemon-client` / `kryptic-daemon-client` |
+| What | GitHub | Published as | License |
+| --- | --- | --- | --- |
+| Daemon and CLI | [Kryptic.Daemon](https://github.com/dev-kryptic/Kryptic.Daemon) | `kryptic` binary | GPL-3.0 |
+| Encryption engine (.NET) | [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | NuGet `Kryptic.Encryption` | Apache-2.0 |
+| Encryption engine (TypeScript) | [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | npm `@krypticdev/encryption` | Apache-2.0 |
+| Encryption engine (Go) | [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go module of the same name | Apache-2.0 |
+| Kubernetes operator | [k8s-operator](https://github.com/dev-kryptic/k8s-operator) | Kubernetes manifests | Apache-2.0 |
+| Language SDKs | [Kryptic.Net](https://github.com/dev-kryptic/Kryptic.Net), [Node](https://github.com/dev-kryptic/Kryptic.Node), [Python](https://github.com/dev-kryptic/Kryptic.Python), [Java](https://github.com/dev-kryptic/Kryptic.Java), [Go](https://github.com/dev-kryptic/Kryptic.Go), [Ruby](https://github.com/dev-kryptic/Kryptic.Ruby), [Cpp](https://github.com/dev-kryptic/Kryptic.Cpp), [Rust](https://github.com/dev-kryptic/Kryptic.Rust) | `Kryptic.Daemon.Client` / `@krypticdev/daemon-client` / `kryptic-daemon-client` | Apache-2.0 |
 
-Every language package is a thin daemon client, not an SDK: one entry point that
-asks the local daemon for the current project's secrets.
+Each Kryptic SDK is intentionally thin: one entry point that talks to the local
+daemon. It contains no authentication or secret-storage logic.
 
 <Tiles
   title="Documentation"
@@ -50,8 +50,8 @@ asks the local daemon for the current project's secrets.
     },
     {
       href: '/packages/node',
-      name: 'Language packages',
-      description: 'Thin Apache-2.0 clients for .NET, Node.js, Python, Java, Go, Ruby, C++, and Rust.',
+      name: 'Language SDKs',
+      description: 'Lightweight, language-native SDKs for .NET, Node.js, Python, Java, Go, Ruby, C++, and Rust.',
     },
     {
       href: '/cli',
@@ -61,7 +61,7 @@ asks the local daemon for the current project's secrets.
     {
       href: '/configuration',
       name: 'Configuration',
-      description: 'The kryptic.json schema and the environment variables every package honors.',
+      description: 'The kryptic.json schema and the environment variables every SDK honors.',
     },
     {
       href: '/dashboard',

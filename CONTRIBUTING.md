@@ -55,7 +55,7 @@ Both CI checks that run on your PR are `pr-build` (lint and build) and
 
 - One sentence per line in `.mdx` where practical — it keeps diffs readable.
 - Use the real command output, not an approximation of it.
-- Product names: **Kryptic**, and the packages are *packages*, never "SDKs".
+- Product names: **Kryptic**. In public copy the language clients are *SDKs*. Use *package* only for the NuGet, npm, PyPI, Maven, or RubyGems artifact.
 - Prefer showing the smallest command that works over explaining every flag.
 - Screenshots: don't add new ones. Ours are generated from an internal build.
 

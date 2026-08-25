@@ -204,6 +204,7 @@ Each link below points to a clean markdown version of the documentation page.
   const sectionNames = {
     introduction: 'Introduction',
     'get-started': 'Getting Started',
+    packages: 'SDKs',
     templates: 'Templates',
   };
 

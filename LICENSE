@@ -102,7 +102,7 @@ OTHER KRYPTIC COMPONENTS
 ================================================================================
 
 Separate, and unaffected by this file: the Kryptic encryption engine and the
-language packages are Apache-2.0; the daemon and CLI are GPL-3.0; the
+language SDKs are Apache-2.0; the daemon and CLI are GPL-3.0; the
 Kubernetes operator is Apache-2.0; the enterprise module is source-available
 under the Kryptic Enterprise License. See DOCUMENTATION.md section 11 for the
 full component licensing breakdown.

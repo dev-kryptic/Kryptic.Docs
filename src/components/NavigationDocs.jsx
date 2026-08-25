@@ -25,7 +25,7 @@ export const docsNavigation = [
     ],
   },
   {
-    title: 'PACKAGES',
+    title: 'SDKS',
     links: [
       { title: 'Node.js', href: '/packages/node' },
       { title: '.NET', href: '/packages/dotnet' },

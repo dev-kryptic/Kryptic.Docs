@@ -67,13 +67,13 @@ one click to copy.
 }
 ```
 
-## 3. Add the package for your language
+## 3. Install the SDK for your language
 
-One dev dependency, one line at startup. Every package is a thin Apache-2.0 client that
-asks the daemon for your secrets over a local socket. Published names are
+One dev dependency, one line at startup. Every SDK is a thin Apache-2.0 client that
+asks the daemon for your secrets over a local socket. Published package names are
 `Kryptic.Daemon.Client` (.NET), `@krypticdev/daemon-client` (npm), and `kryptic-daemon-client` on the other registries.
 
-<CodeGroup title="Install package">
+<CodeGroup title="Install the SDK">
 ```bash title=".NET"
 dotnet add package Kryptic.Daemon.Client
 ```
@@ -213,7 +213,7 @@ cargo run
 
 That's it. Secrets are in `process.env` (or `IConfiguration`, `os.environ`, `ENV`, …)
 before your code reads them. Existing environment variables are never overwritten, and in
-production the package is a no-op.
+production the SDK is a no-op.
 
 <Success>
   Your workflow did not change: F5, `npm run dev`, `dotnet run` - everything just works,
@@ -226,5 +226,5 @@ production the package is a no-op.
 </Note>
 
 <div className="not-prose mt-8">
-  <Button href="/packages/node" arrow="right">Per-language guides</Button>
+  <Button href="/packages/node" arrow="right">Per-language SDK guides</Button>
 </div>

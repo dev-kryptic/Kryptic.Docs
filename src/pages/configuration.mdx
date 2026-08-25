@@ -1,13 +1,13 @@
 import { Note, Properties, Property } from '@/components/mdx'
 
-export const description = 'kryptic.json schema and the environment variables every package honors.'
+export const description = 'kryptic.json schema and the environment variables every SDK honors.'
 
 # Configuration reference
 
 ## kryptic.json
 
 The per-repository project file. It contains no secrets and is committed to version
-control. Every package finds it by walking up from the current working directory, so it
+control. Every SDK finds it by walking up from the current working directory, so it
 also works from subdirectories and monorepo packages.
 
 ```json
@@ -28,9 +28,9 @@ also works from subdirectories and monorepo packages.
   </Property>
 </Properties>
 
-## Environment variables (packages)
+## Environment variables (SDKs)
 
-Every language package honors the same set. Environment variables always win over
+Every language SDK honors the same set. Environment variables always win over
 `kryptic.json` and over options passed in code.
 
 <Properties>
@@ -43,7 +43,7 @@ Every language package honors the same set. Environment variables always win ove
   <Property name="KRYPTIC_SOCKET_PATH" type="string">
     Override the daemon endpoint. Default: `/tmp/kryptic-daemon.sock` on macOS,
     `$XDG_RUNTIME_DIR/kryptic-daemon.sock` on Linux, `\\.\pipe\kryptic-daemon` on
-    Windows. Tests use this to point packages at a mock daemon.
+    Windows. Tests use this to point SDKs at a mock daemon.
   </Property>
   <Property name="KRYPTIC_TIMEOUT_MS" type="number">
     Daemon connection timeout in milliseconds. Default `2000`.
@@ -57,7 +57,7 @@ Every language package honors the same set. Environment variables always win ove
 </Properties>
 
 <Note>
-  Packages are development-only by design. Each one checks its runtime's idiomatic
+  SDKs are development-only by design. Each one checks its runtime's idiomatic
   environment signal and becomes a no-op outside development:
 
   - **Node.js:** `NODE_ENV` set to anything other than `development`

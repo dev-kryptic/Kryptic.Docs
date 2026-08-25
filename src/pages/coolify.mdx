@@ -16,7 +16,7 @@ Coolify only stores the bootstrap credential. Your application secrets stay in
 Kryptic.
 
 <Warning>
-  Language packages (`inject()`, `AddKryptic()`, and so on) talk to a local
+  Language SDKs (`inject()`, `AddKryptic()`, and so on) talk to a local
   daemon and are a **no-op outside development**. They will not load secrets in a
   Coolify container. Use `kryptic ci export`.
 </Warning>

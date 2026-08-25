@@ -57,7 +57,7 @@ No custom primitives. AES-256-GCM and P-256 ECDH come from platform cryptography
 Argon2id comes from proven libraries. Each engine ships a `SECURITY.md` describing
 the key hierarchy.
 
-Language packages never decrypt. They ask the local daemon over a unix socket or
+Language SDKs never decrypt. They ask the local daemon over a unix socket or
 named pipe; the daemon already holds plaintext in memory after opening the
 bundle with the Go engine.
 
