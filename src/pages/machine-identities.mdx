@@ -84,5 +84,7 @@ pipeline's access is as reviewable as a person's.
 
 <Note>
   For Kubernetes, prefer the [operator](/kubernetes) over calling the API from an
-  init container - it handles refresh, drift and failure modes for you.
+  init container. It handles refresh, drift and failure modes for you. For
+  Coolify, follow the [Coolify guide](/coolify): there is no native connector, so
+  the container runs `kryptic ci export` at start.
 </Note>
