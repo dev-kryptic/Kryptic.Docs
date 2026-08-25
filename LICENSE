@@ -12,9 +12,12 @@ PART 1 — DOCUMENTATION CONTENT: BSD 3-Clause License
 Applies to the written documentation only:
 
   src/pages/**/*.mdx
-  guides/**
   public/llms/**
   public/llms.txt
+
+public/llms/ and public/llms.txt are generated from the .mdx sources by
+`npm run gen:llm` and carry the same licence as the prose they are built from.
+Edit the .mdx, not the generated output.
 
 Copyright (c) 2026 Kryptic by Theka.dev SINGLE MEMBER P.C.
 All rights reserved.
@@ -55,9 +58,11 @@ PART 2 — EVERYTHING ELSE: Proprietary, all rights reserved
 
 Applies to every path not listed in Part 1, including but not limited to:
 
-  src/app/**, src/components/**, src/chrome/**, src/lib/**, src/hooks/**,
-  src/mdx/**, src/catalog/**, src/styles/**
-  scripts/**, tooling/**, and all build and configuration files
+  src/components/**, src/lib/**, src/hooks/**, src/styles/**
+  src/pages/_app.jsx and src/pages/_document.jsx
+  mdx/**            (the MDX build pipeline)
+  scripts/**        (build-time generators)
+  all build and configuration files
   public/logo.png
   public/screenshots/**
 
@@ -65,9 +70,17 @@ This material is proprietary. It is not open source and it is not
 source-available. Publishing it here grants no licence to use, copy, modify,
 merge, publish, distribute, sublicense, or sell any part of it.
 
-This carve-out is not narrowable. public/screenshots/** depict the Kryptic
-Platform dashboard, which is proprietary and unpublished, and the site source
-incorporates third-party material that Kryptic has no right to sublicense.
+Two parts of this are closed for reasons beyond a simple reservation of rights:
+
+  - public/screenshots/** depict the Kryptic Platform dashboard, which is
+    proprietary and unpublished.
+
+  - src/styles/kryptic-tokens.css is a copy of the colour and typography tokens
+    from @krypticdev/design-system, a proprietary Kryptic package published to a
+    restricted npm scope and otherwise used only by the closed Kryptic clients.
+
+The rest is simply reserved. Nothing in this section should be read as an
+invitation to negotiate over individual files.
 
 Forking this repository on GitHub in order to prepare a pull request is
 expressly permitted, and so is running the site locally for that purpose. Any
