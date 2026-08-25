@@ -4,7 +4,7 @@ export const description = 'The Kryptic Node.js package - inject() into process.
 
 # Node.js
 
-`kryptic-daemon-client` injects your project's secrets into `process.env` during
+`@krypticdev/daemon-client` injects your project's secrets into `process.env` during
 development startup. In production it is a no-op, and it never throws - no daemon
 simply means your app starts with the environment it already has.
 
@@ -13,17 +13,17 @@ Source: [github.com/dev-kryptic/Kryptic.Node](https://github.com/dev-kryptic/Kry
 ## Install
 
 ```bash
-npm install --save-dev kryptic-daemon-client
+npm install --save-dev @krypticdev/daemon-client
 ```
 
 ## Use
 
 ```js
 // CommonJS - top of your entry point
-require('kryptic-daemon-client').inject();
+require('@krypticdev/daemon-client').inject();
 
 // ES modules
-import { inject } from 'kryptic-daemon-client';
+import { inject } from '@krypticdev/daemon-client';
 await inject();
 
 // All secrets now available:

@@ -71,7 +71,7 @@ one click to copy.
 
 One dev dependency, one line at startup. Every package is a thin Apache-2.0 client that
 asks the daemon for your secrets over a local socket. Published names are
-`Kryptic.Daemon.Client` (.NET) and `kryptic-daemon-client` everywhere else.
+`Kryptic.Daemon.Client` (.NET), `@krypticdev/daemon-client` (npm), and `kryptic-daemon-client` on the other registries.
 
 <CodeGroup title="Install package">
 ```bash title=".NET"
@@ -79,7 +79,7 @@ dotnet add package Kryptic.Daemon.Client
 ```
 
 ```bash title="Node.js"
-npm install --save-dev kryptic-daemon-client
+npm install --save-dev @krypticdev/daemon-client
 ```
 
 ```bash title="Python"
@@ -131,7 +131,7 @@ builder.Configuration.AddKryptic();
 
 ```js title="Node.js"
 // top of your entry point
-require('kryptic-daemon-client').inject();
+require('@krypticdev/daemon-client').inject();
 ```
 
 ```python title="Python"
