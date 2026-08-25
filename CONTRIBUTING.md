@@ -15,9 +15,9 @@ right `.mdx` file.
 | everything else | No — site source and assets are proprietary (see [LICENSE](LICENSE)) |
 
 Site source changes (components, styling, navigation chrome, build scripts) are
-not accepted from outside contributors, because parts of it derive from a
-commercially licensed template we cannot sublicense. If you have found a bug in
-the site itself, please open an issue instead of a PR.
+not accepted from outside contributors — the site source is proprietary and
+incorporates third-party material we cannot sublicense. If you have found a bug
+in the site itself, please open an issue instead of a PR.
 
 One exception worth knowing: adding a new page also needs a one-line route entry
 in `src/components/NavigationDocs.jsx`, or the page will not appear in the

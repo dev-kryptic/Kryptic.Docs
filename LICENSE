@@ -65,14 +65,9 @@ This material is proprietary. It is not open source and it is not
 source-available. Publishing it here grants no licence to use, copy, modify,
 merge, publish, distribute, sublicense, or sell any part of it.
 
-Two specific reasons this carve-out exists and cannot be narrowed:
-
-  - Parts of the site source derive from a commercially licensed third-party
-    UI template. Those rights are not ours to pass on, so the site source
-    cannot be relicensed permissively.
-
-  - public/screenshots/** depict the Kryptic Platform dashboard, which is
-    proprietary and unpublished.
+This carve-out is not narrowable. public/screenshots/** depict the Kryptic
+Platform dashboard, which is proprietary and unpublished, and the site source
+incorporates third-party material that Kryptic has no right to sublicense.
 
 Forking this repository on GitHub in order to prepare a pull request is
 expressly permitted, and so is running the site locally for that purpose. Any
