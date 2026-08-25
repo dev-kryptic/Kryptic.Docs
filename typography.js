@@ -3,7 +3,7 @@
  * Only the token-driven colours and a handful of structural choices live here;
  * @tailwindcss/typography merges this over its own defaults, so list markers,
  * table scaffolding and the rest come from the plugin rather than being
- * re-declared. Colours resolve to src/styles/kryptic-tokens.css.
+ * redeclared. Colours resolve to src/styles/kryptic-tokens.css.
  *
  * Custom variables beyond the plugin's set (consumed by components):
  *   --tw-prose-links-hover, --tw-prose-links-underline,
