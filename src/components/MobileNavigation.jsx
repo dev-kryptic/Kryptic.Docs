@@ -1,35 +1,35 @@
-import { Fragment, createContext, useContext } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { createContext, useContext } from 'react'
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'
 import { motion } from 'framer-motion'
 import { create } from 'zustand'
 
 import { Header } from '@/components/Header'
 import { NavigationDocs } from '@/components/NavigationDocs'
 
+/* Slide-in navigation drawer for narrow viewports.
+ *
+ * The drawer renders its own <Header> so the top bar stays put while the panel
+ * animates in. That copy needs to know it is inside the drawer - otherwise it
+ * would render a second toggle button and recurse - hence the context flag.
+ */
+
 function MenuIcon(props) {
   return (
-    <svg
-      viewBox="0 0 10 9"
-      fill="none"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M.5 1h9M.5 8h9M.5 4.5h9" />
+    <svg viewBox="0 0 16 16" fill="none" strokeLinecap="round" strokeWidth="1.5" aria-hidden="true" {...props}>
+      <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" />
     </svg>
   )
 }
 
-function XIcon(props) {
+function CloseIcon(props) {
   return (
-    <svg
-      viewBox="0 0 10 9"
-      fill="none"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="m1.5 1 7 7M8.5 1l-7 7" />
+    <svg viewBox="0 0 16 16" fill="none" strokeLinecap="round" strokeWidth="1.5" aria-hidden="true" {...props}>
+      <path d="m4 4 8 8M12 4l-8 8" />
     </svg>
   )
 }
@@ -50,23 +50,24 @@ export const useMobileNavigationStore = create((set) => ({
 export function MobileNavigation() {
   let isInsideMobileNavigation = useIsInsideMobileNavigation()
   let { isOpen, toggle, close } = useMobileNavigationStore()
-  let ToggleIcon = isOpen ? XIcon : MenuIcon
+  let ToggleIcon = isOpen ? CloseIcon : MenuIcon
 
   return (
     <IsInsideMobileNavigationContext.Provider value={true}>
       <button
         type="button"
-        className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+        className="flex h-6 w-6 items-center justify-center rounded-sm text-ink transition hover:bg-surface-hover"
         aria-label="Toggle navigation"
+        aria-expanded={isOpen}
         onClick={toggle}
       >
-        <ToggleIcon className="w-2.5 stroke-zinc-900 dark:stroke-white" />
+        <ToggleIcon className="h-4 w-4 stroke-current" />
       </button>
+
       {!isInsideMobileNavigation && (
-        <Transition.Root show={isOpen} as={Fragment}>
+        <Transition show={isOpen}>
           <Dialog onClose={close} className="fixed inset-0 z-50 lg:hidden">
-            <Transition.Child
-              as={Fragment}
+            <TransitionChild
               enter="duration-300 ease-out"
               enterFrom="opacity-0"
               enterTo="opacity-100"
@@ -74,12 +75,11 @@ export function MobileNavigation() {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div className="fixed inset-0 top-14 bg-zinc-400/20 backdrop-blur-sm dark:bg-[#0a0d0c]/40" />
-            </Transition.Child>
+              <div className="fixed inset-0 top-14 bg-canvas/50 backdrop-blur-sm" />
+            </TransitionChild>
 
-            <Dialog.Panel>
-              <Transition.Child
-                as={Fragment}
+            <DialogPanel>
+              <TransitionChild
                 enter="duration-300 ease-out"
                 enterFrom="opacity-0"
                 enterTo="opacity-100"
@@ -88,10 +88,9 @@ export function MobileNavigation() {
                 leaveTo="opacity-0"
               >
                 <Header />
-              </Transition.Child>
+              </TransitionChild>
 
-              <Transition.Child
-                as={Fragment}
+              <TransitionChild
                 enter="duration-500 ease-in-out"
                 enterFrom="-translate-x-full"
                 enterTo="translate-x-0"
@@ -101,14 +100,14 @@ export function MobileNavigation() {
               >
                 <motion.div
                   layoutScroll
-                  className="fixed bottom-0 left-0 top-14 w-full overflow-y-auto bg-white/70 dark:bg-[#0a0d0c]/95 backdrop-blur-lg px-4 pb-4 pt-6 shadow-lg shadow-zinc-900/10 ring-1 ring-zinc-900/7.5 dark:ring-neutral-500/10 min-[416px]:max-w-sm sm:px-6 sm:pb-10"
+                  className="fixed bottom-0 left-0 top-14 w-full overflow-y-auto bg-canvas/95 px-4 pb-4 pt-6 shadow-panel ring-1 ring-edge backdrop-blur-lg min-[416px]:max-w-sm sm:px-6 sm:pb-10"
                 >
                   <NavigationDocs />
                 </motion.div>
-              </Transition.Child>
-            </Dialog.Panel>
+              </TransitionChild>
+            </DialogPanel>
           </Dialog>
-        </Transition.Root>
+        </Transition>
       )}
     </IsInsideMobileNavigationContext.Provider>
   )

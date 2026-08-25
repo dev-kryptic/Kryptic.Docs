@@ -1,0 +1,155 @@
+:root,
+:root.dark,
+[data-theme='dark'] {
+  /* Backgrounds */
+  --bg-rgb: 10 13 12;
+  --bg: rgb(var(--bg-rgb));
+  --bg-grad-1-rgb: 12 16 14;
+  --bg-grad-1: rgb(var(--bg-grad-1-rgb));
+  --bg-grad-2-rgb: 9 11 10;
+  --bg-grad-2: rgb(var(--bg-grad-2-rgb));
+  --surface-rgb: 17 23 20;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 21 28 25;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-hover-rgb: 24 33 29;
+  --surface-hover: rgb(var(--surface-hover-rgb));
+
+  /* Borders */
+  --border-rgb: 35 44 40;
+  --border: rgb(var(--border-rgb));
+  --border-soft-rgb: 27 35 31;
+  --border-soft: rgb(var(--border-soft-rgb));
+  --border-lift-rgb: 44 53 47;
+  --border-lift: rgb(var(--border-lift-rgb));
+
+  /* Text */
+  --text-rgb: 233 241 236;
+  --text: rgb(var(--text-rgb));
+  --text-2-rgb: 170 184 176;
+  --text-2: rgb(var(--text-2-rgb));
+  --text-3-rgb: 111 125 118;
+  --text-3: rgb(var(--text-3-rgb));
+
+  /* Accent (Kryptic green). --accent for fills, --accent-ink for text/thin strokes. */
+  --accent-rgb: 95 242 166;
+  --accent: rgb(var(--accent-rgb));
+  --accent-ink-rgb: 95 242 166;
+  --accent-ink: rgb(var(--accent-ink-rgb));
+  --accent-2-rgb: 59 212 134;
+  --accent-2: rgb(var(--accent-2-rgb));
+  --accent-dim: rgba(95, 242, 166, 0.12);
+  --accent-glow: rgba(95, 242, 166, 0.25);
+  --accent-border: rgba(95, 242, 166, 0.2);
+  --crypt-ink-rgb: 4 20 12;
+  --crypt-ink: rgb(var(--crypt-ink-rgb)); /* text on green fills, both themes */
+
+  /* Semantic */
+  --amber-rgb: 245 197 99;
+  --amber: rgb(var(--amber-rgb));   --amber-dim: rgba(245, 197, 99, 0.12);   --amber-border: rgba(245, 197, 99, 0.2);
+  --red-rgb: 245 123 123;
+  --red: rgb(var(--red-rgb));     --red-dim: rgba(245, 123, 123, 0.12);    --red-border: rgba(245, 123, 123, 0.2);
+  --blue-rgb: 122 184 245;
+  --blue: rgb(var(--blue-rgb));    --blue-dim: rgba(122, 184, 245, 0.12);   --blue-border: rgba(122, 184, 245, 0.2);
+  --violet-rgb: 183 155 240;
+  --violet: rgb(var(--violet-rgb));  --violet-dim: rgba(183, 155, 240, 0.12); --violet-border: rgba(183, 155, 240, 0.2);
+
+  --avatar-deep-rgb: 29 37 33;
+
+  --avatar-deep: rgb(var(--avatar-deep-rgb));
+
+  /* Glass (sidebar / topbar) */
+  --glass-side: linear-gradient(180deg, rgba(17, 23, 20, 0.6), rgba(10, 13, 12, 0.3));
+  --glass-top: rgba(10, 13, 12, 0.72);
+
+  --grain-opacity: 0.025;
+
+  /* Typography */
+  --display: 'Bricolage Grotesque', sans-serif;
+  --body: 'Hanken Grotesk', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 9px;
+  --radius-xl: 13px;
+  --radius-pill: 20px;
+}
+
+:root:not(.dark),
+[data-theme='light'] {
+  --bg-rgb: 243 246 244;
+  --bg: rgb(var(--bg-rgb));
+  --bg-grad-1-rgb: 238 243 240;
+  --bg-grad-1: rgb(var(--bg-grad-1-rgb));
+  --bg-grad-2-rgb: 247 250 248;
+  --bg-grad-2: rgb(var(--bg-grad-2-rgb));
+  --surface-rgb: 255 255 255;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 241 246 243;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-hover-rgb: 237 243 239;
+  --surface-hover: rgb(var(--surface-hover-rgb));
+
+  --border-rgb: 221 230 224;
+
+  --border: rgb(var(--border-rgb));
+  --border-soft-rgb: 232 239 234;
+  --border-soft: rgb(var(--border-soft-rgb));
+  --border-lift-rgb: 203 216 208;
+  --border-lift: rgb(var(--border-lift-rgb));
+
+  --text-rgb: 14 22 19;
+
+  --text: rgb(var(--text-rgb));
+  --text-2-rgb: 71 87 80;
+  --text-2: rgb(var(--text-2-rgb));
+  --text-3-rgb: 126 141 133;
+  --text-3: rgb(var(--text-3-rgb));
+
+  --accent-rgb: 22 176 105;
+
+  --accent: rgb(var(--accent-rgb));
+  --accent-ink-rgb: 11 141 80;
+  --accent-ink: rgb(var(--accent-ink-rgb));
+  --accent-2-rgb: 12 154 87;
+  --accent-2: rgb(var(--accent-2-rgb));
+  --accent-dim: rgba(16, 160, 95, 0.10);
+  --accent-glow: rgba(16, 160, 95, 0.22);
+  --accent-border: rgba(16, 160, 95, 0.25);
+
+  --amber-rgb: 176 125 28;
+
+  --amber: rgb(var(--amber-rgb));   --amber-dim: rgba(176, 125, 28, 0.11);   --amber-border: rgba(176, 125, 28, 0.25);
+  --red-rgb: 207 77 77;
+  --red: rgb(var(--red-rgb));     --red-dim: rgba(207, 77, 77, 0.10);      --red-border: rgba(207, 77, 77, 0.25);
+  --blue-rgb: 44 116 196;
+  --blue: rgb(var(--blue-rgb));    --blue-dim: rgba(44, 116, 196, 0.10);    --blue-border: rgba(44, 116, 196, 0.25);
+  --violet-rgb: 115 85 189;
+  --violet: rgb(var(--violet-rgb));  --violet-dim: rgba(115, 85, 189, 0.10);  --violet-border: rgba(115, 85, 189, 0.25);
+
+  --avatar-deep-rgb: 207 220 213;
+
+  --avatar-deep: rgb(var(--avatar-deep-rgb));
+
+  --glass-side: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(243, 246, 244, 0.45));
+  --glass-top: rgba(243, 246, 244, 0.8);
+
+  --grain-opacity: 0.018;
+}
+
+/* Kryptic brand tint ramp - theme-independent. Used for tinted surfaces and
+   prose accents where a flat --accent would be too strong. */
+:root {
+  --accent-50-rgb: 238 250 243;
+  --accent-100-rgb: 213 245 228;
+  --accent-200-rgb: 168 235 201;
+  --accent-300-rgb: 122 224 174;
+  --accent-400-rgb: 95 242 166;
+  --accent-500-rgb: 95 242 166;
+  --accent-600-rgb: 59 212 134;
+  --accent-700-rgb: 22 176 105;
+  --accent-800-rgb: 11 141 80;
+  --accent-900-rgb: 4 20 12;
+}

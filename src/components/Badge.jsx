@@ -1,81 +1,54 @@
-import { useState } from 'react';
+import { useState } from 'react'
+
+/* Inline status pill for MDX prose, with an optional hover explanation.
+   Tones map onto the semantic signal tokens; unknown statuses fall back to neutral. */
+
+const toneStyles = {
+  info: {
+    pill: 'bg-signal-blue/10 text-signal-blue',
+    border: 'border-signal-blue',
+  },
+  warning: {
+    pill: 'bg-signal-amber/10 text-signal-amber',
+    border: 'border-signal-amber',
+  },
+  error: {
+    pill: 'bg-signal-red/10 text-signal-red',
+    border: 'border-signal-red',
+  },
+  'cloud-only': {
+    pill: 'bg-accent/10 text-accent-text',
+    border: 'border-accent',
+  },
+  experimental: {
+    pill: 'bg-signal-violet/10 text-signal-violet',
+    border: 'border-signal-violet',
+  },
+  neutral: {
+    pill: 'bg-surface-raised text-ink-muted',
+    border: 'border-edge-lift',
+  },
+}
 
 export function Badge({ status, text, hoverText }) {
-    const [isHovered, setIsHovered] = useState(false);
+  let [isHovered, setIsHovered] = useState(false)
+  let tone = toneStyles[status] ?? toneStyles.neutral
 
-    const getStatusStyles = (status) => {
-        switch (status) {
-            case 'info':
-                return 'text-blue-400';
-            case 'warning':
-                return 'text-yellow-600';
-            case 'error':
-                return 'text-red-400';
-            case 'cloud-only':
-                return 'text-kryptic';
-            case 'experimental':
-                return 'text-teal-400';
-            default:
-                return 'text-gray-400';
-        }
-    };
-
-    const getStatusBorder = (status) => {
-        switch (status) {
-            case 'info':
-                return 'border-blue-400';
-            case 'warning':
-                return 'border-yellow-600';
-            case 'error':
-                return 'border-red-400';
-            case 'cloud-only':
-                return 'border-kryptic';
-            case 'experimental':
-                return 'border-teal-400';
-            default:
-                return 'border-gray-400';
-        }
-    };
-
-    const getBadgeBg = (status) => {
-        switch (status) {
-            case 'info':
-                return 'bg-blue-300/30 dark:bg-blue-400/10';
-            case 'warning':
-                return 'bg-kryptic-300/30 dark:bg-yellow-600/10';
-            case 'error':
-                return 'bg-red-300/30 dark:bg-red-400/10';
-            case 'cloud-only':
-                return 'bg-kryptic-200/50 dark:bg-kryptic-dark/20';
-            case 'experimental':
-                return 'bg-teal-200/50 dark:bg-teal-500/15';
-            default:
-                return 'bg-gray-500/30 dark:bg-gray-400/10';
-        }
-    };
-
-    const baseStyle = 'relative inline-block rounded-md py-0.5 px-2 text-sm';
-    const textColor = getStatusStyles(status);
-    const bgColor = getBadgeBg(status);
-    const borderStyle = getStatusBorder(status);
-
-    return (
+  return (
+    <span
+      className={`relative inline-block rounded-sm px-2 py-0.5 text-sm ${tone.pill}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {text}
+      {hoverText && isHovered && (
         <span
-            className={`${baseStyle} ${bgColor} ${textColor}`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+          role="tooltip"
+          className={`absolute left-1/2 z-10 mt-2 w-max max-w-xs -translate-x-1/2 whitespace-pre-line rounded-md border bg-surface p-3 shadow-panel backdrop-blur-md ${tone.border} ${tone.pill}`}
         >
-            {text}
-            {hoverText && isHovered && (
-                <div className={`
-                    absolute z-10 left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs p-3
-                    rounded-md whitespace-pre-line
-                    dark:bg-zinc-900/5 bg-white-900/5 backdrop-blur-md border ${borderStyle}
-                    ${textColor} shadow-lg
-                `}>
-                    {hoverText}
-                </div>
-            )}
+          {hoverText}
         </span>
-    );
+      )}
+    </span>
+  )
 }

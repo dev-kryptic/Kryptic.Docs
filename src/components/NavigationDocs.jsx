@@ -142,11 +142,13 @@ function NavigationGroup({ group, className, hasChildren }) {
       <motion.h2
         // layout={"size"}
         className={clsx(
-          'group flex items-center justify-between gap-2',
+          // The header is clickable in both shapes, so the pointer cursor and
+          // no-select belong on the base rather than only the expandable branch.
+          'group flex cursor-pointer select-none items-center justify-between gap-2',
           hasChildren
-            ? 'cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white'
-            : 'text-xs font-semibold text-zinc-900 dark:text-white',
-          group.href === router.pathname && 'text-zinc-900 dark:text-white'
+            ? 'py-1 pr-3 text-sm font-medium text-ink-muted transition hover:text-ink'
+            : 'text-xs font-semibold text-ink',
+          group.href === router.pathname && 'text-ink'
         )}
         onClick={() => {
           if (group.href) {
@@ -184,7 +186,7 @@ function NavigationGroup({ group, className, hasChildren }) {
           >
             <ChevronDownIcon
               className={clsx(
-                'fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white',
+                'fill-ink-muted transition group-hover:fill-ink',
                 'transition',
                 isOpen ? 'rotate-180 transform' : ''
               )}
@@ -194,7 +196,10 @@ function NavigationGroup({ group, className, hasChildren }) {
         )}
       </motion.h2>
       <div className={clsx('relative', hasChildren ? '' : 'mt-3 pl-2')}>
-        {!hasChildren && (
+        {/* The highlight, rail and active marker decorate the link list, so they
+            are gated on isOpen as well - a collapsed group has nothing to mark,
+            and its row offsets collapse onto the header. */}
+        {!hasChildren && isOpen && (
           <>
             <AnimatePresence>
               {isActiveGroup && (
@@ -206,7 +211,7 @@ function NavigationGroup({ group, className, hasChildren }) {
             </AnimatePresence>
             <motion.div
               // layout
-              className="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"
+              className="absolute inset-y-0 left-2 w-px bg-edge"
             />
             <AnimatePresence initial={false}>
               {isActiveGroup && (

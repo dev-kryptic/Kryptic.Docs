@@ -1,38 +1,25 @@
-:root {
-  --shiki-color-text: theme('colors.black');
-  --shiki-token-constant: theme('colors.kryptic.700');
-  --shiki-token-string: theme('colors.kryptic.700');
-  --shiki-token-comment: theme('colors.zinc.500');
-  --shiki-token-keyword: theme('colors.kryptic.600');
-  --shiki-token-parameter: theme('colors.violet.600');
-  --shiki-token-function: theme('colors.kryptic.800');
-  --shiki-token-string-expression: theme('colors.kryptic.700');
-  --shiki-token-punctuation: theme('colors.zinc.800');
-  --toastify-icon-color-info: theme('colors.kryptic.light') !important;
-  --toastify-color-info: theme('colors.kryptic.light') !important;
-  --toastify-color-dark: theme('colors.white') !important;
-  --toastify-text-color-dark: theme('colors.zinc.600') !important;
-  --toastify-color-light: theme('colors.white') !important;
-  --toastify-text-color-light: theme('colors.zinc.600') !important;
-}
+@import './kryptic-tokens.css';
 
-/* Dark mode styles */
-:root.dark {
-  --shiki-color-text: theme('colors.white');
-  --shiki-token-constant: theme('colors.kryptic.300');
-  --shiki-token-string: theme('colors.kryptic.300');
-  --shiki-token-comment: theme('colors.zinc.500');
-  --shiki-token-keyword: theme('colors.kryptic.DEFAULT');
-  --shiki-token-parameter: theme('colors.violet.300');
-  --shiki-token-function: theme('colors.kryptic.200');
-  --shiki-token-string-expression: theme('colors.kryptic.300');
-  --shiki-token-punctuation: theme('colors.zinc.200');
-  --toastify-icon-color-info: theme('colors.kryptic.DEFAULT') !important;
-  --toastify-color-info: theme('colors.kryptic.DEFAULT') !important;
-  --toastify-color-dark: theme('colors.kryptic-bg.surface') !important;
-  --toastify-text-color-dark: theme('colors.zinc.300') !important;
-  --toastify-color-light: theme('colors.kryptic-bg.surface') !important;
-  --toastify-text-color-light: theme('colors.zinc.300') !important;
+/* Syntax highlighting (Shiki) and toast colours, mapped onto the design tokens.
+   These are read by Shiki's generated markup and by react-toastify, neither of
+   which goes through Tailwind, so they have to be plain custom properties. */
+:root {
+  --shiki-color-text: var(--text);
+  --shiki-token-constant: var(--accent-ink);
+  --shiki-token-string: var(--accent-ink);
+  --shiki-token-comment: var(--text-3);
+  --shiki-token-keyword: var(--accent-2);
+  --shiki-token-parameter: var(--violet);
+  --shiki-token-function: var(--blue);
+  --shiki-token-string-expression: var(--accent-ink);
+  --shiki-token-punctuation: var(--text-2);
+
+  --toastify-icon-color-info: var(--accent-ink);
+  --toastify-color-info: var(--accent-ink);
+  --toastify-color-dark: var(--surface);
+  --toastify-text-color-dark: var(--text-2);
+  --toastify-color-light: var(--surface);
+  --toastify-text-color-light: var(--text-2);
 }
 
 @tailwind base;
@@ -40,22 +27,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg: #f3f6f4;
-    --bg-grad-1: #eef3f0;
-    --bg-grad-2: #f7faf8;
-    --accent-dim: rgba(16, 160, 95, 0.10);
-    --grain-opacity: 0.018;
-  }
-
-  :root.dark {
-    --bg: #0a0d0c;
-    --bg-grad-1: #0c100e;
-    --bg-grad-2: #090b0a;
-    --accent-dim: rgba(95, 242, 166, 0.12);
-    --grain-opacity: 0.025;
-  }
-
   html {
     scroll-behavior: smooth;
   }

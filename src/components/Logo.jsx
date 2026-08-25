@@ -10,7 +10,7 @@ export function Logo(props) {
         height={32}
         className="h-8 w-8 shrink-0"
       />
-      <span className="font-display text-base font-semibold tracking-tight text-zinc-900 dark:text-white">
+      <span className="font-display text-base font-semibold tracking-tight text-ink">
         Kryptic Docs
       </span>
     </div>
