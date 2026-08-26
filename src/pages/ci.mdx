@@ -1,0 +1,117 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Inject secrets into CI, Docker, and env files with a machine identity and kryptic ci export.'
+
+# CI/CD
+
+Pipelines authenticate as a [machine identity](/machine-identities). There is no
+marketplace GitHub Action, Azure DevOps task, CircleCI orb, or Jenkins plugin.
+The dashboard **Client generator** (also a tab on each project) emits a
+ready-to-paste snippet for the runner you already use, pre-filled with the
+project id and environment.
+
+The command that decrypts is always the same:
+
+```bash
+kryptic ci export --project proj_x --env production --format dotenv|shell|json
+```
+
+Kryptic is a [blind store](/encryption): the Pipelines BFF returns ciphertext.
+`kryptic ci export` unwraps the machine private key, opens the org key, and
+prints plaintext on the runner. The platform never sees it.
+
+## Setup
+
+1. Dashboard → **Machine identities** → **New identity**. Grant it the
+   organization key under **Settings → Encryption**.
+2. Store `KRYPTIC_CLIENT_ID` and `KRYPTIC_CLIENT_SECRET` in that CI provider's
+   secret store. The client secret is shown once.
+3. Open the project → **Client generator**, pick the runner, copy the snippet.
+
+<Warning>
+  Do not run `curl https://kryptic.dev/install.sh | sh` on a runner. That
+  installer configures a desktop daemon (systemd user service). CI snippets
+  download the static Linux binary from `https://kryptic.dev/dl/kryptic-linux-*`.
+</Warning>
+
+Self-hosted: set `KRYPTIC_PIPELINES_API` to the public Pipelines BFF URL
+(default `https://pipelines.kryptic.dev`).
+
+## GitHub Actions
+
+```yaml
+- name: Load secrets from Kryptic
+  env:
+    KRYPTIC_CLIENT_ID: ${{ secrets.KRYPTIC_CLIENT_ID }}
+    KRYPTIC_CLIENT_SECRET: ${{ secrets.KRYPTIC_CLIENT_SECRET }}
+  run: |
+    ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+    curl -fsSL "https://kryptic.dev/dl/kryptic-linux-${ARCH}" -o /tmp/kryptic
+    chmod +x /tmp/kryptic
+    eval "$(/tmp/kryptic ci export --project proj_x --env production --format shell)"
+    # Secrets live in this step. Put build / test / deploy below.
+```
+
+## GitLab CI
+
+```yaml
+default:
+  before_script:
+    - |
+      ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+      curl -fsSL "https://kryptic.dev/dl/kryptic-linux-${ARCH}" -o /tmp/kryptic
+      chmod +x /tmp/kryptic
+      eval "$(/tmp/kryptic ci export --project proj_x --env production --format shell)"
+```
+
+## Azure DevOps
+
+```yaml
+steps:
+  - bash: |
+      ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+      curl -fsSL "https://kryptic.dev/dl/kryptic-linux-${ARCH}" -o /tmp/kryptic
+      chmod +x /tmp/kryptic
+      eval "$(/tmp/kryptic ci export --project proj_x --env production --format shell)"
+    env:
+      KRYPTIC_CLIENT_ID: $(KRYPTIC_CLIENT_ID)
+      KRYPTIC_CLIENT_SECRET: $(KRYPTIC_CLIENT_SECRET)
+    displayName: Load secrets from Kryptic
+```
+
+## Docker Compose
+
+Generate a gitignored dotenv, then start the stack:
+
+```bash
+kryptic ci export --project proj_x --env production --format dotenv > .env
+docker compose up
+```
+
+```yaml
+services:
+  app:
+    build: .
+    env_file: .env
+```
+
+For a long-running container that should decrypt itself at start, use the
+**Dockerfile (runtime)** snippet: an entrypoint runs `kryptic ci export` and
+`exec`s the process. Coolify uses that same shape; see [Coolify](/coolify).
+
+<Note>
+  Language packages (`inject()`, `AddKryptic()`, and so on) talk to a local
+  daemon and are a **no-op outside development**. They will not load secrets in
+  CI or in a container. Use `kryptic ci export`.
+</Note>
+
+## Other runners
+
+The Client generator also covers Bitbucket Pipelines, CircleCI, Jenkins,
+TeamCity, Buildkite, Travis CI, Google Cloud Build, AWS CodeBuild, Drone /
+Woodpecker, Semaphore, Tekton, Dockerfile BuildKit secrets, Kubernetes Jobs,
+systemd, Make, dotenv, and a plain shell `eval`.
+
+For Deployments and other long-lived cluster workloads, prefer the
+[Kubernetes operator](/kubernetes) over a Job that calls export.

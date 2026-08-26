@@ -43,6 +43,7 @@ export const docsNavigation = [
       { title: 'The dashboard', href: '/dashboard' },
       { title: 'Access control', href: '/access-control' },
       { title: 'Machine identities', href: '/machine-identities' },
+      { title: 'CI/CD', href: '/ci' },
       { title: 'Secret scanning', href: '/scanning' },
     ],
   },

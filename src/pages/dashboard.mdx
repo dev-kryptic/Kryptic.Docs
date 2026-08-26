@@ -23,7 +23,8 @@ enabled - those buttons appear only for providers that are actually configured.
 The dashboard is the operational summary: member, project, secret and active
 daemon counts; a live activity monitor; trials and invitations that are about to
 expire; access requests you can approve without leaving the page; and a CI
-client generator for GitHub Actions, GitLab CI or shell. Prefer
+client generator for GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose,
+dotenv, and the other runners listed in [CI/CD](/ci). Prefer
 [`kryptic ci export`](/cli#ci-export) in those snippets: the
 platform serves ciphertext, and the CLI decrypts on the runner.
 
@@ -71,6 +72,13 @@ See [Access control](/access-control) for how grants and roles combine.
 
 Rename the project, copy its `kryptic.json`, or delete it - deletion requires
 typing the project name.
+
+### Client generator
+
+The **Client generator** tab emits a ready-to-paste snippet for the project's
+id and a chosen environment: GitHub Actions, GitLab CI, Azure DevOps, Docker,
+Compose, dotenv, and the rest of the [CI/CD](/ci) catalogue. Store the machine
+identity's client id and secret in the runner's secret store, paste, done.
 
 ## Members
 

@@ -76,7 +76,9 @@ kryptic ci export --project proj_x --env production [--format dotenv|shell|json]
 `KRYPTIC_PIPELINES_API` overrides the Pipelines BFF URL (default
 `https://pipelines.kryptic.dev`). There is no server-side plaintext export: the BFF
 returns ciphertext plus the machine's sealed org-key grant, and `kryptic ci` opens
-them with the [Go encryption engine](/encryption).
+them with the [Go encryption engine](/encryption). Ready-to-paste snippets for
+GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose, and the rest live in
+the dashboard Client generator and in [CI/CD](/ci).
 
 ## Secret scanning
 

@@ -67,13 +67,18 @@ The [REST API v1](/rest-api) is the same shape on `https://secrets.kryptic.dev`.
     KRYPTIC_CLIENT_ID: ${{ secrets.KRYPTIC_CLIENT_ID }}
     KRYPTIC_CLIENT_SECRET: ${{ secrets.KRYPTIC_CLIENT_SECRET }}
   run: |
-    curl -fsSL https://kryptic.dev/install.sh | sh
-    eval "$(kryptic ci export --project proj_x --env production --format shell)"
+    ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+    curl -fsSL "https://kryptic.dev/dl/kryptic-linux-${ARCH}" -o /tmp/kryptic
+    chmod +x /tmp/kryptic
+    eval "$(/tmp/kryptic ci export --project proj_x --env production --format shell)"
 ```
 
-The dashboard can generate a GitHub Actions, GitLab CI or shell snippet pre-filled
-with the project id. Prefer `kryptic ci export` over calling the bundle endpoint
-yourself: it is the path that actually decrypts.
+The dashboard **Client generator** (and the same tab on each project) emits a
+snippet pre-filled with the project id for GitHub Actions, GitLab CI, Azure
+DevOps, Docker, Compose, dotenv, and the other runners listed in
+[CI/CD](/ci). Prefer `kryptic ci export` over calling the bundle endpoint
+yourself: it is the path that actually decrypts. Do not use `install.sh` on a
+runner; that script configures a desktop daemon.
 
 ## Lifecycle
 
