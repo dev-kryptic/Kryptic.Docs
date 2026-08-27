@@ -19,7 +19,7 @@ and serves the current installer from kryptic.dev.
 
 - **macOS:** signed `.pkg` for Apple Silicon or Intel. Puts Kryptic in Applications and starts it at login.
 - **Windows:** signed setup `.exe`. Installs the CLI, starts the tray app, and adds Kryptic to PATH.
-- **Linux:** the one-liner below, or a `.deb` from the download page. Registers a systemd user service.
+- **Linux:** the one-liner below. Installs to `~/.local` and registers a systemd user service.
 
 After the installer finishes, open a new terminal and sign in (or use the menu bar / tray):
 
@@ -50,8 +50,8 @@ Start-Process .\Kryptic-Setup.exe
 </CodeGroup>
 
 <Note>
-  On Linux without `dpkg`, the one-liner installs to `~/.local/bin`. Add that directory
-  to your `PATH` if `kryptic` is not found after install.
+  The Linux one-liner installs to `~/.local/bin`. Add that directory to your
+  `PATH` if `kryptic` is not found after install.
 </Note>
 
 ## 2. Add kryptic.json

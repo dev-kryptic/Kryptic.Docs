@@ -112,3 +112,16 @@ kryptic update --installer  # download the signed installer and open it
   Windows setup, prefer [kryptic.dev/download](https://kryptic.dev/download) or
   `kryptic update --installer` instead.
 </Warning>
+
+## Reinstall on Linux
+
+If a previous `.deb` is still on the machine (App Center shows Kryptic as
+Installed), remove it first, then install again with the one-liner:
+
+```bash
+sudo apt remove kryptic
+curl -fsSL https://kryptic.dev/install.sh | sh
+```
+
+The new copy lands in `~/.local`. Existing sign-in is kept unless you also
+delete `~/.config/kryptic`.
