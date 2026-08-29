@@ -30,6 +30,10 @@ const nextConfig = {
       source: '/',
       destination: '/introduction',
     },
+    {
+      source: '/health',
+      destination: '/api/health',
+    },
   ],
 }
 
