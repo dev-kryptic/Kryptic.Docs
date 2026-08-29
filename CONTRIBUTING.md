@@ -66,5 +66,10 @@ Open an issue at
 If a doc is wrong in a way that could cause data loss or a security mistake, say
 so in the title and we will prioritise it.
 
-Security vulnerabilities in Kryptic itself should not go in a public issue —
-email hello@kryptic.dev instead.
+Security vulnerabilities in Kryptic itself should not go in a public issue.
+Email security@kryptic.dev instead.
+
+## Code of conduct
+
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Reports of abusive behaviour go
+to hello@kryptic.dev.
