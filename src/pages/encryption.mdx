@@ -33,7 +33,9 @@ An Owner or Admin initializes encryption in **Settings → Encryption**. The
 browser generates the org key, wraps a copy to the admin's vault, and shows a
 one-time recovery code (Emergency Kit). Later recipients (other members' vaults,
 approved daemon devices, machine identities) receive the org key as a sealed-box
-grant. An admin approves pending grants from the same page.
+grant. An admin approves pending grants from **Approvals** (or from **Device**
+right after a daemon login). Unlock the vault first. Encryption setup stays on
+Settings → Encryption.
 
 Rotation is client-side: the admin's browser generates a fresh key, re-encrypts
 current values locally, and re-grants active recipients atomically. Recommended

@@ -22,9 +22,11 @@ kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main
 kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/operator.yaml
 ```
 
-Create a [machine identity](/machine-identities) in the dashboard, grant it the
-organization key under **Settings → Encryption**, then store its credentials in
-the namespace where your `KrypticSecret`s will live:
+Create a [machine identity](/machine-identities) in the dashboard (vault
+unlocked), grant it the organization key on **Approvals** if it is still
+waiting, then store its credentials in the namespace where your
+`KrypticSecret`s will live. **Settings → Encryption** is only for initializing
+the org key and the Emergency Kit.
 
 ```bash
 kubectl create secret generic kryptic-machine-credentials \

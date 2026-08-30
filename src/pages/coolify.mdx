@@ -36,10 +36,11 @@ you need immediately.
 
 ## 1. Create a machine identity
 
-In the dashboard: **Machine identities** -> **New identity**. Scope it to the
-project this Coolify app belongs to. Then grant it the organization key under
-**Settings → Encryption**. Until that grant exists, export fails when it tries
-to unwrap the org key.
+In the dashboard: unlock the vault, then **Machine identities** -> **New
+identity**. Grant it the organization key on **Approvals** if it is still
+waiting. **Settings → Encryption** is only for initializing the org key and the
+Emergency Kit. Until that grant exists, export fails when it tries to unwrap
+the org key.
 
 <Warning>
   The client secret is shown **exactly once**. Copy it into Coolify before you
@@ -150,7 +151,7 @@ If export fails, the container exits before the app starts. Typical causes:
 | `set KRYPTIC_CLIENT_ID and KRYPTIC_CLIENT_SECRET` | Variables are missing, build-only, or not marked Runtime |
 | `credential exchange failed` / 401 | Wrong secret, identity deactivated, or you need to rotate |
 | `fetching secrets bundle` / 403 | Identity is not scoped to this project |
-| `could not unwrap the org key` | Grant the identity the organization key under **Settings → Encryption** |
+| `could not unwrap the org key` | Unlock the vault and grant the identity the organization key on **Approvals** |
 | `KRYPTIC_PROJECT_ID is not set` | Missing from Coolify, or the start command is not going through the entrypoint |
 | connection / TLS errors | The container cannot reach `https://pipelines.kryptic.dev` (or your `KRYPTIC_PIPELINES_API`) on port 443 |
 

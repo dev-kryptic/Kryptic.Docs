@@ -23,8 +23,10 @@ prints plaintext on the runner. The platform never sees it.
 
 ## Setup
 
-1. Dashboard → **Machine identities** → **New identity**. Grant it the
-   organization key under **Settings → Encryption**.
+1. Unlock the vault, then Dashboard → **Machine identities** → **New identity**.
+   Grant it the organization key on **Approvals** if it is still waiting.
+   **Settings → Encryption** is only for initializing the org key and the
+   Emergency Kit.
 2. Store `KRYPTIC_CLIENT_ID` and `KRYPTIC_CLIENT_SECRET` in that CI provider's
    secret store. The client secret is shown once.
 3. Open the project → **Client generator**, pick the runner, copy the snippet.

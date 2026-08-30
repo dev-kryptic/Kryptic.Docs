@@ -1,7 +1,7 @@
 import { Note } from '@/components/mdx'
 
 export const description =
-  'A tour of the Kryptic management dashboard - every screen and what it is for.'
+  'A tour of the Kryptic management dashboard: every screen and what it is for.'
 
 # The dashboard
 
@@ -9,27 +9,52 @@ The management dashboard is where an organization is run: projects and secrets,
 who can see what, machine credentials, audit history, and billing. Click any
 screenshot to enlarge it.
 
-## Signing in
+## Signing in and registering
 
 <img className="imagewrapper-big" src="/screenshots/login.png" alt="Kryptic sign-in page" />
 
 Sign in with email and password, or with any SSO provider your organization has
-enabled - those buttons appear only for providers that are actually configured.
+enabled. Those buttons appear only for providers that are actually configured.
+If the email domain has SAML, a one-click SSO button appears after you type the
+address.
+
+<img className="imagewrapper-big" src="/screenshots/register.png" alt="Create your organization" />
+
+**Register** creates a new organization. You become the Owner. A `?plan=team`
+or `?plan=business` link starts a 14-day trial with no card. Invite the rest of
+the team after you are in.
+
+## Chrome, roles, and the vault
+
+The sidebar is split into **Workspace** (Dashboard, Projects, Secret scanning)
+and **Organization** (Members, Groups, Machine identities, Daemon sessions,
+Approvals, Audit log, Integrations, Settings). Owners and Admins see the full
+Organization block. Everyone else sees **My daemons** instead of that block.
+
+The top bar has jump-to-project search, a notifications bell, and the theme
+toggle.
+
+Roles are Owner, Admin, Developer, and Viewer. There are no custom roles.
+
+Reveal, import, export, creating a machine identity, and sealing the
+organization key all need the vault unlocked. Enroll, unlock, and rotate under
+**Settings → Encryption**. The passphrase never leaves the browser.
 
 ## Overview
 
 <img className="imagewrapper-big" src="/screenshots/dashboard.png" alt="Kryptic dashboard" />
 
 The dashboard is the operational summary: member, project, secret and active
-daemon counts; a live activity monitor; trials and invitations that are about to
-expire; access requests you can approve without leaving the page; and a CI
-client generator for GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose,
+daemon counts; a live activity monitor (your own rows unless you are Admin+);
+trials and invitations that are about to expire; an Approvals summary that
+links to the inbox; group and machine-identity summaries; and a CI client
+generator for GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose,
 dotenv, and the other runners listed in [CI/CD](/ci). Prefer
 [`kryptic ci export`](/cli#ci-export) in those snippets: the
 platform serves ciphertext, and the CLI decrypts on the runner.
 
-The top bar carries a jump-to-project search, a notifications bell, and the
-theme toggle.
+If this browser saw a daemon device-flow code that is still waiting, a banner
+at the top links to **Approve daemon** (`/device`).
 
 ## Projects
 
@@ -37,13 +62,15 @@ theme toggle.
 
 A project maps to a repository. Creating one auto-creates the `development`,
 `staging` and `production` environments and shows the `kryptic.json` to commit.
+Developers and Viewers can **Request access** from this page (environments,
+level, and a reason). Admins approve those requests on [Approvals](#approvals).
 
 ### Secrets
 
 <img className="imagewrapper-big" src="/screenshots/project-secrets.png" alt="Secrets matrix" />
 
 Rows are keys, columns are environments. **Values are never sent to the browser
-by default** - cells are masked, and revealing one is an explicit, audit-logged
+by default**. Cells are masked, and revealing one is an explicit, audit-logged
 call that decrypts in the browser under the org key.
 
 <img className="imagewrapper-big" src="/screenshots/project-secret-revealed.png" alt="A revealed secret" />
@@ -52,27 +79,6 @@ Each cell offers reveal, copy, version history with restore, and delete. The
 toolbar handles `.env` import and per-environment export. Import encrypts in
 the browser before upload.
 
-### Environments
-
-<img className="imagewrapper-big" src="/screenshots/project-environments.png" alt="Environments tab" />
-
-Add custom environments such as `qa` or `preview` within your plan's limit. You
-cannot delete the last environment, and deleting one cleans up its values.
-
-### Access
-
-<img className="imagewrapper-big" src="/screenshots/project-access.png" alt="Project access tab" />
-
-Grants tie a user *or a group* to this project with a level **per environment**.
-See [Access control](/access-control) for how grants and roles combine.
-
-### Settings
-
-<img className="imagewrapper-big" src="/screenshots/project-settings.png" alt="Project settings tab" />
-
-Rename the project, copy its `kryptic.json`, or delete it - deletion requires
-typing the project name.
-
 ### Client generator
 
 The **Client generator** tab emits a ready-to-paste snippet for the project's
@@ -80,13 +86,40 @@ id and a chosen environment: GitHub Actions, GitLab CI, Azure DevOps, Docker,
 Compose, dotenv, and the rest of the [CI/CD](/ci) catalogue. Store the machine
 identity's client id and secret in the runner's secret store, paste, done.
 
+### Environments
+
+<img className="imagewrapper-big" src="/screenshots/project-environments.png" alt="Environments tab" />
+
+Add custom environments such as `qa` or `preview` within your plan's limit. You
+cannot delete the last environment, and deleting one cleans up its values.
+Admin only.
+
+### Access
+
+<img className="imagewrapper-big" src="/screenshots/project-access.png" alt="Project access tab" />
+
+Grants tie a user *or a group* to this project with a level **per environment**.
+This is project access, not the organization-key grant (that lives on
+Approvals). See [Access control](/access-control) for how grants and roles
+combine. Admin only.
+
+### Settings
+
+<img className="imagewrapper-big" src="/screenshots/project-settings.png" alt="Project settings tab" />
+
+Rename the project, copy its `kryptic.json`, or delete it. Deletion requires
+typing the project name. Admin only.
+
 ## Members
 
 <img className="imagewrapper-big" src="/screenshots/members.png" alt="Members" />
 
-Invite by email (several at once), change roles, deactivate or reactivate
-people, and revoke sessions. Pending invitations can be resent - which issues a
-fresh token and invalidates the old one - or cancelled.
+Invite several emails at once (one per line or comma-separated), assign a
+built-in role (Admin, Developer, or Viewer), deactivate or reactivate people,
+and revoke sessions. There is no CSV import and no custom roles. Pending
+invitations can be resent (which issues a fresh token and invalidates the old
+one) or cancelled. Invitees accept at `/invitations/accept` by setting a name
+and a password.
 
 ## Groups
 
@@ -99,18 +132,42 @@ survives staff changes: you manage membership, not a dozen individual grants.
 
 <img className="imagewrapper-big" src="/screenshots/machine-identities.png" alt="Machine identities" />
 
-Credentials for CI/CD and other non-human callers. The client secret is shown
-**exactly once** at creation and stored only as an Argon2id hash. Identities can
-be scoped to specific projects, rotated, and deactivated. After creation they
-need an org-key grant from **Settings → Encryption** before they can decrypt.
+Credentials for CI/CD and other non-human callers. Unlock the vault to create
+one: the browser generates the key pair and can seal the organization key.
+The client secret is shown **exactly once** at creation and stored only as an
+Argon2id hash. There is no project-scoping control in the dashboard. Rotate or
+deactivate from this page. Pending machine grants, if any, are approved on
+**Approvals**. See [Machine identities](/machine-identities).
 
-## Daemon sessions
+## Daemon sessions and device approval
 
 <img className="imagewrapper-big" src="/screenshots/daemon-sessions.png" alt="Daemon sessions" />
 
 Every signed-in developer machine: device, platform, version, IP and last seen.
-Admins see the whole organization and can revoke any session - this is the
-"someone lost their laptop" control. Non-admins see only their own devices.
+Admins see the whole organization and can revoke any session. This is the
+"someone lost their laptop" control. Non-admins see only their own devices
+(**My daemons**).
+
+Approving a device-flow code on `/device` binds the daemon to the account.
+Decrypt still needs an organization-key grant. An admin can grant that key on
+the device page after approval, or later on Approvals. A signed-in daemon
+without a grant cannot serve a single secret.
+
+<img className="imagewrapper-big" src="/screenshots/device-approve.png" alt="Approve a daemon" />
+
+## Approvals
+
+<img className="imagewrapper-big" src="/screenshots/approvals.png" alt="Approvals inbox" />
+
+**Approvals** is the admin inbox for two different queues:
+
+1. **Organization-key grants** (org-wide). Members, devices, and CI machines
+   wait here until an admin seals the org key. The vault must be unlocked.
+2. **Project access requests** (per project and environment). Independent of
+   the org-key grant. Approving creates the grant.
+
+Encryption setup stays under **Settings → Encryption**. Grants are not approved
+there.
 
 ## Audit log
 
@@ -125,16 +182,16 @@ reveal entry names the key and environment, never the secret.
 <img className="imagewrapper-big" src="/screenshots/secret-scanning.png" alt="Secret scanning" />
 
 Paste file content or a git patch and scan it against 222 gitleaks rules. The
-same engine runs fully offline in the CLI - see [`kryptic scan`](/cli#secret-scanning).
+same engine runs fully offline in the CLI. See [`kryptic scan`](/cli#secret-scanning).
 
 ## Integrations
 
 OAuth, SAML and SCIM live under **Integrations**, not Settings.
 
-<img className="imagewrapper-big" src="/screenshots/settings-idp.png" alt="Identity providers" />
+<img className="imagewrapper-big" src="/screenshots/integrations-sso.png" alt="Single sign-on" />
 
 - **Single sign-on** - connect the organization's own OAuth apps (Google,
-  Microsoft, GitHub) and claim an email domain for auto-provisioning.
+  Microsoft, GitHub, GitLab) and claim an email domain for auto-provisioning.
 - **Directory import** - pull users and groups from Microsoft Entra (and Google
   Workspace when configured).
 - **SAML 2.0** - Okta, JumpCloud, or a generic SAML 2.0 provider. Connecting
@@ -148,22 +205,39 @@ data key, not the client-held org key.
 
 <img className="imagewrapper-big" src="/screenshots/settings-general.png" alt="Organization settings" />
 
-**General** holds the organization profile, billing email, and the session expiry
-policy that caps how long any login stays valid regardless of refreshes.
+**General** holds the organization profile, billing email, slug, and the
+session expiry policy that caps how long any login stays valid.
 
-**Encryption** is where an Owner or Admin initializes the org key, downloads the
-Emergency Kit, unlocks the vault, rotates the key, and approves pending grants
-to members, devices and machine identities. Every cryptographic operation runs
-in the browser. See [Encryption](/encryption).
+<img className="imagewrapper-big" src="/screenshots/settings-encryption.png" alt="Encryption settings" />
+
+**Encryption** is where an Owner or Admin enrolls a vault, initializes the org
+key, downloads the Emergency Kit, unlocks or locks the vault, recovers with the
+recovery code, and rotates the key. Every cryptographic operation runs in the
+browser. Pending grants are approved on [Approvals](#approvals), not here. See
+[Encryption](/encryption).
+
+**Billing details** is the legal invoice record: company name, address, country,
+and VAT. Greek VAT numbers are resolved from the AADE registry.
+
+<img className="imagewrapper-big" src="/screenshots/settings-billing-details.png" alt="Billing details" />
 
 ### Plans and billing
 
 <img className="imagewrapper-big" src="/screenshots/settings-billing.png" alt="Plans and billing" />
 
-Plan and seat usage, 14-day trials with no card, Stripe checkout (monthly or
-annual, VAT handled), seat adjustment with proration, and downloadable invoices.
+**Plans & billing** is plan and seat usage, 14-day trials with no card, Stripe
+checkout (monthly or annual, VAT handled), and seat adjustment with proration.
+
+**Invoices** lists every tax invoice as a downloadable PDF.
+
+<img className="imagewrapper-big" src="/screenshots/settings-invoices.png" alt="Invoices" />
+
+**Danger zone** (Owner only) deletes the organization and everything in it.
+You type the organization name and your password. There is no undo.
+
+<img className="imagewrapper-big" src="/screenshots/settings-danger-zone.png" alt="Danger zone" />
 
 <Note>
   Self-hosted deployments without Stripe configured show a sales pointer instead
-  of a broken checkout - nothing in the dashboard depends on billing being set up.
+  of a broken checkout. Nothing in the dashboard depends on billing being set up.
 </Note>

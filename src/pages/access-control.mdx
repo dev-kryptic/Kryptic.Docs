@@ -33,9 +33,7 @@ environment**. The common shape:
 | staging | - | read | read/write |
 | production | - | read | read/write |
 
-Effective access resolves in order: role -> direct grant -> group grant. The
-dashboard has an effective-access preview so an administrator can answer "what
-can this person actually see?" before it becomes an incident.
+Effective access resolves in order: role -> direct grant -> group grant.
 
 ## Groups
 
@@ -48,9 +46,14 @@ Groups can also be populated automatically from your identity provider - see
 
 ## Access requests
 
-Developers and Viewers can request access to a project they cannot see, choosing
-environments, level and a reason. Administrators approve or deny from the
-dashboard; approving creates the grant and notifies the requester.
+Developers and Viewers can request access from the Projects page, choosing
+environments, level and a reason. Administrators approve or deny on
+**Approvals**; approving creates the grant and notifies the requester.
+
+**Approvals** also holds organization-key grants (members, devices, CI
+machines). That queue is independent of project access: a member can have a
+project grant and still be unable to decrypt until an admin seals the org key
+(vault unlocked).
 
 This keeps the default posture tight without turning every onboarding into a
 support ticket.

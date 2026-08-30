@@ -17,11 +17,11 @@ allowance.
 
 ## Creating one
 
-Dashboard -> **Machine identities** -> **New identity**. Optionally scope it to
-specific projects; an unscoped identity can read every project in the
-organization. After creation, an admin grants it the organization key under
-**Settings → Encryption** (the identity cannot decrypt bundles until that grant
-exists).
+Dashboard -> **Machine identities** -> **New identity**. Unlock the vault first:
+the browser generates the key pair and can seal the organization key. There is
+no project-scoping control in the dashboard. Pending machine grants, if any,
+are approved on **Approvals** (the identity cannot decrypt bundles until that
+grant exists).
 
 <Warning>
   The client secret is displayed **exactly once**, at creation. It is stored only
@@ -84,9 +84,8 @@ runner; that script configures a desktop daemon.
 
 | Action | Effect |
 | --- | --- |
-| **Rotate** | Issues a new secret and **invalidates the old one immediately** |
+| **Rotate** | Issues a new secret and **invalidates the old one immediately**. The vault must be unlocked |
 | **Deactivate** | Token exchange starts returning 401 |
-| **Scope** | Restricts which projects the identity can read |
 
 Every read is audit-logged with the machine identity as the actor, so a CI
 pipeline's access is as reviewable as a person's.
