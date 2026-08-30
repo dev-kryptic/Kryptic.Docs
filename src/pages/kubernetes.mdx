@@ -9,8 +9,9 @@ Declare a `KrypticSecret` and the operator keeps a native Kubernetes `Secret` in
 sync with a Kryptic project environment. No init containers, no sidecars, and no
 secrets in your manifests.
 
-Source: [github.com/dev-kryptic/k8s-operator](https://github.com/dev-kryptic/k8s-operator)
-(Apache 2.0). The operator decrypts **inside the cluster** with
+Source: [github.com/dev-kryptic/Kryptic.K8s.Operator](https://github.com/dev-kryptic/Kryptic.K8s.Operator)
+(Apache 2.0). Install from the latest [GitHub Release](https://github.com/dev-kryptic/Kryptic.K8s.Operator/releases/latest)
+so the image tag matches a published build. The operator decrypts **inside the cluster** with
 [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go):
 the platform serves ciphertext, the machine client secret unwraps the operator's
 private key, that key opens the org key, and the org key opens each envelope.
@@ -18,14 +19,18 @@ private key, that key opens the org key, and the org key opens each envelope.
 ## Install
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/dev-kryptic/k8s-operator/main/deploy/operator.yaml
+kubectl apply -f https://github.com/dev-kryptic/Kryptic.K8s.Operator/releases/latest/download/crd.yaml
+kubectl apply -f https://github.com/dev-kryptic/Kryptic.K8s.Operator/releases/latest/download/operator.yaml
 ```
+
+The operator image is `ghcr.io/dev-kryptic/kryptic-operator`. After the first
+release, that GHCR package must be public or cluster pulls will 401.
 
 Create a [machine identity](/machine-identities) in the dashboard (vault
 unlocked), grant it the organization key on **Approvals** if it is still
 waiting, then store its credentials in the namespace where your
-`KrypticSecret`s will live. **Settings → Encryption** is only for initializing
+`KrypticSecret`s will live. That per-namespace Secret is the recommended
+production path. **Settings → Encryption** is only for initializing
 the org key and the Emergency Kit.
 
 ```bash
@@ -35,6 +40,40 @@ kubectl create secret generic kryptic-machine-credentials \
 ```
 
 Self-hosted platforms add `--from-literal=apiUrl=https://pipelines.kryptic.example.com`.
+
+### Optional cluster machine identity
+
+For non-production clusters you can set one machine identity on the operator
+and omit `spec.auth` on every `KrypticSecret`. Create the Secret once in
+`kryptic-system` and wire it into the operator Deployment as
+`KRYPTIC_CLIENT_ID`, `KRYPTIC_CLIENT_SECRET`, and optional `KRYPTIC_API_URL`
+(the commented block in `operator.yaml`).
+
+```bash
+kubectl create secret generic kryptic-machine-credentials \
+  --namespace kryptic-system \
+  --from-literal=clientId=kmi_xxxxxxxxxxxxxxxx \
+  --from-literal=clientSecret=<the one-time secret>
+```
+
+```yaml
+apiVersion: kryptic.dev/v1
+kind: KrypticSecret
+metadata:
+  name: backend-secrets
+spec:
+  projectId: proj_a1b2c3d4e5f6
+  environment: development
+  secretName: backend-env
+```
+
+<Warning>
+  Use this only on non-production clusters. One identity for the whole cluster
+  means every `KrypticSecret` shares the same blast radius. Prefer a Secret in
+  each application namespace for production. If `spec.auth.secretRef` is set,
+  that Secret always wins and a missing name does not fall back to the cluster
+  identity.
+</Warning>
 
 ## Declare a secret
 
@@ -102,6 +141,7 @@ kubectl get krypticsecret backend-secrets -o jsonpath='{.status.conditions[0]}'
 | `spec.environment` | required | Environment slug |
 | `spec.secretName` | resource name | Target Kubernetes Secret |
 | `spec.refreshInterval` | `5m` | Values below 30s are ignored |
+| `spec.auth.secretRef` | cluster env, if set | Per-namespace credentials. Recommended in production. |
 | `spec.keys` | all | Restrict which keys are synced |
 | `spec.template.type` | `Opaque` | Type of the produced Secret |
 | `spec.template.labels` / `.annotations` | - | Merged onto the produced Secret |

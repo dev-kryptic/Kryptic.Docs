@@ -53,6 +53,12 @@ kryptic ci export --project proj_x --env production --format dotenv > .env
 | `shell` | `export KEY='value'` lines, correctly escaped |
 | `json` | A flat JSON object |
 
+The [Kubernetes operator](/kubernetes) uses the same identity. The recommended
+production path is a credentials Secret in each application namespace. For
+non-production clusters you can set `KRYPTIC_CLIENT_ID` and
+`KRYPTIC_CLIENT_SECRET` on the operator once and omit `spec.auth` on each
+`KrypticSecret`.
+
 If you are implementing your own client instead of the CLI, exchange credentials
 at `POST https://pipelines.kryptic.dev/api/token`, fetch `GET /api/keys/me` and
 `GET /api/secrets/bundle?projectPublicId=proj_x&environment=production`, then
