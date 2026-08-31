@@ -86,11 +86,18 @@ the dashboard Client generator and in [CI/CD](/ci).
 kryptic scan               # scan the working directory
 kryptic scan path/to/dir   # scan a specific path
 kryptic scan --staged      # scan only lines added in the git index (pre-commit hook)
+kryptic scan --export      # write kryptic-scan-report.md in the current directory
+kryptic scan --export out/report.md
 ```
 
 Runs the gitleaks default ruleset (222 rules) fully locally - nothing leaves your
-machine. Findings are printed redacted, and a non-zero exit code makes it a CI or
-pre-commit gate:
+machine. On a terminal you get a 0-100% progress bar. Findings are printed redacted,
+and a non-zero exit code makes it a CI or pre-commit gate.
+
+`--export` writes a Markdown report with the Kryptic logo, a summary, and redacted
+findings. Omit the path to write `kryptic-scan-report.md` in the directory you ran
+the command from. Pass a directory to write that filename inside it, or a `.md`
+file to use that path.
 
 ```bash
 # .git/hooks/pre-commit

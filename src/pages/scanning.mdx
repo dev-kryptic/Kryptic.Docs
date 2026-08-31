@@ -23,6 +23,8 @@ every scan is kept in history.
 kryptic scan                 # the working directory
 kryptic scan path/to/dir     # a specific path
 kryptic scan --staged        # only lines added in the git index
+kryptic scan --export        # also write kryptic-scan-report.md in the current directory
+kryptic scan --export reports/scan.md
 ```
 
 <Success>
@@ -30,7 +32,10 @@ kryptic scan --staged        # only lines added in the git index
   the binary, so it works with no network and no sign-in.
 </Success>
 
-Findings print redacted and the exit code is non-zero:
+Findings print redacted and the exit code is non-zero. On a terminal you also get
+a 0-100% progress bar. `kryptic scan --export` writes a Markdown report with the
+Kryptic logo (omit the path to put `kryptic-scan-report.md` in the directory you
+ran the command from).
 
 ```
 settings.py:14  github-pat  ghp_************************************
