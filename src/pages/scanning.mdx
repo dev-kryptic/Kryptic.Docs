@@ -1,7 +1,7 @@
 import { Note, Success } from '@/components/mdx'
 
 export const description =
-  'Detect leaked secrets in code and diffs - in the dashboard or fully offline from the CLI.'
+  'Detect leaked secrets in code and diffs. Paste in the dashboard, or scan fully offline from the CLI, a local git hook, or Scan… in the tray.'
 
 # Secret scanning
 
@@ -16,6 +16,9 @@ for lockfiles, vendored code and generated artifacts.
 Paste file content, or a git patch with **Treat as a git patch** ticked to scan
 only added lines. Findings come back with the rule, severity and location, and
 every scan is kept in history.
+
+This path sends the pasted content to your organization's Kryptic deployment.
+The local hook, CLI, and tray scan below do not.
 
 ## From the CLI - fully offline
 
@@ -45,18 +48,74 @@ settings.py:14  github-pat  ghp_************************************
 1 potential secret(s) found.
 ```
 
-## As a pre-commit hook
+## As a local git hook
+
+This is a hook Git runs on your machine after `git commit` and before the commit
+is created. It is not a Kryptic-hosted product. There is no hook service, and
+nothing is uploaded.
+
+<Success>
+  The hook runs on the developer machine. Staged files never leave the laptop.
+  Kryptic servers never receive scan input or findings.
+</Success>
+
+<Note>
+  Do not confuse this with the dashboard paste-scan above. Pasting content in the
+  dashboard sends it to your organization's Kryptic deployment. `kryptic scan
+  --staged` does not: it reads the git index locally and never contacts a Kryptic
+  server.
+</Note>
 
 ```bash
 cat > .git/hooks/pre-commit <<'HOOK'
 #!/bin/sh
-kryptic scan --staged
+exec kryptic scan --staged
 HOOK
 chmod +x .git/hooks/pre-commit
 ```
 
-The commit is blocked if anything is found. Because it scans the index rather
-than the working tree, it catches exactly what you are about to publish.
+A non-zero exit code blocks the commit. There is no progress bar in a hook
+(stderr is not a TTY). That is correct.
+
+Optional one-liners if you already use a hook runner:
+
+```yaml
+# lefthook.yml
+pre-commit:
+  commands:
+    kryptic:
+      run: kryptic scan --staged
+```
+
+```bash
+# Husky
+echo 'kryptic scan --staged' > .husky/pre-commit
+chmod +x .husky/pre-commit
+```
+
+## From the tray: Scan…
+
+**Scan…** is in the Windows/Linux tray and the macOS menu bar. It works while
+signed out.
+
+1. Choose **Scan…**.
+2. Pick a folder in the native folder picker.
+3. A determinate 0-100% progress bar runs the same embedded gitleaks engine as
+   `kryptic scan`. Closing the progress window, or Cancel, stops the walk. The
+   rest of the menu stays usable. Only one folder scan runs at a time.
+4. On completion, `kryptic-scan-report.md` is written at the **root of the
+   folder you chose** (not the process working directory). Findings are
+   redacted. The report states the scan ran fully offline.
+5. A result dialog shows the file count, finding count, and report path, with
+   **Open Report** to open the Markdown file in the OS default app.
+
+If you cancel, no report is written. A partial file is not left as if the scan
+finished.
+
+<Success>
+  Tray Scan… is local: no network, no sign-in, no daemon BFF. The bytes it sees
+  stay on this machine.
+</Success>
 
 ## In CI
 
@@ -65,8 +124,8 @@ than the working tree, it catches exactly what you are about to publish.
   run: kryptic scan
 ```
 
-No credentials needed - scanning is local, so this step works on forks and
-untrusted pull requests where secrets are unavailable by design.
+Still offline. No Kryptic credentials are required, so this step works on forks
+and untrusted pull requests where secrets are unavailable by design.
 
 <Note>
   A finding is a *candidate*. Entropy thresholds and allowlists remove most false

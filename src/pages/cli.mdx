@@ -17,11 +17,17 @@ kryptic start    # run the daemon in the foreground (the service manager calls t
 kryptic stop     # stop the running daemon (pidfile-based, graceful)
 kryptic status   # is the daemon up, and who is signed in
 kryptic flush    # drop the daemon's 5-minute in-memory secrets cache
+kryptic logs     # print the diagnostics log path (send this file to support)
+kryptic logs --reveal  # open the diagnostics log in the file manager
 ```
 
 `start` refuses to run when another daemon already holds the pidfile; `stop` cleans up
 stale pidfiles left by crashes. `flush` is what you want after rotating a secret and
 needing the next local run to see it immediately.
+
+`kryptic logs` points at `…/kryptic/logs/kryptic.krypticlog` (2 MiB, one rotated
+backup). The file records function only: no secrets, tokens, or names. The menu
+bar and tray also have **Reveal Diagnostics Log**.
 
 ## Authentication
 
@@ -100,9 +106,12 @@ the command from. Pass a directory to write that filename inside it, or a `.md`
 file to use that path.
 
 ```bash
-# .git/hooks/pre-commit
-kryptic scan --staged
+# .git/hooks/pre-commit (local only: staged files never leave the laptop)
+exec kryptic scan --staged
 ```
+
+See [Secret scanning](/scanning) for the full hook, Lefthook/Husky one-liners,
+and tray **Scan…**. There is no Kryptic-hosted hook.
 
 ## Updating
 
