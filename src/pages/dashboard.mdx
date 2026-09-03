@@ -13,15 +13,20 @@ screenshot to enlarge it.
 
 <img className="imagewrapper-big" src="/screenshots/login.png" alt="Kryptic sign-in page" />
 
-Sign in with email and password, or with any SSO provider your organization has
-enabled. Those buttons appear only for providers that are actually configured.
-If the email domain has SAML, a one-click SSO button appears after you type the
-address.
+Sign in with email and password, or with Google, Microsoft, Microsoft Entra ID,
+or GitHub. If the email domain has SAML, a one-click SSO button appears after
+you type the address.
 
 <img className="imagewrapper-big" src="/screenshots/register.png" alt="Create your organization" />
 
-**Register** creates a new organization. You become the Owner. A `?plan=team`
-or `?plan=business` link starts a 14-day trial with no card. Invite the rest of
+**Register** with Google, Microsoft, Entra ID, or GitHub creates the organization
+immediately. The identity provider already verified the address, so there is no
+confirmation email. The first login then asks the owner to confirm the
+organization name. Closing the browser is fine: the prompt returns on the next
+sign-in, or they can save it under Settings → General. Password signup still
+asks for a confirmation click before the organization exists, and the name is
+already on that form. You become the Owner either way. A `?plan=team` or
+`?plan=business` link starts a 14-day trial with no card. Invite the rest of
 the team after you are in.
 
 ## Chrome, roles, and the vault
@@ -29,7 +34,8 @@ the team after you are in.
 The sidebar is split into **Workspace** (Dashboard, Projects, Secret scanning)
 and **Organization** (Members, Groups, Machine identities, Daemon sessions,
 Approvals, Audit log, Integrations, Settings). Owners and Admins see the full
-Organization block. Everyone else sees **My daemons** instead of that block.
+Organization block. Everyone else sees **My daemons** and **Settings**
+(Account if they sign in with a local password, General if they are Admin+, then Encryption).
 
 The top bar has jump-to-project search, a notifications bell, and the theme
 toggle.
@@ -191,11 +197,12 @@ OAuth, SAML and SCIM live under **Integrations**, not Settings.
 <img className="imagewrapper-big" src="/screenshots/integrations-sso.png" alt="Single sign-on" />
 
 - **Single sign-on** - connect the organization's own OAuth apps (Google,
-  Microsoft, GitHub, GitLab) and claim an email domain for auto-provisioning.
+  Microsoft, GitHub) and claim an email domain for auto-provisioning.
 - **Directory import** - pull users and groups from Microsoft Entra (and Google
   Workspace when configured).
 - **SAML 2.0** - Okta, JumpCloud, or a generic SAML 2.0 provider. Connecting
-  Okta issues a SCIM token in the same step. See [Set up Okta](/enterprise/okta).
+  Okta or JumpCloud issues a SCIM token in the same step. See
+  [Set up Okta](/enterprise/okta) or [Set up JumpCloud](/enterprise/jumpcloud).
 - **Provisioning** - SCIM 2.0 token issue and revoke. See [SCIM](/enterprise/scim).
 
 The stored OAuth client secret is encrypted with the organization's operational
@@ -203,18 +210,26 @@ data key, not the client-held org key.
 
 ## Settings
 
+**Account** is only for members who sign in with a local password: change that
+password. Display name and email are not editable here. SSO, SAML, and SCIM
+members do not see Account. This is not the vault passphrase.
+
 <img className="imagewrapper-big" src="/screenshots/settings-general.png" alt="Organization settings" />
 
-**General** holds the organization profile, billing email, slug, and the
-session expiry policy that caps how long any login stays valid.
+**General** (Admin+) is above Encryption. It holds the organization name, slug,
+and the session expiry policy that caps how long any login stays valid. Billing
+email lives on **Billing details**, not here.
 
 <img className="imagewrapper-big" src="/screenshots/settings-encryption.png" alt="Encryption settings" />
 
-**Encryption** is where an Owner or Admin enrolls a vault, initializes the org
-key, downloads the Emergency Kit, unlocks or locks the vault, recovers with the
-recovery code, and rotates the key. Every cryptographic operation runs in the
-browser. Pending grants are approved on [Approvals](#approvals), not here. See
-[Encryption](/encryption).
+**Encryption** is where every member enrolls a vault, unlocks or locks it, and
+changes the vault passphrase (re-wraps the same key, so grants stay valid).
+Forgot the passphrase? Kryptic cannot reset it. Creating a new vault key
+revokes grants; an admin must grant the organization key again. An Owner or
+Admin also initializes the org key, downloads the Emergency Kit, recovers
+with the recovery code, and rotates the key. Every cryptographic operation
+runs in the browser. Pending grants are approved on [Approvals](#approvals),
+not here. See [Encryption](/encryption).
 
 **Billing details** is the legal invoice record: company name, address, country,
 and VAT. Greek VAT numbers are resolved from the AADE registry.
@@ -233,7 +248,8 @@ checkout (monthly or annual, VAT handled), and seat adjustment with proration.
 <img className="imagewrapper-big" src="/screenshots/settings-invoices.png" alt="Invoices" />
 
 **Danger zone** (Owner only) deletes the organization and everything in it.
-You type the organization name and your password. There is no undo.
+You type the organization name, then your login password, or your vault
+passphrase if you signed up with SSO. There is no undo.
 
 <img className="imagewrapper-big" src="/screenshots/settings-danger-zone.png" alt="Danger zone" />
 

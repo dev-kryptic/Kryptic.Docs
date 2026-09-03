@@ -1,0 +1,197 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Set up JumpCloud SAML 2.0 single sign-on and SCIM provisioning with Kryptic.'
+
+# Set up JumpCloud SAML 2.0
+
+Available on **Business** and **Enterprise**. JumpCloud is the identity
+provider. Kryptic is the service provider. Sign-in uses SAML 2.0. Joiners and
+leavers use SCIM 2.0, issued when you connect JumpCloud in the dashboard.
+
+Create a **Custom SAML App** in the JumpCloud Admin Portal. There is no
+Kryptic catalog connector. Do not use **Configure SSO with OIDC**. JumpCloud
+needs an [SSO Package or higher](https://jumpcloud.com/support/sso-using-custom-saml-application-connectors),
+or the SSO add-on.
+
+Cloud hosts used below:
+
+| What | URL |
+| --- | --- |
+| Dashboard | `https://app.kryptic.dev` |
+| SAML metadata (entity id) | `https://api.kryptic.dev/saml/metadata` |
+| Assertion consumer service | `https://api.kryptic.dev/saml/acs` |
+| SCIM base | `https://api.kryptic.dev/scim/v2` |
+| SP-initiated sign-in | `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+
+Self-hosted: replace `https://api.kryptic.dev` with your Management API origin
+(`PUBLIC_API_URL`). The ACS and entity id must match that host exactly.
+
+If your JumpCloud tenant is not in the US, use the regional Admin Portal URL
+from [JumpCloud Data Centers](https://jumpcloud.com/support/jumpcloud-data-centers).
+LDAP, RADIUS, and firewall allow lists are region-specific too.
+
+## 1. Create the app in JumpCloud
+
+In the **JumpCloud Admin Portal**:
+
+1. **Access → SSO Applications → + Add New Application**.
+2. Click **Select** on the **Custom Application** tile, or search for
+   **Custom SAML App**. Searching for Custom SAML App pre-selects SSO.
+3. Under **Manage Single Sign-On (SSO)**, choose **Configure SSO with SAML**,
+   not OIDC, then **Next**.
+4. **Display Label**: `Kryptic`. That name appears in the User Portal.
+5. Optional: a description, a User Portal image, or hide the app from the
+   User Portal.
+6. Under **Advanced Settings**, you can set the **SSO IdP URL**. If you leave
+   it empty, JumpCloud uses `https://sso.jumpcloud.com/saml2/`. This value
+   cannot be edited after the app is created. Recreate the connector if you
+   need a different URL later.
+7. **Save Application**, then **Configure Application**.
+
+## 2. SAML settings
+
+On the SSO tab you can **Upload Metadata** from
+`https://api.kryptic.dev/saml/metadata`, or fill the fields by hand. JumpCloud
+field names below match
+[SSO Application Connector Fields](https://jumpcloud.com/support/sso-application-connector-fields).
+
+| JumpCloud field | Value |
+| --- | --- |
+| SP Entity ID (Audience) | `https://api.kryptic.dev/saml/metadata` |
+| ACS URL | `https://api.kryptic.dev/saml/acs` |
+| SAMLSubject NameID | **email** (the default). Do not change it. |
+| SAMLSubject NameID Format | **EmailAddress** if JumpCloud asks you to pick a format |
+| Signature Algorithm | **RSA-SHA256** (the default). Do not switch to SHA-1. |
+| Sign | **Response** is the default. **Assertion and Response** is also fine. |
+| Default RelayState | leave empty |
+| Login URL | optional. For SP-initiated only, use `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+
+Leave **Replace SP Certificate** alone. We do not sign AuthnRequests, so no
+service-provider certificate is required.
+
+NameID as email is enough. We also read `email`, `emailaddress`, and `mail`
+if present. Extra user attributes are optional. Do not rely on JumpCloud JIT
+provisioning. SCIM is the joiners-and-leavers path.
+
+Leave **Include Group Attribute** off unless you have a reason to send
+`memberOf` in the assertion. Group membership in Kryptic comes from SCIM.
+
+Save the connector. After it activates, JumpCloud generates a signing
+certificate and private key. Open the application and use **Export Metadata**
+or **Copy Metadata URL**.
+
+## 3. Copy JumpCloud's metadata into Kryptic
+
+In Kryptic, as an **Owner**:
+
+1. Open [app.kryptic.dev](https://app.kryptic.dev) → **Integrations → SAML 2.0**.
+2. On the JumpCloud card, **Connect**.
+3. Email domain: the domain your people use (for example `acme.com`). Assertions
+   outside that domain are rejected.
+4. Paste the IdP metadata XML from **Export Metadata**.
+5. Save. Connecting JumpCloud issues a **SCIM bearer token in the same step**.
+   Copy it now. It is stored hashed and cannot be shown again.
+
+<Note>
+  The first successful SAML sign-in still creates a **Developer** if SCIM has
+  not provisioned them yet. Raise roles in Kryptic, not in JumpCloud.
+</Note>
+
+## 4. Turn on SCIM in JumpCloud
+
+JumpCloud renamed **Identity Management** to **Provisioning** on the full-page
+application UI. Older Admin Portal layouts still say Identity Management. Use
+whichever tab you see. Steps follow
+[Integrate with Custom SCIM](https://jumpcloud.com/support/provision-and-manage-users-and-groups-in-apps-using-custom-scim-identity-management-integration).
+
+Kryptic is SCIM 2.0 only. JumpCloud no longer lets you create SCIM 1.1
+integrations.
+
+Still in the Kryptic app:
+
+1. Open the **Provisioning** tab (or **Identity Management**).
+2. Leave **Use mTLS** off. Kryptic authenticates with a bearer token.
+3. Fill the required fields:
+
+| JumpCloud field | Value |
+| --- | --- |
+| Base URL | `https://api.kryptic.dev/scim/v2` (no trailing slash) |
+| Token (Token Key) | the token Kryptic showed once (no `Bearer` prefix) |
+| Test User Email | an address that does **not** already exist in Kryptic |
+
+4. **Test Connection**. JumpCloud sends `GET /Users` to check the URL and
+   token. On success, the rest of the form appears.
+5. Leave **Enable management of User Groups and Group Membership in this
+   application** on if you want groups in Kryptic. We support group create,
+   update, delete, and membership. Turn it off if you do not want groups.
+   Leaving it on when you do not want groups can fail activation.
+6. Leave password sending off. New JumpCloud integrations disable it by
+   default. Kryptic sign-in is SSO. We do not need a password.
+7. Keep the default uniqueness of id, email, and username. Map **userName** to
+   JumpCloud Email if the JumpCloud username is not an email address. Kryptic
+   uses `userName` or the primary email as the account email.
+8. Click **Activate**. Do not click **Save**. Save discards the configuration
+   and you start over.
+
+Activation creates, reads, updates, and deletes a test user (and a test group
+if group management is on). Kryptic deactivates on DELETE rather than
+physically deleting. JumpCloud treats that as deactivate-and-clean-up. You
+may see a deactivated test user under **Members**. Leave it, or remove it
+after activation succeeds.
+
+<Warning>
+  The Test User Email must not already exist in Kryptic. JumpCloud does not
+  check first. A collision fails Create /User and the integration will not
+  activate.
+</Warning>
+
+## 5. Authorize user groups
+
+JumpCloud denies the app until you bind groups. On the Kryptic application,
+open **User Groups** and check the groups that should get SSO and SCIM.
+
+SCIM only provisions people and groups bound to the app. Assigning someone
+in JumpCloud without this checkbox does not create a Kryptic account.
+
+Unassign, deactivate, or delete in JumpCloud deactivates the Kryptic account
+and revokes browser and daemon sessions immediately. Accounts are not
+physically deleted, so the audit log still names them.
+
+<Warning>
+  SAML without SCIM leaves offboarded people with access. The dashboard warns
+  if SSO is live and no SCIM request has arrived yet.
+</Warning>
+
+## 6. Sign in
+
+On [app.kryptic.dev/login](https://app.kryptic.dev/login), type your work
+email. When its domain has a SAML connection, a **Continue with JumpCloud**
+button appears; no password needed. Direct link, if you want to bookmark one:
+
+```
+https://api.kryptic.dev/saml/login?domain=your-domain.com
+```
+
+## Rotating certificates or the SCIM token
+
+When JumpCloud's signing certificate is close to expiry, paste the new IdP
+metadata with **Reconnect**. Reconnect does not re-issue the SCIM token, so
+provisioning keeps working.
+
+To rotate the SCIM token, revoke it in Kryptic and enable SCIM again, then
+update JumpCloud in the same window:
+
+1. **Access → SSO Applications**, open the Kryptic app.
+2. **Provisioning → Configuration Settings**.
+3. Paste the new value into **Token Key** (JumpCloud may also call this API
+   Key, Client Secret, or Bearer Token).
+4. Click **Update**. Save does not apply a new token.
+
+Issuing a new token in Kryptic invalidates the previous one immediately.
+
+## See also
+
+- [SAML 2.0 SSO](/enterprise/saml): what we verify on every assertion
+- [SCIM provisioning](/enterprise/scim): endpoints, groups, and deprovisioning rules
+- [Set up Okta](/enterprise/okta): the same product path on Okta

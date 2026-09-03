@@ -37,6 +37,14 @@ grant. An admin approves pending grants from **Approvals** (or from **Device**
 right after a daemon login). Unlock the vault first. Encryption setup stays on
 Settings → Encryption.
 
+The vault passphrase is not the login password. Members with a local password
+change that password on **Settings → Account**. Change the vault passphrase on
+**Settings → Encryption**
+while the vault is unlocked: the same private key is re-wrapped, so existing
+grants stay valid. A forgotten vault passphrase cannot be reset. Creating a
+new vault key is a new key pair. An admin must grant the organization key
+again.
+
 Rotation is client-side: the admin's browser generates a fresh key, re-encrypts
 current values locally, and re-grants active recipients atomically. Recommended
 after removing a member.

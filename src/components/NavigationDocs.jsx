@@ -70,6 +70,7 @@ export const docsNavigation = [
     links: [
       { title: 'SAML 2.0 SSO', href: '/enterprise/saml' },
       { title: 'Set up Okta', href: '/enterprise/okta' },
+      { title: 'Set up JumpCloud', href: '/enterprise/jumpcloud' },
       { title: 'SCIM provisioning', href: '/enterprise/scim' },
     ],
   },
