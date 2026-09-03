@@ -1,4 +1,5 @@
 import { Note, Warning } from '@/components/mdx'
+import { DocsTable } from '@/components/DocsTable'
 
 export const description =
   'How Kryptic encrypts secrets, what the server can see, and where the open-source engines live.'
@@ -8,6 +9,8 @@ export const description =
 Kryptic is a **blind store**. Secret values are encrypted on the client (browser,
 daemon, or CI runner) under a 256-bit organization key that exists in plaintext
 only on clients. The server stores and serves ciphertext it has no path to open.
+The wire-level writeup (envelopes, sealed boxes, who decrypts when) is
+[For geeks](/geeks).
 
 This is the licensing boundary as well: anything that can see a secret in
 plaintext is open source. The server platform is proprietary
@@ -15,11 +18,27 @@ because it never holds a key that would let it read your values.
 
 ## What the server can and cannot see
 
-| Material | Who can open it |
-| --- | --- |
-| Secret envelopes (`v1.<orgKeyId>.…`) | Anyone holding the org key: an unlocked browser vault, an approved daemon device, a granted machine identity |
-| Org-key grants (P-256 sealed boxes) | The recipient whose public key the grant was sealed to |
-| Operational ciphertexts (SSO IdP client secrets, directory credentials) | The server, under a separate data key wrapped by `MASTER_KEY` |
+<DocsTable
+  columns={['Material', 'Who can open it']}
+  rows={[
+    [
+      <>
+        Secret envelopes (<code>{'v1.<orgKeyId>.…'}</code>)
+      </>,
+      'Anyone holding the org key: an unlocked browser vault, an approved daemon device, a granted machine identity',
+    ],
+    [
+      'Org-key grants (P-256 sealed boxes)',
+      'The recipient whose public key the grant was sealed to',
+    ],
+    [
+      'Operational ciphertexts (SSO IdP client secrets, directory credentials)',
+      <>
+        The server, under a separate data key wrapped by <code>MASTER_KEY</code>
+      </>,
+    ],
+  ]}
+/>
 
 Losing `MASTER_KEY` on a self-hosted install breaks those operational
 ciphertexts (SSO secrets and similar). It does **not** decrypt, or prevent
@@ -56,11 +75,43 @@ implemented three times so every runtime that touches plaintext uses the same
 bytes. A format change must land in all three repositories in the same release;
 `interop-vectors/` in each repo is the contract.
 
-| Repository | Runtime | Consumed by | Package |
-| --- | --- | --- | --- |
-| [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | .NET | Kryptic Platform (operational ciphertexts only) | NuGet `Kryptic.Encryption` |
-| [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | TypeScript / WebCrypto | Management dashboard | npm `@krypticdev/encryption` |
-| [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go | Daemon, CLI (`kryptic ci export`), Kubernetes operator | Go module of the same name |
+<DocsTable
+  columns={['Repository', 'Runtime', 'Consumed by', 'Package']}
+  rows={[
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Net">
+        Kryptic.Encryption.Net
+      </a>,
+      '.NET',
+      'Kryptic Platform (operational ciphertexts only)',
+      <>
+        NuGet <code>Kryptic.Encryption</code>
+      </>,
+    ],
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.NPM">
+        Kryptic.Encryption.NPM
+      </a>,
+      'TypeScript / WebCrypto',
+      'Management dashboard',
+      <>
+        npm <code>@krypticdev/encryption</code>
+      </>,
+    ],
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Go">
+        Kryptic.Encryption.Go
+      </a>,
+      'Go',
+      <>
+        Daemon, CLI (<code>kryptic ci export</code>), Kubernetes operator
+      </>,
+      <>
+        Go module <code>github.com/dev-kryptic/Kryptic.Encryption.Go</code>
+      </>,
+    ],
+  ]}
+/>
 
 No custom primitives. AES-256-GCM and P-256 ECDH come from platform cryptography
 (.NET `System.Security.Cryptography`, browser WebCrypto, Go `crypto/ecdh`).

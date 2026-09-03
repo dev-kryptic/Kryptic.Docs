@@ -1,0 +1,75 @@
+import { Note, Warning } from '@/components/mdx'
+import { DecryptPaths } from '@/components/geeks/DecryptPaths'
+
+export const description =
+  'Where Kryptic decrypts: dashboard reveal, daemon injection, CI export, and the local socket.'
+
+# Decrypt paths
+
+Plaintext exists in four places, all on the customer side: an unlocked
+browser tab after an explicit reveal, daemon process memory (≤ 5 minutes),
+a CI runner or operator process, and the application environment (or a
+Kubernetes Secret the operator wrote). It never exists on a Kryptic API
+host.
+
+Click a path, then step through it.
+
+<DecryptPaths />
+
+## Local socket
+
+The daemon/SDK contract is [PROTOCOL.md](https://github.com/dev-kryptic/Kryptic.Daemon/blob/main/PROTOCOL.md)
+v1. Newline-delimited JSON, one request, one reply, then the connection
+closes.
+
+| Platform | Endpoint |
+| --- | --- |
+| macOS | `/tmp/kryptic-daemon.sock` |
+| Linux | `$XDG_RUNTIME_DIR/kryptic-daemon.sock`, fallback `/tmp/kryptic-daemon.sock` |
+| Windows | `\\.\pipe\kryptic-daemon` |
+
+`KRYPTIC_SOCKET_PATH` overrides the path (how tests point a package at a
+mock). `0600` on the unix socket is a second layer. The primary gate is
+`LOCAL_PEERCRED` / `SO_PEERCRED` (same uid) or the named-pipe ACL. A
+connection from another OS user is dropped without a reply.
+
+A successful `secrets` reply is already plaintext. The SDK injects it and
+does not talk to the network. Explicitly set environment variables always
+win. Packages are automatic no-ops in production and staging.
+
+## The three API shapes
+
+They all speak envelopes. None returns a secret value.
+
+| Caller | Host | Auth | Decrypts with |
+| --- | --- | --- | --- |
+| Dashboard | Management API | Member session | `@krypticdev/encryption` in the browser |
+| Daemon | Daemon BFF (`daemon.kryptic.dev`) | Device session | `Kryptic.Encryption.Go` in the daemon |
+| `kryptic ci export` | Pipelines BFF (`pipelines.kryptic.dev`) | Machine token | Go engine on the runner |
+| REST clients | Secrets API (`secrets.kryptic.dev`) | Machine token | Whatever engine *you* run. The API will not. |
+
+Reads return `wrappedOrgKey` plus envelopes that include `definitionId` and
+`environmentId` so the caller can rebuild associated data. Writes accept an
+envelope you already encrypted. A missing grant is `403`, not an empty
+plaintext list.
+
+<Warning>
+  Do not send plaintext to the REST API or the Pipelines BFF. There is no
+  server-side `/export`. If you need dotenv on a runner, use
+  [`kryptic ci export`](/cli#ci-export).
+</Warning>
+
+## What never decrypts
+
+- Language SDKs. They ask the daemon.
+- The Management API, Daemon BFF, Pipelines BFF, and Secrets API.
+- Audit log, activity monitor, and notifications. They name the key and
+  the environment, never the value.
+- Secret scanning. It matches *your* paste or git patch against 222
+  gitleaks rules. It does not open envelopes.
+
+<Note>
+  The licensing boundary is the same as the crypto boundary. If a binary
+  can see plaintext, its repository is public. If it cannot, it is the
+  proprietary platform.
+</Note>

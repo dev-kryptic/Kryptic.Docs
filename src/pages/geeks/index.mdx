@@ -1,0 +1,140 @@
+import { Note } from '@/components/mdx'
+import { Tiles } from '@/components/Tiles'
+import { ArchitectureMap } from '@/components/geeks/ArchitectureMap'
+import { DocsTable } from '@/components/DocsTable'
+
+export const description =
+  'Technical review of Kryptic encryption: key hierarchy, envelopes, and where plaintext exists.'
+
+# For geeks
+
+This is the wire-level writeup for security teams, DevSecOps, and anyone
+who will not take "end-to-end" as a slogan. It describes the primitives, the
+key hierarchy, the envelope formats, and the exact hop where a ciphertext
+becomes plaintext.
+
+The operator guide stays on [Encryption](/encryption). That page is how you
+enroll a vault and rotate a key. This section is how the bytes move.
+
+Kryptic is a **blind store**. Secret values are encrypted on a client
+(browser, daemon, CI runner, or cluster operator) under a 256-bit organization
+key that exists in plaintext only on clients. The four API hosts store and
+serve ciphertext they have no function to open. Anything that can see a secret
+in plaintext is [open source](https://github.com/dev-kryptic).
+
+<Note>
+  We do not use the phrase "zero-knowledge". The design is end-to-end
+  encryption with a client-held org key. An independent cryptographic review
+  has not been published yet. Read the engines and the interop vectors
+  instead of a label.
+</Note>
+
+## The map
+
+Click a node. Clients on the top row can hold plaintext. The blind store on
+the bottom row cannot.
+
+<ArchitectureMap />
+
+Transport between a client and an API host is TLS 1.3. The only path that
+carries plaintext off a crypto client is the local OS socket from daemon to
+SDK, which never leaves the machine and is gated by kernel peer credentials
+(or a Windows named-pipe ACL).
+
+## What this section covers
+
+<Tiles
+  items={[
+    {
+      href: '/geeks/key-hierarchy',
+      name: 'Key hierarchy',
+      description:
+        'Passphrase, device key, machine secret, recovery code, party P-256, org key, and what the server data key is for.',
+    },
+    {
+      href: '/geeks/envelopes',
+      name: 'Envelopes',
+      description:
+        'v1 secret envelopes, sbx.v1 sealed boxes, associated data, Argon2id wraps, and the interop contract.',
+    },
+    {
+      href: '/geeks/paths',
+      name: 'Decrypt paths',
+      description:
+        'Dashboard reveal, daemon injection, and CI or Kubernetes: when plaintext appears, and what never decrypts.',
+    },
+  ]}
+/>
+
+## What the server can see
+
+<DocsTable
+  columns={['Visible to the platform', 'Invisible to the platform']}
+  rows={[
+    [
+      'Envelope metadata (version, key id, nonce, ciphertext length)',
+      'Secret values',
+    ],
+    [
+      <>
+        Secret <em>names</em> (<code>DATABASE_URL</code>)
+      </>,
+      'The org key',
+    ],
+    ['Project and environment structure', 'Party private keys'],
+    ['Grant recipients and public keys', 'Vault passphrases and recovery codes'],
+    [
+      'Wrapped private keys and Argon2id hashes it cannot open',
+      'Machine client secrets (hash only)',
+    ],
+    [
+      'Audit metadata (who fetched which key name, never the value)',
+      'Any server-side decrypt path for values (it does not exist)',
+    ],
+  ]}
+/>
+
+Losing `MASTER_KEY` on a self-hosted install breaks operational ciphertexts
+(SSO IdP secrets and similar). It does not decrypt customer secret values and
+it does not stop clients that already hold the org key.
+
+## Read the engines
+
+The same bytes are implemented three times. A format change must land in all
+three repositories in the same release. `interop-vectors/` is the contract.
+
+<DocsTable
+  columns={['Repository', 'Runtime', 'Who uses it']}
+  rows={[
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Net">
+        Kryptic.Encryption.Net
+      </a>,
+      <>
+        .NET <code>AesGcm</code> / ECDH
+      </>,
+      'Platform operational ciphertexts only',
+    ],
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.NPM">
+        Kryptic.Encryption.NPM
+      </a>,
+      'WebCrypto + hash-wasm',
+      'Management dashboard',
+    ],
+    [
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Go">
+        Kryptic.Encryption.Go
+      </a>,
+      <>
+        <code>crypto/ecdh</code> + x/crypto
+      </>,
+      <>
+        Daemon, <code>kryptic ci export</code>, Kubernetes operator
+      </>,
+    ],
+  ]}
+/>
+
+No custom primitives. Each engine ships a `SECURITY.md` that matches this
+section. Language SDKs never decrypt.

@@ -206,6 +206,7 @@ Each link below points to a clean markdown version of the documentation page.
     'get-started': 'Getting Started',
     packages: 'SDKs',
     templates: 'Templates',
+    geeks: 'Geeks',
   };
 
   for (const [section, sectionPages] of Object.entries(sections)) {

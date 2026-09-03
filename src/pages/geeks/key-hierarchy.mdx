@@ -1,0 +1,68 @@
+import { Note } from '@/components/mdx'
+import { KeyHierarchyGraph } from '@/components/geeks/KeyHierarchyGraph'
+
+export const description =
+  'The Kryptic end-to-end key hierarchy: what is derived from what, and where each key lives.'
+
+# Key hierarchy
+
+Secret values are end-to-end encrypted. The org key exists only on clients.
+The server stores it inside sealed boxes it cannot open. Click a layer.
+
+<KeyHierarchyGraph />
+
+## Where each key lives
+
+| Key | At rest | In memory | At the server |
+| --- | --- | --- | --- |
+| Vault passphrase / recovery code / machine client secret | Nowhere (customer-held) | Client, during derivation | No (machine secret stored as an Argon2id hash) |
+| Party private keys | Database or OS store, wrapped | Client only | Only wrapped |
+| Org key | Database, sealed-box grants only | Browser, daemon, or CI process | Only sealed to recipients |
+| Secret plaintext | Never | Client memory and the requesting process | Never |
+| Server org data key | Database, wrapped under `MASTER_KEY` | Server, SSO and similar | Yes, and it cannot open secret values |
+
+## Grants
+
+An Owner or Admin initializes encryption in the browser: 32 random bytes, a
+wrap to their own vault, and a one-time Emergency Kit. Later recipients
+(other vaults, approved daemon devices, machine identities) receive the org
+key as a sealed-box grant. Pending grants sit on [Approvals](/dashboard#approvals).
+A signed-in daemon without a grant cannot serve a secret.
+
+Changing the vault passphrase re-wraps the same P-256 private key. Existing
+grants stay valid. Creating a new vault key is a new key pair. An admin must
+grant the org key again.
+
+<Note>
+  Revoking a grant stops future delivery. It cannot erase a key a client
+  already held. Rotate the org key after a member or machine leaves if that
+  matters for your threat model.
+</Note>
+
+## Rotation
+
+Org-key rotation is a client-side ceremony. The admin browser generates a
+fresh key, decrypts and re-encrypts every current secret value locally, seals
+new grants to every active recipient and a new recovery key, and submits the
+change atomically. Old grants are revoked. Version history under the retired
+key is purged.
+
+Server data-key rotation re-encrypts operational ciphertexts (IdP secrets)
+only. Master-key rotation rewraps those data keys. Neither touches customer
+secret values.
+
+## Recovery
+
+The Emergency Kit is a recovery key pair whose private key is wrapped by
+Argon2id of a 160-bit Crockford base32 code (eight groups of four). The code
+is shown once and is never stored by Kryptic. If you lose every vault
+passphrase, every enrolled device, and that code, the values are unrecoverable.
+That is the design working.
+
+## The isolated server key
+
+SSO IdP client secrets and directory credentials are encrypted with a
+server-side org data key, wrapped by `MASTER_KEY`. That key is not on the
+customer-secret path. Do not conflate the two. Back `MASTER_KEY` up on
+self-hosted installs so you can re-read IdP credentials. Losing it does not
+disclose `DATABASE_URL`.

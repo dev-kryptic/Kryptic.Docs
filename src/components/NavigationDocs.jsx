@@ -59,10 +59,18 @@ export const docsNavigation = [
     title: 'PLATFORM',
     links: [
       { title: 'Encryption', href: '/encryption' },
-      { title: 'Vulnerability disclosure', href: '/security' },
       { title: 'Self-hosting', href: '/self-hosting' },
       { title: 'Kubernetes operator', href: '/kubernetes' },
       { title: 'Coolify', href: '/coolify' },
+    ],
+  },
+  {
+    title: 'GEEKS',
+    links: [
+      { title: 'Overview', href: '/geeks' },
+      { title: 'Key hierarchy', href: '/geeks/key-hierarchy' },
+      { title: 'Envelopes', href: '/geeks/envelopes' },
+      { title: 'Decrypt paths', href: '/geeks/paths' },
     ],
   },
   {
@@ -72,6 +80,12 @@ export const docsNavigation = [
       { title: 'Set up Okta', href: '/enterprise/okta' },
       { title: 'Set up JumpCloud', href: '/enterprise/jumpcloud' },
       { title: 'SCIM provisioning', href: '/enterprise/scim' },
+    ],
+  },
+  {
+    title: 'SECURITY',
+    links: [
+      { title: 'Vulnerability disclosure', href: '/security' },
     ],
   },
 ]

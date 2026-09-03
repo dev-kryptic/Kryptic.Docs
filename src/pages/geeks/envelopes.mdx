@@ -1,0 +1,96 @@
+import { Note } from '@/components/mdx'
+import { EnvelopeAnatomy } from '@/components/geeks/EnvelopeAnatomy'
+
+export const description =
+  'Kryptic secret envelopes and P-256 sealed boxes: wire format, associated data, and interop.'
+
+# Envelopes
+
+Every ciphertext the platform stores or transmits is one of two versioned
+strings. Both are safe to log: they contain no key material and no plaintext.
+Click a segment.
+
+<EnvelopeAnatomy />
+
+## Secret envelope
+
+```
+v1.<keyId>.<base64url nonce>.<base64url ciphertext||tag>
+```
+
+| Field | Size / rule |
+| --- | --- |
+| Version | `v1` |
+| `keyId` | `[a-zA-Z0-9_-]{1,64}` |
+| Nonce | 12 bytes, CSPRNG, base64url no padding |
+| Body | AES-256-GCM ciphertext with a 16-byte tag appended |
+
+Implementations: .NET `AesGcm`, WebCrypto `AES-GCM`, Go `crypto/aes` + GCM.
+The engine refuses a caller-supplied nonce.
+
+### Context binding
+
+Secret values set GCM associated data to:
+
+```
+secret:<secretDefinitionId>:env:<environmentId>
+```
+
+GUIDs are the lowercase JSON form (`Guid.ToString()` / `.toLowerCase()`).
+Decrypt without the same string fails the tag. An attacker with raw database
+access cannot move the production `DATABASE_URL` ciphertext onto a
+development row a low-privilege user may reveal.
+
+Wrapping envelopes (vault passphrase, recovery code, machine client secret)
+use the same `v1` layout with informational key ids `vaultpass_v1`,
+`recovery_v1`, and `machinesecret_v1`, and **no** associated data.
+
+## Sealed box
+
+```
+sbx.v1.<recipientKeyId>.<base64url ephemeralPub>.<base64url nonce>.<base64url ciphertext||tag>
+```
+
+This is ECIES over P-256:
+
+1. Generate a fresh ephemeral P-256 key pair.
+2. ECDH against the recipient public key (uncompressed SEC1, 65 bytes).
+3. HKDF-SHA256, salt empty, info = `kryptic-sealed-box-v1` || ephemeral pub || recipient pub.
+4. Expand to 44 bytes: 32-byte AES key || 12-byte nonce.
+5. AES-256-GCM seal the payload (almost always the 32-byte org key).
+
+The nonce is derived, not random. The per-message ephemeral key gives
+uniqueness. A deterministic seal makes the committed interop vectors
+byte-exact across C#, TypeScript, and Go.
+
+## Argon2id
+
+Local passwords, vault wraps, recovery wraps, and machine-secret wraps use
+parameter set v1: 64 MiB memory, 3 iterations, parallelism 4, 16-byte salt,
+32-byte output. The parameter version is stored next to each wrap so a later
+set can be introduced without invalidating old ones. Verification is
+constant-time.
+
+Password hashes on the server use:
+
+```
+argon2id.<parameterSetVersion>.<base64url salt>.<base64url hash>
+```
+
+Machine client secrets are stored only in that hashed form. The secret that
+derives the wrap key is shown once at identity creation.
+
+<Note>
+  Argon2id is not a FIPS-approved KDF. AES-256-GCM and P-256 ECDH come from
+  platform cryptography: Windows CNG, browser WebCrypto, Go `crypto/ecdh`.
+  .NET `AesGcm` is FIPS-validated on Windows CNG, and on Linux only when the
+  host OpenSSL is a validated module in approved mode.
+</Note>
+
+## Interop
+
+`interop-vectors/` in each engine repository is the lock. The same inputs
+must produce or open the same bytes. Suites cover round-trip, bit-flip
+tamper, wrong-key and wrong-context rejection, envelope fuzzing, and
+Argon2id determinism per salt and parameter set. If you are reviewing the
+product, start there and in `SECURITY.md`.
