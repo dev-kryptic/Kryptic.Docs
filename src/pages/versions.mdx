@@ -1,0 +1,47 @@
+export const description =
+  'What shipped in each Kryptic release.'
+
+# Versions
+
+What changed in each release of Kryptic: the product you sign into and run
+secrets from. The latest release is **Patch.20260905**.
+
+Language SDKs, the daemon, the Kubernetes operator, and the encryption
+libraries version on their own. Their notes live with each of those products.
+
+## Patch.20260905
+
+Work since the September 1 launch. Signing up with an email and password
+waits until you confirm the address. Signing in with Google, Microsoft, or
+GitHub can create the organization for you. Your login password and your
+vault passphrase stay separate.
+
+### Added
+
+- Password signup sends a confirmation email. The organization is created
+  after you click the link.
+- Google, Microsoft, and GitHub can create an organization when the email is
+  new and no other organization already uses that domain.
+- After you join with one of those providers, you can name the organization.
+- You can change your vault passphrase. People who already have access keep
+  it.
+- Directory import shows a preview. You pick which users and groups to bring
+  in before anyone is created.
+- A secret can reuse the value of another secret in the same project.
+  Exports and reveals follow that link. You change the original, not the
+  alias, and you cannot delete a secret that others still point at.
+- When a developer updates a secret, the change waits for an owner or
+  admin. They can approve or deny it. The person who asked can cancel.
+- Rotation reminders, once or on a schedule. Due items show on the
+  dashboard. If you do not pick who to notify, owners and admins are
+  emailed.
+- You can open a past version of a secret.
+- Adding seats goes through checkout. Removing seats applies right away.
+- Access requests expire after 7 days.
+
+### Changed
+
+- You cannot sign in with a password until the email is confirmed.
+- Owners who signed up with Google, Microsoft, or GitHub can delete the
+  organization without a login password. Owners who use a password still
+  confirm with that password.

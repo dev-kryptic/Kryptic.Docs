@@ -81,9 +81,28 @@ call that decrypts in the browser under the org key.
 
 <img className="imagewrapper-big" src="/screenshots/project-secret-revealed.png" alt="A revealed secret" />
 
-Each cell offers reveal, copy, version history with restore, and delete. The
-toolbar handles `.env` import and per-environment export. Import encrypts in
-the browser before upload.
+Each cell offers reveal, copy, version history with restore, and delete. Version
+history can reveal a past value when the vault is unlocked (or after the usual
+unlock dialog). The toolbar handles `.env` import and per-environment export.
+Import encrypts in the browser before upload.
+
+Two secret types ship today:
+
+- **String** - a normal encrypted value per environment.
+- **Reference** - an alias for another String secret in the same project. The
+  server copies the target's ciphertext under the alias key for the same
+  environment. Decrypt still uses the target's definition id, so the blind-store
+  model is unchanged. A secret cannot reference itself or form a cycle.
+
+A calendar control on each key sets a **rotation reminder** (one-time or
+recurring). Due reminders appear on the dashboard **Expiring soon** card. If no
+recipients are selected, owners and admins are notified.
+
+Developers who edit a value submit a **change request**. Owners and admins
+approve or deny it on Approvals after revealing the proposed value (vault
+unlocked). The requester can reveal it too, to confirm what they submitted, or
+cancel, which clears the admin notification. Pending approvals expire after 7
+days.
 
 ### Client generator
 
@@ -165,12 +184,16 @@ without a grant cannot serve a single secret.
 
 <img className="imagewrapper-big" src="/screenshots/approvals.png" alt="Approvals inbox" />
 
-**Approvals** is the admin inbox for two different queues:
+**Approvals** is tabbed by kind:
 
-1. **Organization-key grants** (org-wide). Members, devices, and CI machines
+1. **Change requests.** A developer-proposed secret write. Reveal decrypts
+   the proposed value in the browser. Approving applies the ciphertext. The
+   requester can cancel; pending requests expire after 7 days and their
+   notifications are removed.
+2. **Access requests** (per project and environment). Approving creates the
+   grant. Pending requests also expire after 7 days.
+3. **Organization-key grants** (org-wide). Members, devices, and CI machines
    wait here until an admin seals the org key. The vault must be unlocked.
-2. **Project access requests** (per project and environment). Independent of
-   the org-key grant. Approving creates the grant.
 
 Encryption setup stays under **Settings → Encryption**. Grants are not approved
 there.

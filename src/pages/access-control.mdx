@@ -14,7 +14,7 @@ which are per project and per environment.
 | --- | --- |
 | **Owner** | Everything, including billing, organization settings, key rotation, and deleting the organization |
 | **Admin** | Manage members, projects, groups and machine identities; export secrets; read the audit log |
-| **Developer** | Work with the projects they are granted; request access to others |
+| **Developer** | Work with the projects they are granted; request access to others; propose secret changes that an owner or admin must approve |
 | **Viewer** | Read-only within granted projects |
 
 Roles alone do not grant access to a project's secrets - a Developer with no
@@ -39,7 +39,8 @@ Effective access resolves in order: role -> direct grant -> group grant.
 
 Granting access to a group instead of a person is what makes access survive
 staff changes. Add someone to "Backend Team" and they inherit every grant that
-group holds; remove them and the access disappears immediately.
+group holds; remove them and the access disappears immediately. Open a group
+to see every project grant it holds, and who is in it.
 
 Groups can also be populated automatically from your identity provider - see
 [SCIM provisioning](/enterprise/scim) and Entra directory import.
@@ -57,6 +58,16 @@ project grant and still be unable to decrypt until an admin seals the org key
 
 This keeps the default posture tight without turning every onboarding into a
 support ticket.
+
+## Secret change requests
+
+Developers with write access still encrypt values in the browser, but the write
+is held as a **change request** until an owner or admin approves it on
+Approvals. The requester and reviewers can reveal the proposed value after
+unlocking the vault, then approve, deny, or cancel. Cancelling removes the
+admin notification. Pending requests (and access requests) expire after 7 days,
+and stale notifications are cleared with them. Owners and admins continue to
+write directly.
 
 ## Organization isolation
 

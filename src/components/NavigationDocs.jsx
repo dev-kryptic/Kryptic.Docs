@@ -62,6 +62,7 @@ export const docsNavigation = [
       { title: 'Self-hosting', href: '/self-hosting' },
       { title: 'Kubernetes operator', href: '/kubernetes' },
       { title: 'Coolify', href: '/coolify' },
+      { title: 'Versions', href: '/versions' },
     ],
   },
   {
