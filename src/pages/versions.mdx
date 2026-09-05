@@ -14,7 +14,7 @@ libraries version on their own. Their notes live with each of those products.
 Work since the September 1 launch. Signing up with an email and password
 waits until you confirm the address. Signing in with Google, Microsoft, or
 GitHub can create the organization for you. Your login password and your
-vault passphrase stay separate.
+vault passphrase stay separate steps.
 
 ### Added
 
@@ -27,15 +27,15 @@ vault passphrase stay separate.
   it.
 - Directory import shows a preview. You pick which users and groups to bring
   in before anyone is created.
-- A secret can reuse the value of another secret in the same project.
+- A reference secret can reuse the value of another secret in the same project.
   Exports and reveals follow that link. You change the original, not the
   alias, and you cannot delete a secret that others still point at.
-- When a developer updates a secret, the change waits for an owner or
+- When a developer updates a secret, the change request waits for an owner or
   admin. They can approve or deny it. The person who asked can cancel.
-- Rotation reminders, once or on a schedule. Due items show on the
+- Secrets rotation reminders, once or on a schedule. Due items show on the
   dashboard. If you do not pick who to notify, owners and admins are
   emailed.
-- You can open a past version of a secret.
+- You can now reveal a past version of a secret before restoring it.
 - Adding seats goes through checkout. Removing seats applies right away.
 - Access requests expire after 7 days.
 
