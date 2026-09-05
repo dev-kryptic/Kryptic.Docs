@@ -4,10 +4,37 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **Patch.20260905**.
+secrets from. The latest release is **Patch.20260906**.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## Patch.20260906
+
+Yearly billing, Stripe-native trials, and clearer what happens when a trial
+or paid plan ends without payment.
+
+### Added
+
+- Team and Business can be billed yearly (two months free versus monthly).
+- Trials create a Stripe subscription with no card required. Add a payment
+  method in Plans & billing before the trial ends.
+- If a trial ends without a card, or a paid plan is cancelled or fails
+  renewal after a 3-day grace, the organization returns to Free. The Owner
+  and up to two Admins stay active; other members are disabled until you
+  subscribe again and re-enable them.
+- Failed renewals send owner emails at the start of the grace and again
+  about 24 hours before Free downgrade.
+
+### Changed
+
+- Plans & billing after subscribe focuses on status plus Change seats,
+  Change plan, and Change billing.
+- Seat bands are Free up to 3, Team up to 25, Business up to 200,
+  Enterprise unlimited.
+- Adding seats, plan upgrades, and monthly-to-yearly go through Stripe
+  Checkout. Seat reductions and yearly downgrades wait for renewal. No
+  mid-cycle refund.
 
 ## Patch.20260905
 

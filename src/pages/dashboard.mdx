@@ -263,8 +263,17 @@ and VAT. Greek VAT numbers are resolved from the AADE registry.
 
 <img className="imagewrapper-big" src="/screenshots/settings-billing.png" alt="Plans and billing" />
 
-**Plans & billing** is plan and seat usage, 14-day trials with no card, Stripe
-checkout (monthly or annual, VAT handled), and seat adjustment with proration.
+**Plans & billing** shows a shop before you subscribe (monthly or yearly at two
+months free, 14-day trials with no card). A trial creates a Stripe subscription
+in trialing so you can open the customer portal and add a payment method before
+the trial ends. After subscribe it is one status card plus Change seats, Change
+plan, and Change billing. Seat bands are Free up to 3, Team up to 25, Business
+up to 200, and Enterprise unlimited. Adding seats, upgrading a plan, and
+switching monthly to yearly each open Stripe Checkout. Yearly downgrades wait
+for renewal. If a trial ends without a card, or a paid plan is cancelled or
+fails renewal after a 3-day payment grace, the org returns to Free: the Owner
+and up to two Admins stay active; other members are disabled until you
+subscribe again and re-enable them.
 
 **Invoices** lists every tax invoice as a downloadable PDF.
 
