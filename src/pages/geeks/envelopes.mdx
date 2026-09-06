@@ -41,6 +41,11 @@ Decrypt without the same string fails the tag. An attacker with raw database
 access cannot move the production `DATABASE_URL` ciphertext onto a
 development row a low-privilege user may reveal.
 
+An **Org reference** does not store a copy of the catalog envelope. At read
+time the resolver follows the per-environment binding and the client decrypts
+the catalog row with `secret:<orgDefinitionId>:env:<orgEnvironmentId>`. Bundles
+return those catalog ids, not the project environment id.
+
 Wrapping envelopes (vault passphrase, recovery code, machine client secret)
 use the same `v1` layout with informational key ids `vaultpass_v1`,
 `recovery_v1`, and `machinesecret_v1`, and **no** associated data.

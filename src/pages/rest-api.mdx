@@ -58,7 +58,12 @@ salt. Derive an unwrap key from the client secret, open the private key, then op
 
 ## Secrets
 
-Read the ciphertext bundle for one environment:
+Read the ciphertext bundle for one environment. An **Org reference** in that
+project is resolved at read time: the bundle includes the catalog envelope and
+the catalog definition and environment ids, so associated data matches
+[Envelopes](/geeks/envelopes). `PUT` cannot write a Reference or Org
+reference key. Change the type in the dashboard first, or update the target
+catalog value.
 
 ```bash
 GET /v1/projects/proj_x/secrets?environment=production

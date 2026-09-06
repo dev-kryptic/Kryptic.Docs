@@ -1,7 +1,7 @@
 import { Note, Warning } from '@/components/mdx'
 
 export const description =
-  'Roles, per-environment grants, groups and access requests - how Kryptic decides who can read a secret.'
+  'Roles, per-environment grants, groups, shared secrets and access requests - how Kryptic decides who can read a secret.'
 
 # Access control
 
@@ -13,8 +13,8 @@ which are per project and per environment.
 | Role | Can |
 | --- | --- |
 | **Owner** | Everything, including billing, organization settings, key rotation, and deleting the organization |
-| **Admin** | Manage members, projects, groups and machine identities; export secrets; read the audit log |
-| **Developer** | Work with the projects they are granted; request access to others; propose secret changes that an owner or admin must approve |
+| **Admin** | Manage members, projects, groups, shared secrets and machine identities; export secrets; read the audit log |
+| **Developer** | Work with the projects they are granted; request access to others; propose secret changes (including org references) that an owner or admin must approve |
 | **Viewer** | Read-only within granted projects |
 
 Roles alone do not grant access to a project's secrets - a Developer with no
@@ -59,15 +59,26 @@ project grant and still be unable to decrypt until an admin seals the org key
 This keeps the default posture tight without turning every onboarding into a
 support ticket.
 
+## Shared secrets
+
+The organization catalog lives on **Shared secrets**. Owners and Admins author
+it and reveal catalog values there. Developers get key names, labels, and
+catalog environment slugs so they can pick an **Org reference** on a project.
+They never receive catalog envelopes from that page. Reveal of a linked
+project key follows the project's environment grant. Managing the catalog and
+creating new project links is Business and Enterprise. See
+[Shared secrets](/shared-secrets).
+
 ## Secret change requests
 
 Developers with write access still encrypt values in the browser, but the write
 is held as a **change request** until an owner or admin approves it on
 Approvals. The requester and reviewers can reveal the proposed value after
-unlocking the vault, then approve, deny, or cancel. Cancelling removes the
-admin notification. Pending requests (and access requests) expire after 7 days,
-and stale notifications are cleared with them. Owners and admins continue to
-write directly.
+unlocking the vault, then approve, deny, or cancel. An org-reference request
+shows the catalog key and environment mappings instead of a value. Cancelling
+removes the admin notification. Pending requests (and access requests) expire
+after 7 days, and stale notifications are cleared with them. Owners and admins
+continue to write directly.
 
 ## Organization isolation
 

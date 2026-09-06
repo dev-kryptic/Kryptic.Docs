@@ -4,10 +4,31 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **Patch.20260906**.
+secrets from. The latest release is **Patch.20260906.2**.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## Patch.20260906.2
+
+Organization-wide shared secrets on Business and Enterprise.
+
+### Added
+
+- Owners and admins get a Shared secrets catalog: one set of keys,
+  environments, and labels for the whole organization.
+- A project secret can be an org reference. Each project environment maps
+  to a catalog environment. Rotate the catalog value once and every linked
+  project picks it up.
+- After a fallback to Free or Team, existing catalog values and links keep
+  working. You cannot create, edit, or add new links until you are back on
+  Business or Enterprise. Unlink stays allowed.
+- When a developer changes an org reference, the write waits for an owner
+  or admin as a change request.
+- New organizations get development, staging, and production on the catalog.
+  They stay unused until you link them.
+- Catalog keys use the same rotation reminders as project keys. Due items
+  show on the dashboard as `shared/key`.
 
 ## Patch.20260906
 

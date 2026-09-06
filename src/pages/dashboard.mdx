@@ -34,10 +34,11 @@ the team after you are in.
 ## Chrome, roles, and the vault
 
 The sidebar is split into **Workspace** (Dashboard, Projects, Secret scanning)
-and **Organization** (Members, Groups, Machine identities, Daemon sessions,
-Approvals, Audit log, Integrations, Settings). Owners and Admins see the full
-Organization block. Everyone else sees **My daemons** and **Settings**
-(Account if they sign in with a local password, General if they are Admin+, then Encryption).
+and **Organization** (Members, Groups, Shared secrets, Machine identities,
+Daemon sessions, Approvals, Audit log, Integrations, Settings). Owners and
+Admins see the full Organization block. Everyone else sees **My daemons** and
+**Settings** (Account if they sign in with a local password, General if they
+are Admin+, then Encryption).
 
 The top bar has jump-to-project search, a notifications bell, and the theme
 toggle.
@@ -88,23 +89,29 @@ history can reveal a past value when the vault is unlocked (or after the usual
 unlock dialog). The toolbar handles `.env` import and per-environment export.
 Import encrypts in the browser before upload.
 
-Two secret types ship today:
+Three secret types ship today:
 
 - **String** - a normal encrypted value per environment.
 - **Reference** - an alias for another String secret in the same project. The
   server copies the target's ciphertext under the alias key for the same
   environment. Decrypt still uses the target's definition id, so the blind-store
   model is unchanged. A secret cannot reference itself or form a cycle.
+- **Org reference** - a pointer at one key in the organization catalog. You
+  map each project environment to a catalog environment (or leave it unlinked).
+  Reads resolve the binding at read time. New links need Business or
+  Enterprise. See [Shared secrets](/shared-secrets).
 
 A calendar control on each key sets a **rotation reminder** (one-time or
-recurring). Due reminders appear on the dashboard **Expiring soon** card. If no
-recipients are selected, owners and admins are notified.
+recurring). Shared catalog keys have the same control on
+[Shared secrets](/shared-secrets). Due reminders appear on the dashboard
+**Expiring soon** card. If no recipients are selected, owners and admins are
+notified.
 
-Developers who edit a value submit a **change request**. Owners and admins
-approve or deny it on Approvals after revealing the proposed value (vault
-unlocked). The requester can reveal it too, to confirm what they submitted, or
-cancel, which clears the admin notification. Pending approvals expire after 7
-days.
+Developers who edit a value or create an org reference submit a **change
+request**. Owners and admins approve or deny it on Approvals. Value changes
+are revealed in the browser (vault unlocked). Org-reference requests show the
+catalog key and environment mappings instead. The requester can cancel, which
+clears the admin notification. Pending approvals expire after 7 days.
 
 ### Client generator
 
@@ -136,6 +143,15 @@ combine. Admin only.
 
 Rename the project, copy its `kryptic.json`, or delete it. Deletion requires
 typing the project name. Admin only.
+
+## Shared secrets
+
+**Shared secrets** is the organization catalog: keys that many projects can
+point at (AWS, Stripe, and similar). Owners and Admins author it. Developers
+see key names and catalog environments when they add an **Org reference** on
+a project. Managing the catalog and creating new project links is Business
+and Enterprise. Existing links keep resolving after a fallback to Free or
+Team. The full rules are on [Shared secrets](/shared-secrets).
 
 ## Members
 
@@ -188,10 +204,11 @@ without a grant cannot serve a single secret.
 
 **Approvals** is tabbed by kind:
 
-1. **Change requests.** A developer-proposed secret write. Reveal decrypts
-   the proposed value in the browser. Approving applies the ciphertext. The
-   requester can cancel; pending requests expire after 7 days and their
-   notifications are removed.
+1. **Change requests.** A developer-proposed secret write or org-reference
+   link. For a value, reveal decrypts the proposed ciphertext in the browser.
+   For an org reference, Approvals shows the catalog key and the environment
+   mappings. Approving applies the change. The requester can cancel; pending
+   requests expire after 7 days and their notifications are removed.
 2. **Access requests** (per project and environment). Approving creates the
    grant. Pending requests also expire after 7 days.
 3. **Organization-key grants** (org-wide). Members, devices, and CI machines
@@ -275,7 +292,10 @@ plan, and switching monthly to yearly each open Stripe Checkout. Yearly
 downgrades wait for renewal. If a trial ends without a card, or a paid plan is
 cancelled or fails renewal after a 3-day payment grace, the org returns to Free:
 the Owner and up to two Admins stay active; other members are disabled until you
-subscribe again and re-enable them.
+subscribe again and re-enable them. Shared-secret catalog rows and existing
+project org references stay and keep resolving; new catalog writes and new
+project links wait until you are on Business or Enterprise again. Unlink stays
+allowed. See [Shared secrets](/shared-secrets).
 
 **Invoices** lists every tax invoice as a downloadable PDF.
 
