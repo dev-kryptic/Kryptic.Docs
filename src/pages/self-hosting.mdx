@@ -4,9 +4,11 @@ export const description = 'Run the full Kryptic platform yourself with Docker C
 
 # Self-hosting
 
-The whole platform - PostgreSQL, Redis, the API hosts, the management dashboard,
-and the public site - runs from one `docker-compose.yml`. Images for Kubernetes
-are published at `ghcr.io/dev-kryptic`.
+The whole platform - PostgreSQL, Redis, the API hosts, and the management
+dashboard - runs from one `docker-compose.yml`. Images come from the Kryptic
+Nexus registry as `nexus.webservices.theka.io/docker/kryptic/<name>:<version>`.
+Pin the version tag (for example `1.3.0`). Docs and the public site are not
+in this stack.
 
 Self-hosting requires a **Business or Enterprise licence key**. There is no free
 self-hosted tier: the Free and Team plans are cloud-only. If you are still evaluating,
@@ -22,7 +24,13 @@ try Kryptic on a cloud plan first - self-hosting is bought, not trialled.
 
 ```bash
 cp .env.example .env
+docker login nexus.webservices.theka.io
 ```
+
+Use the `kryptic_…` username from the registry-access email and the password
+you set at `https://kryptic.dev/registry-access?token=...`. That login sits
+next to any other registries you already use. It is only sent when you pull
+from this host.
 
 ```bash
 # .env
@@ -33,6 +41,8 @@ MASTER_KEY_ID=key_master_v1
 MANAGEMENT_CLIENT_URL=https://kryptic.example.com
 PUBLIC_API_URL=https://api.kryptic.example.com
 PUBLIC_DAEMON_BFF_URL=https://daemon.kryptic.example.com
+DOCKER_REGISTRY=nexus.webservices.theka.io/docker
+IMAGE_TAG=1.3.0
 ```
 
 On every API host, also set the self-host gate (ASP.NET Core nested config, so
@@ -109,8 +119,10 @@ CI runners use `KRYPTIC_PIPELINES_API` (compose: `http://localhost:5212`) with
 
 ## Helm
 
-A Helm chart with the same topology lives in the platform's `helm/` directory.
-Images default to `ghcr.io/dev-kryptic`. It routes:
+A Helm chart with the same topology lives in `Kryptic.Self.Hosting/helm/kryptic`.
+Set `image.registry` to `nexus.webservices.theka.io/docker` and `image.tag` to
+the version you were issued (for example `1.3.0`). Create one
+`imagePullSecret` for that host and list it under `image.pullSecrets`. It routes:
 
 | Host | Service |
 | --- | --- |
