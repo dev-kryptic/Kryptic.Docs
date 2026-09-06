@@ -1,12 +1,16 @@
 import { Note } from '@/components/mdx'
 
-export const description = 'The Kryptic Java SDK - Kryptic.inject() into system properties.'
+export const description = 'The Kryptic Java SDK - Kryptic.inject() and @EnableKryptic.'
 
 # Java
 
 `dev.kryptic:daemon-client` fetches your project's secrets and exposes them as system
 properties (the JVM cannot modify its own process environment). Zero dependencies,
 Java 17+. Outside development it is a no-op, and it never throws.
+
+Spring Boot apps can take `dev.kryptic:daemon-client-spring-boot` instead and put
+`@EnableKryptic` on the application class. That calls `Kryptic.fetch()` and adds a
+`kryptic` property source to the Spring Environment.
 
 Source: [github.com/dev-kryptic/Kryptic.Java](https://github.com/dev-kryptic/Kryptic.Java).
 
@@ -16,7 +20,17 @@ Source: [github.com/dev-kryptic/Kryptic.Java](https://github.com/dev-kryptic/Kry
 <dependency>
   <groupId>dev.kryptic</groupId>
   <artifactId>daemon-client</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
+</dependency>
+```
+
+Spring Boot:
+
+```xml
+<dependency>
+  <groupId>dev.kryptic</groupId>
+  <artifactId>daemon-client-spring-boot</artifactId>
+  <version>1.0.1</version>
 </dependency>
 ```
 
@@ -37,6 +51,25 @@ For frameworks that want a map instead of system properties, use `Kryptic.fetch(
 ```java
 Map<String, String> secrets = Kryptic.fetch();
 ```
+
+Spring Boot:
+
+```java
+import dev.kryptic.spring.EnableKryptic;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
+
+@SpringBootApplication
+@EnableKryptic
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+`@Value("${DATABASE_URL}")` and `environment.getProperty("DATABASE_URL")` then resolve
+from the daemon during development.
 
 ## Behavior
 
