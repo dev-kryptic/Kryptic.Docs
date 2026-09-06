@@ -4,10 +4,38 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.3.1**.
+secrets from. The latest release is **1.3.3**.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.3.3
+
+Self-host first login without mail, one organization per instance, and
+billing from the signed key.
+
+### Changed
+
+- Self-hosted password signup creates the organization immediately. There
+  is no confirmation email.
+
+### Fixed
+
+- Self-hosted billing uses the signed key's plan, seat cap, and expiry.
+- A self-hosted instance accepts only one organization.
+
+## 1.3.2
+
+SMTP for self-host mail, the instance licence on the box, and the dashboard origin.
+
+### Added
+
+- Self-hosted installs send mail over SMTP when `SMTP_HOST` is set.
+
+### Changed
+
+- A self-hosted instance uses the signed licence for plan and seat cap.
+- The management API accepts the dashboard origin from `ManagementClientUrl`.
 
 ## 1.3.1
 
