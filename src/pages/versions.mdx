@@ -4,11 +4,24 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.3.4**. New tags are `X.Y.Z`
+secrets from. The latest release is **1.3.5**. New tags are `X.Y.Z`
 only. `Y` is the compat band: any `1.3.Z` works with any other `1.3.Z`.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.3.5
+
+Empty self-host licence key is unlicensed, not Business.
+
+### Fixed
+
+- Self-hosted installs with no licence key no longer resolve to Business.
+  Writes stop; existing secrets stay readable.
+
+### Changed
+
+- Registry-access kit zip includes `values.example.yaml` for Helm.
 
 ## 1.3.4
 

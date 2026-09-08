@@ -137,18 +137,21 @@ CI runners use `KRYPTIC_PIPELINES_API` (compose: `http://localhost:5212`) with
 ## Helm
 
 The chart is published under `kryptic-selfhost/helm` in Nexus. Use the same
-`kryptic_…` registry-access user for `helm install --repo` and for the
-image pull secret. Copy `helm/values.example.yaml` to a local file, fill
-the keys, and pass it with `-f`. Helm `--version` is the chart release
-(`1.3.4`). Pin images with `KRYPTIC_VERSION` (`1.3` follows the latest
-`1.3.Z`).
+`kryptic_…` registry-access user for `helm repo add` and for the image
+pull secret. Helm does not reuse `docker login`. The registry-access kit
+zip includes `values.example.yaml`. Copy that (or
+`helm/values.example.yaml` from the repo) to a local file, fill the keys,
+and pass it with `-f`. Helm `--version` is the chart release (`1.3.5`).
+Pin images with `KRYPTIC_VERSION` (`1.3` follows the latest `1.3.Z`).
 
 ```bash
-helm install kryptic \
-  --repo https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
-  --username <registry-access username> \
-  --password <password> \
-  --version 1.3.4 \
+helm repo add kryptic \
+  https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
+  --username '<registry-access username>' \
+  --password '<password>'
+
+helm install kryptic kryptic/kryptic \
+  --version 1.3.5 \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```
