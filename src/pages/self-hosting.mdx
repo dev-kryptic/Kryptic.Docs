@@ -141,7 +141,7 @@ The chart is published under `kryptic-selfhost/helm` in Nexus. Use the same
 pull secret. Helm does not reuse `docker login`. The registry-access kit
 zip includes `values.example.yaml`. Copy that (or
 `helm/values.example.yaml` from the repo) to a local file, fill the keys,
-and pass it with `-f`. Helm `--version` is the chart release (`1.3.5`).
+and pass it with `-f`. Helm `--version` is the chart release (`1.3.6`).
 Pin images with `KRYPTIC_VERSION` (`1.3` follows the latest `1.3.Z`).
 
 ```bash
@@ -151,7 +151,7 @@ helm repo add kryptic \
   --password '<password>'
 
 helm install kryptic kryptic/kryptic \
-  --version 1.3.5 \
+  --version 1.3.6 \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```
