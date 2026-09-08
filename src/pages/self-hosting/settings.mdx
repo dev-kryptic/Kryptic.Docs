@@ -53,10 +53,11 @@ Compose: set `MANAGEMENT_CLIENT_URL`, `MANAGEMENT_API_URL`,
 `DAEMON_BFF_URL`, `PIPELINES_BFF_URL`, and `SECRETS_API_URL` to the
 public URLs (after your reverse proxy in production).
 
-Helm: leave a URL empty to derive it from ingress hosts, or from
-`SERVER_IP` plus the Compose ports when ingress is off. Hosts are
-hostnames only (`kryptic.example.com`), not URLs. `tls.secretName` must
-exist in the namespace, or set `tls.enabled: false`.
+Helm: the five URLs default to `http://localhost:<port>`. Change them
+when `SERVER_IP` is not localhost, or when ingress is on (same hosts
+as `ingress.hosts`, with `https://` when TLS is on). Hosts are
+hostnames only (`kryptic.example.com`), not URLs. `tls.secretName`
+must exist in the namespace, or set `tls.enabled: false`.
 
 <DocsTable
   columns={['Host', 'Service']}

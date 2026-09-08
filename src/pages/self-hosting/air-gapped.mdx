@@ -6,7 +6,7 @@ Licence checks are offline. The signed key and public PEM are enough.
 
 The registry-access email attaches `kryptic-selfhost.zip` (Compose,
 `.env.example`, `up.sh`, `values.example.yaml`, and the Helm chart
-`kryptic-<version>.tgz`) and links the air-gapped image bundle. The
+`kryptic-helm-<version>.tgz`) and links the air-gapped image bundle. The
 bundle is too large to attach to the mail.
 
 On a machine with internet access, download the bundle from the link in
@@ -47,7 +47,7 @@ echo 'KRYPTIC_PULL_POLICY=missing' >> .env
 file (charts up to 1.3.9 default to `Always`).
 
 ```bash
-helm upgrade --install kryptic ./kryptic-<chart-version-from-email>.tgz \
+helm upgrade --install kryptic ./kryptic-helm-<chart-version-from-email>.tgz \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```
