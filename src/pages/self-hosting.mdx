@@ -6,8 +6,9 @@ export const description = 'Run the full Kryptic platform yourself with Docker C
 
 The management dashboard and the four product APIs run from
 `Kryptic.Self.Hosting/compose/docker-compose.yml`. Images come from the Kryptic Nexus registry as
-`nexus.webservices.theka.io/docker/kryptic/<name>:<version>`. Pin the compat
-band (`1.3`). Every `1.3.Z` works with every other `1.3.Z`. Docs, the public
+`nexus.webservices.theka.io/docker/kryptic/<name>:<version>`. Pin the same
+tag as the kit (`1.3.7`, or `1.3.7-01` on a support hotfix). Platform,
+Management Client, and Self-Hosting always share that tag. Docs, the public
 site, Public API, and Internal API are not in this stack.
 
 Self-hosting requires a **Business or Enterprise licence key**. There is no free
@@ -45,7 +46,7 @@ DAEMON_BFF_URL=https://daemon.kryptic.example.com
 PIPELINES_BFF_URL=https://pipelines.kryptic.example.com
 SECRETS_API_URL=https://secrets.kryptic.example.com
 DOCKER_REGISTRY=nexus.webservices.theka.io/docker
-KRYPTIC_VERSION=1.3
+KRYPTIC_VERSION=1.3.7
 Deployment__SelfHosted=true
 Licensing__LicenseKey=KRYPTIC-...
 Licensing__PublicKeyPem="-----BEGIN PUBLIC KEY-----..."
@@ -141,8 +142,8 @@ The chart is published under `kryptic-selfhost/helm` in Nexus. Use the same
 pull secret. Helm does not reuse `docker login`. The registry-access kit
 zip includes `values.example.yaml`. Copy that (or
 `helm/values.example.yaml` from the repo) to a local file, fill the keys,
-and pass it with `-f`. Helm `--version` is the chart release (`1.3.6`).
-Pin images with `KRYPTIC_VERSION` (`1.3` follows the latest `1.3.Z`).
+and pass it with `-f`. Helm `--version` and `KRYPTIC_VERSION` are the
+same tag (`1.3.7`).
 
 ```bash
 helm repo add kryptic \
@@ -151,7 +152,7 @@ helm repo add kryptic \
   --password '<password>'
 
 helm install kryptic kryptic/kryptic \
-  --version 1.3.6 \
+  --version 1.3.7 \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```

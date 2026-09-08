@@ -4,11 +4,22 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.3.6**. New tags are `X.Y.Z`
-only. `Y` is the compat band: any `1.3.Z` works with any other `1.3.Z`.
+secrets from. The latest release is **1.3.7**. Platform, Management
+Client, and Self-Hosting share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on
+a support hotfix).
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.3.7
+
+Platform, Management Client, and Self-Hosting share one `v1.3.7` tag.
+Self-host image pins are that exact tag.
+
+### Changed
+
+- Releases are lockstep. Chart version, Helm `--version`, and
+  `KRYPTIC_VERSION` are the same string.
 
 ## 1.3.6
 
