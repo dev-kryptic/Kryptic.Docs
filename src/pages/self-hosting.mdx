@@ -4,110 +4,206 @@ export const description = 'Run the full Kryptic platform yourself with Docker C
 
 # Self-hosting
 
-The management dashboard and the four product APIs run from
-`Kryptic.Self.Hosting/compose/docker-compose.yml`. Images come from the Kryptic Nexus registry as
-`nexus.webservices.theka.io/docker/kryptic/<name>:<version>`. Pin the same
-tag as the kit (`1.3.7`, or `1.3.7-01` on a support hotfix). Platform,
-Management Client, and Self-Hosting always share that tag. Docs, the public
+The management dashboard and the four product APIs. Images come from
+`nexus.webservices.theka.io/docker/kryptic/<name>:<tag>`. Docs, the public
 site, Public API, and Internal API are not in this stack.
 
-Self-hosting requires a **Business or Enterprise licence key**. There is no free
-self-hosted tier: the Free and Team plans are cloud-only. If you are still evaluating,
-try Kryptic on a cloud plan first - self-hosting is bought, not trialled.
+Self-hosting requires a **Business or Enterprise licence key**. There is no
+free self-hosted tier. If you are still evaluating, try Kryptic on a cloud
+plan first.
 
-## Prerequisites
+Your registry-access email has:
 
-- Docker with Compose v2
-- A host with 2 GB of RAM to spare
-- (production) A reverse proxy terminating TLS in front of the exposed ports
+| Field | Where you put it |
+| --- | --- |
+| Username + the password you set | `docker login` or `helm repo add`, and the image pull secret |
+| Image tag | `KRYPTIC_VERSION` in `.env` or Helm values |
+| Helm chart version | `helm install --version` |
 
-## 1. Configure
+The attached `kryptic-selfhost.zip` has Compose, `.env.example`, `up.sh`,
+and `values.example.yaml`.
+
+## Docker Compose
+
+On one host with Docker Compose v2 (about 2 GB of RAM).
 
 ```bash
-cd Kryptic.Self.Hosting/compose
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
 cp .env.example .env
-docker login nexus.webservices.theka.io
 ```
 
-Use the `kryptic_…` username from the registry-access email and the password
-you set at `https://kryptic.dev/registry-access?token=...`. That login sits
-next to any other registries you already use. It is only sent when you pull
-from this host.
+Edit `.env`. Set `KRYPTIC_VERSION` to the image tag from the email, add the
+licence key, generate `TOKEN_KEY`, `MASTER_KEY`, and `POSTGRES_PASSWORD`
+(see [Settings and options](#settings-and-options)).
 
 ```bash
-# .env (see .env.example for the full list)
-POSTGRES_PASSWORD=$(openssl rand -hex 24)
-TOKEN_KEY=$(openssl rand -hex 48)          # JWT signing key, 64+ chars
-MASTER_KEY=$(openssl rand -base64 32)      # operational master key, exactly 32 bytes
-MASTER_KEY_ID=key_master_v1
-MANAGEMENT_CLIENT_URL=https://kryptic.example.com
-MANAGEMENT_API_URL=https://api.kryptic.example.com
-DAEMON_BFF_URL=https://daemon.kryptic.example.com
-PIPELINES_BFF_URL=https://pipelines.kryptic.example.com
-SECRETS_API_URL=https://secrets.kryptic.example.com
-DOCKER_REGISTRY=nexus.webservices.theka.io/docker
-KRYPTIC_VERSION=1.3.7
-Deployment__SelfHosted=true
-Licensing__LicenseKey=KRYPTIC-...
-Licensing__PublicKeyPem="-----BEGIN PUBLIC KEY-----..."
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASSWORD=
-SMTP_FROM=no-reply@example.com
-SMTP_STARTTLS=true
-SMTP_SSL=false
+docker login nexus.webservices.theka.io
+# username from the email, password you set at
+# https://kryptic.dev/registry-access?token=...
+
+./up.sh up -d
 ```
 
-Leave `POSTGRES_HOST` empty to run the bundled database. Set it to your
-existing Postgres host to skip creating a container (`./up.sh` does that).
+Dashboard is `http://localhost:8080`. APIs are `5210` (management),
+`5211` (daemon), `5212` (pipelines), `5213` (secrets).
 
-Set `SMTP_HOST` (and usually `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`) so
-invitations and approval mail actually leave the box. First-organization
-signup does not send mail. Port `587` with `SMTP_STARTTLS=true` is the usual
-submission setup. Port `465`
-needs `SMTP_SSL=true` and `SMTP_STARTTLS=false`. Leave `SMTP_HOST` empty and
-the same messages are printed on the API logs instead.
+Then [create your organization](#create-your-organization).
 
-The licence key is a signed token. Plan, seat cap, and expiry are inside it.
-The private half never leaves Kryptic, so editing the string cannot extend
-the term or raise the seat cap. No key, a forged key, or a term past the
-30-day grace window: the instance stays up and secrets stay readable. Writes
-are refused. Reads never stop.
+## Helm (fresh k3s)
 
-<Warning>
-  Back up `MASTER_KEY`. It wraps the platform's operational data keys (SSO IdP
-  credentials, directory-sync secrets). Losing it means those settings cannot be
-  read back. Customer secret *values* are end-to-end encrypted under a
-  client-held organization key and are not recoverable via `MASTER_KEY` - see
-  [Encryption](/encryption). Rotation is supported: set a new `MASTER_KEY`, move
-  the old one to `OldMasterKeys__<keyId>`, restart, and the platform rewraps
-  operational data keys automatically.
-</Warning>
+One empty machine. k3s brings Kubernetes and Traefik.
 
-## 2. Start
+```bash
+curl -sfL https://get.k3s.io | sh -
+
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+mkdir -p "$HOME/.kube"
+sudo cp /etc/rancher/k3s/k3s.yaml "$HOME/.kube/config"
+sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
+```
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+cp values.example.yaml kryptic-values.yaml
+```
+
+Edit `kryptic-values.yaml` in this folder. Set `KRYPTIC_VERSION` to the
+image tag from the email, fill `TOKEN_KEY`, `MASTER_KEY`,
+`POSTGRES_PASSWORD`, `Licensing__LicenseKey`, and the ingress hosts.
+
+```bash
+kubectl create namespace kryptic
+
+kubectl create secret docker-registry kryptic-registry \
+  --namespace kryptic \
+  --docker-server=nexus.webservices.theka.io \
+  --docker-username='<username from the email>' \
+  --docker-password='<password you set>'
+
+helm repo add kryptic \
+  https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
+  --username '<username from the email>' \
+  --password '<password you set>'
+
+helm repo update kryptic
+
+helm install kryptic kryptic/kryptic \
+  --version <chart-version-from-email> \
+  --namespace kryptic \
+  -f kryptic-values.yaml
+```
+
+`helm repo add` is required. Helm does not reuse `docker login`. Leave
+`ingress.className` empty so k3s Traefik is used.
+
+Then [create your organization](#create-your-organization).
+
+## Helm (existing Kubernetes cluster)
+
+Helm 3 and cluster access (`kubectl`).
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+cp values.example.yaml kryptic-values.yaml
+```
+
+Edit `kryptic-values.yaml`. Set `KRYPTIC_VERSION` to the image tag from
+the email, fill the keys and hosts. Set `ingress.className` if the
+cluster has more than one IngressClass (k3s Traefik: leave it empty;
+many clusters: `nginx`).
+
+```bash
+kubectl create namespace kryptic
+
+kubectl create secret docker-registry kryptic-registry \
+  --namespace kryptic \
+  --docker-server=nexus.webservices.theka.io \
+  --docker-username='<username from the email>' \
+  --docker-password='<password you set>'
+
+helm repo add kryptic \
+  https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
+  --username '<username from the email>' \
+  --password '<password you set>'
+
+helm repo update kryptic
+
+helm upgrade --install kryptic kryptic/kryptic \
+  --version <chart-version-from-email> \
+  --namespace kryptic --create-namespace \
+  -f kryptic-values.yaml
+```
+
+Then [create your organization](#create-your-organization).
+
+## Air-gapped
+
+Licence checks are offline. The signed key and public PEM are enough.
+
+On a machine that can reach Nexus, pull what you will copy:
+
+```bash
+docker login nexus.webservices.theka.io
+TAG=<image-tag-from-email>
+for name in management-api daemon-bff pipelines-bff secrets-api management-client; do
+  docker pull "nexus.webservices.theka.io/docker/kryptic/${name}:${TAG}"
+done
+docker pull postgres:17-alpine
+docker pull redis:7-alpine
+docker pull busybox:1.37
+
+docker save -o kryptic-images.tar \
+  "nexus.webservices.theka.io/docker/kryptic/management-api:${TAG}" \
+  "nexus.webservices.theka.io/docker/kryptic/daemon-bff:${TAG}" \
+  "nexus.webservices.theka.io/docker/kryptic/pipelines-bff:${TAG}" \
+  "nexus.webservices.theka.io/docker/kryptic/secrets-api:${TAG}" \
+  "nexus.webservices.theka.io/docker/kryptic/management-client:${TAG}" \
+  postgres:17-alpine redis:7-alpine busybox:1.37
+
+helm repo add kryptic \
+  https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
+  --username '<username from the email>' \
+  --password '<password you set>'
+helm pull kryptic/kryptic --version <chart-version-from-email>
+```
+
+Copy `kryptic-images.tar`, the chart `.tgz`, and `values.example.yaml`
+(from the kit zip) to the offline host.
+
+```bash
+docker load -i kryptic-images.tar
+# or, on Kubernetes nodes, load into each node's containerd / k3s
+
+cp values.example.yaml kryptic-values.yaml
+# set KRYPTIC_VERSION to the image tag from the email
+```
+
+Compose:
 
 ```bash
 ./up.sh up -d
 ```
 
-| Service | Port | Purpose |
-| --- | --- | --- |
-| management client | 8080 | The dashboard your team signs into |
-| Management API | 5210 | Serves the dashboard; runs migrations on startup |
-| Daemon BFF | 5211 | What developer daemons talk to |
-| Pipelines BFF | 5212 | CI/CD machine identities |
-| Secrets API | 5213 | Public REST API v1 |
+Helm (chart file on disk, no `helm repo`):
 
-The other API hosts wait for the Management API. Because the Daemon BFF keeps
-device logins and rate-limit state in Redis, API hosts can scale horizontally
-behind your proxy.
+```bash
+helm upgrade --install kryptic ./kryptic-<chart-version-from-email>.tgz \
+  --namespace kryptic --create-namespace \
+  -f kryptic-values.yaml
+```
 
-## 3. Create your organization
+If the offline registry uses different names, set `DOCKER_REGISTRY` to
+that mirror and retag the images to match.
+
+## Create your organization
 
 Open the dashboard and register the first organization. There is no
-confirmation email: you are signed in immediately. Then initialize encryption
-under **Settings → Encryption** before anyone stores secrets. Invite your team.
+confirmation email. Then initialize encryption under
+**Settings → Encryption** before anyone stores secrets. Invite your team.
 Point developer daemons at your deployment:
 
 ```bash
@@ -115,50 +211,67 @@ kryptic config set-api https://daemon.kryptic.example.com
 kryptic login
 ```
 
-`KRYPTIC_API` overrides the saved URL without writing it, which is useful for a
-one-off local BFF (`http://localhost:5211`). Changing the saved URL signs you
-out, because tokens belong to one server.
+`KRYPTIC_API` overrides the saved URL without writing it. Changing the
+saved URL signs you out, because tokens belong to one server.
 
-CI runners use `KRYPTIC_PIPELINES_API` (compose: `http://localhost:5212`) with
+CI runners use `KRYPTIC_PIPELINES_API` with
 [`kryptic ci export`](/cli#ci-export).
 
-## Operations
+## Settings and options
 
-- **Backups** - PostgreSQL is the only stateful service (`pgdata` volume). Standard
-  `pg_dump` on your schedule. Also back up `MASTER_KEY` and the Emergency Kit
-  shown at org-key setup, in two different places.
-- **Upgrades** - `docker compose pull && docker compose up -d`. Migrations apply
-  automatically.
-- **Licence expiry** - on expiry the deployment keeps working for a 30-day grace window,
-  then goes read-only: secrets stay readable, writes are refused. Reads never stop, in any
-  state. The grace month is billed on renewal.
-- **Multi-instance** - the Daemon BFF uses Redis for device logins and rate limits, so
-  API hosts can scale horizontally behind your proxy.
+### Image tag and chart version
 
-## Helm
+`KRYPTIC_VERSION` is the Platform + Management Client image tag. Use the
+value from the registry-access email. Helm `--version` is the chart. They
+can differ. A values file you pass with `-f` overrides the chart default.
 
-The chart is published under `kryptic-selfhost/helm` in Nexus. Use the same
-`kryptic_…` registry-access user for `helm repo add` and for the image
-pull secret. Helm does not reuse `docker login`. The registry-access kit
-zip includes `values.example.yaml`. Copy that (or
-`helm/values.example.yaml` from the repo) to a local file, fill the keys,
-and pass it with `-f`. Helm `--version` and `KRYPTIC_VERSION` are the
-same tag (`1.3.7`).
+### Keys
 
 ```bash
-helm repo add kryptic \
-  https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
-  --username '<registry-access username>' \
-  --password '<password>'
-
-helm install kryptic kryptic/kryptic \
-  --version 1.3.7 \
-  --namespace kryptic --create-namespace \
-  -f kryptic-values.yaml
+TOKEN_KEY=$(openssl rand -hex 64)          # JWT signing, 64+ hex chars
+MASTER_KEY=$(openssl rand -base64 32)      # exactly 32 bytes
+POSTGRES_PASSWORD=$(openssl rand -hex 24)
 ```
 
-Licence key and public PEM go in `Licensing__LicenseKey` and
-`Licensing__PublicKeyPem` (chart values, same names as Compose). It routes:
+<Warning>
+  Back up `MASTER_KEY`. It wraps operational data keys (SSO, directory
+  sync). Losing it means those settings cannot be read back. Customer
+  secret values are end-to-end encrypted under a client-held organization
+  key and are not recoverable via `MASTER_KEY`. See [Encryption](/encryption).
+  Rotation: set a new `MASTER_KEY`, keep the old value as
+  `OldMasterKeys__` plus the previous `MASTER_KEY_ID`, then restart.
+  The platform rewraps operational data keys.
+</Warning>
+
+### Licence
+
+`Licensing__LicenseKey` and `Licensing__PublicKeyPem`. Plan, seat cap,
+and expiry are inside the signed key. No key, a forged key, or a term
+past the 30-day grace window: the instance stays up and secrets stay
+readable. Writes are refused. helm install refuses an empty key.
+
+### PostgreSQL and Redis
+
+Leave `POSTGRES_HOST` empty (Compose) or `postgres` (Helm) to run the
+bundled database. Point it at an existing server to skip creating one.
+`./up.sh` only starts bundled Postgres when the host is empty.
+
+Leave `REDIS_HOST` as `redis:6379` for the bundled Redis. The Daemon BFF
+keeps device logins and rate limits there, so API hosts can scale behind
+your proxy.
+
+### Public URLs and ingress
+
+These are the origins the browser and daemons hit.
+
+Compose: set `MANAGEMENT_CLIENT_URL`, `MANAGEMENT_API_URL`,
+`DAEMON_BFF_URL`, `PIPELINES_BFF_URL`, and `SECRETS_API_URL` to the
+public URLs (after your reverse proxy in production).
+
+Helm: leave a URL empty to derive it from ingress hosts, or from
+`SERVER_IP` plus the Compose ports when ingress is off. Hosts are
+hostnames only (`kryptic.example.com`), not URLs. `tls.secretName` must
+exist in the namespace, or set `tls.enabled: false`.
 
 | Host | Service |
 | --- | --- |
@@ -168,13 +281,47 @@ Licence key and public PEM go in `Licensing__LicenseKey` and
 | `pipelines.kryptic.example.com` | Pipelines BFF |
 | `secrets.kryptic.example.com` | Secrets API v1 |
 
-External PostgreSQL and Redis are supported by pointing `POSTGRES_HOST` and
-`REDIS_HOST` at those servers (leave them as `postgres` / `redis:6379` for
-the bundled ones).
+Without ingress (single box, port-forward): `ingress.enabled: false` and
+`SERVER_IP` set to the machine IP.
 
-<Note>
-  The Terraform module and the air-gapped installation bundle are not shipped
-  yet. Offline licence validation already works: the key is self-contained and
-  verified against the public PEM you ship with it, so an online install and
-  an air-gapped one run the identical routine.
-</Note>
+### Email
+
+Set `SMTP_HOST` (and usually user, password, from) so invitations and
+approval mail leave the box. First-organization signup does not send
+mail. Port `587` with `SMTP_STARTTLS=true` is the usual submission
+setup. Port `465` needs `SMTP_SSL=true` and `SMTP_STARTTLS=false`. Empty
+`SMTP_HOST` prints those messages on the API logs.
+
+### Ports
+
+| Service | Port |
+| --- | --- |
+| management client | 8080 |
+| Management API | 5210 |
+| Daemon BFF | 5211 |
+| Pipelines BFF | 5212 |
+| Secrets API | 5213 |
+
+The other API hosts wait for the Management API (migrations run there).
+
+### Pull secret
+
+Create `kryptic-registry` yourself so the password never lands in Helm
+history. `imageCredentials.username` / `password` is the convenience
+alternative. The registry-access user pulls both the chart and the
+images.
+
+### Backups and upgrades
+
+PostgreSQL is the only stateful service. Use `pg_dump` on your schedule.
+Back up `MASTER_KEY` and the Emergency Kit from org-key setup, in two
+different places.
+
+Compose upgrade: `docker compose pull && docker compose up -d`.
+Helm: `helm repo update kryptic` then `helm upgrade` with the new chart
+version and the same values file. Change `KRYPTIC_VERSION` when the
+email (or a newer product tag) says to. Migrations apply on Management
+API startup.
+
+On licence expiry the deployment keeps working for 30 days, then goes
+read-only. The grace month is billed on renewal.
