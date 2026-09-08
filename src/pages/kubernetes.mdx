@@ -119,13 +119,41 @@ kubectl get krypticsecret backend-secrets -o jsonpath='{.status.conditions[0]}'
 
 ## Behavior you can rely on
 
-| Situation | What happens |
-| --- | --- |
-| You delete the `KrypticSecret` | The Secret is garbage-collected with it (owner reference) |
-| A key is deleted in Kryptic | It disappears from the Secret on the next sync |
-| The platform is unreachable | The Secret keeps its **last known good values** - a running workload is never emptied by an outage |
-| Bad credentials or unknown project | Not Ready with `ConfigurationError`, backing off 10 minutes instead of hammering the API |
-| A Secret with that name already exists | The operator **refuses to overwrite it** and reports why |
+<DocsTable
+  columns={['Situation', 'What happens']}
+  rows={[
+    [
+      <>
+        You delete the <code>KrypticSecret</code>
+      </>,
+      'The Secret is garbage-collected with it (owner reference)',
+    ],
+    [
+      'A key is deleted in Kryptic',
+      'It disappears from the Secret on the next sync',
+    ],
+    [
+      'The platform is unreachable',
+      <>
+        The Secret keeps its <strong>last known good values</strong>. A running
+        workload is never emptied by an outage
+      </>,
+    ],
+    [
+      'Bad credentials or unknown project',
+      <>
+        Not Ready with <code>ConfigurationError</code>, backing off 10 minutes
+        instead of hammering the API
+      </>,
+    ],
+    [
+      'A Secret with that name already exists',
+      <>
+        The operator <strong>refuses to overwrite it</strong> and reports why
+      </>,
+    ],
+  ]}
+/>
 
 <Warning>
   Kubernetes Secrets are base64-encoded, not encrypted, unless you have enabled
@@ -135,16 +163,43 @@ kubectl get krypticsecret backend-secrets -o jsonpath='{.status.conditions[0]}'
 
 ## Options
 
-| Field | Default | Notes |
-| --- | --- | --- |
-| `spec.projectId` | required | Project public id from `kryptic.json` |
-| `spec.environment` | required | Environment slug |
-| `spec.secretName` | resource name | Target Kubernetes Secret |
-| `spec.refreshInterval` | `5m` | Values below 30s are ignored |
-| `spec.auth.secretRef` | cluster env, if set | Per-namespace credentials. Recommended in production. |
-| `spec.keys` | all | Restrict which keys are synced |
-| `spec.template.type` | `Opaque` | Type of the produced Secret |
-| `spec.template.labels` / `.annotations` | - | Merged onto the produced Secret |
+<DocsTable
+  columns={['Field', 'Default', 'Notes']}
+  rows={[
+    [
+      <code>spec.projectId</code>,
+      'required',
+      <>
+        Project public id from <code>kryptic.json</code>
+      </>,
+    ],
+    [<code>spec.environment</code>, 'required', 'Environment slug'],
+    [<code>spec.secretName</code>, 'resource name', 'Target Kubernetes Secret'],
+    [
+      <code>spec.refreshInterval</code>,
+      <code>5m</code>,
+      'Values below 30s are ignored',
+    ],
+    [
+      <code>spec.auth.secretRef</code>,
+      'cluster env, if set',
+      'Per-namespace credentials. Recommended in production.',
+    ],
+    [<code>spec.keys</code>, 'all', 'Restrict which keys are synced'],
+    [
+      <code>spec.template.type</code>,
+      <code>Opaque</code>,
+      'Type of the produced Secret',
+    ],
+    [
+      <>
+        <code>spec.template.labels</code> / <code>.annotations</code>
+      </>,
+      '-',
+      'Merged onto the produced Secret',
+    ],
+  ]}
+/>
 
 <Note>
   The operator watches every namespace by default. Set `WATCH_NAMESPACE` on the

@@ -11,6 +11,7 @@ export const a = Link
 export { Button } from '@/components/Button'
 export { CodeGroup, Code as code, Pre as pre } from '@/components/Code'
 export { Badge } from '@/components/Badge'
+export { DocsTable } from '@/components/DocsTable'
 export { YouTube }
 
 export const h2 = function H2(props) {

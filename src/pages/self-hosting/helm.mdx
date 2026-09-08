@@ -1,0 +1,41 @@
+export const description = 'Install self-hosted Kryptic with Helm on an existing Kubernetes cluster.'
+
+# Helm (existing Kubernetes cluster)
+
+Helm 3 and cluster access (`kubectl`).
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+cp values.example.yaml kryptic-values.yaml
+```
+
+Edit `kryptic-values.yaml`. Set `KRYPTIC_VERSION` to the image tag from
+the email, fill the keys and hosts. Set `ingress.className` if the
+cluster has more than one IngressClass (k3s Traefik: leave it empty;
+many clusters: `nginx`). See
+[Settings and options](/self-hosting/settings).
+
+```bash
+kubectl create namespace kryptic
+
+kubectl create secret docker-registry kryptic-registry \
+  --namespace kryptic \
+  --docker-server='<registry-host-from-email>' \
+  --docker-username='<username from the email>' \
+  --docker-password='<password you set>'
+
+helm repo add kryptic \
+  <helm-repo-url-from-email> \
+  --username '<username from the email>' \
+  --password '<password you set>'
+
+helm repo update kryptic
+
+helm upgrade --install kryptic kryptic/kryptic \
+  --version <chart-version-from-email> \
+  --namespace kryptic --create-namespace \
+  -f kryptic-values.yaml
+```
+
+Then [create your organization](/self-hosting#create-your-organization).

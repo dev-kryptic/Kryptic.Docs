@@ -1,0 +1,118 @@
+import { Warning } from '@/components/mdx'
+
+export const description = 'Self-host keys, licence, Postgres, URLs, email, and upgrades.'
+
+# Settings and options
+
+## Image tag and chart version
+
+`KRYPTIC_VERSION` is the Platform + Management Client image tag. Use the
+value from the registry-access email. Helm `--version` is the chart. They
+can differ. A values file you pass with `-f` overrides the chart default.
+
+## Keys
+
+```bash
+TOKEN_KEY=$(openssl rand -hex 64)          # JWT signing, 64+ hex chars
+MASTER_KEY=$(openssl rand -base64 32)      # exactly 32 bytes
+POSTGRES_PASSWORD=$(openssl rand -hex 24)
+```
+
+<Warning>
+  Back up `MASTER_KEY`. It wraps operational data keys (SSO, directory
+  sync). Losing it means those settings cannot be read back. Customer
+  secret values are end-to-end encrypted under a client-held organization
+  key and are not recoverable via `MASTER_KEY`. See [Encryption](/encryption).
+  Rotation: set a new `MASTER_KEY`, keep the old value as
+  `OldMasterKeys__` plus the previous `MASTER_KEY_ID`, then restart.
+  The platform rewraps operational data keys.
+</Warning>
+
+## Licence
+
+`Licensing__LicenseKey` and `Licensing__PublicKeyPem`. Plan, seat cap,
+and expiry are inside the signed key. No key, a forged key, or a term
+past the 30-day grace window: the instance stays up and secrets stay
+readable. Writes are refused. helm install refuses an empty key.
+
+## PostgreSQL and Redis
+
+Leave `POSTGRES_HOST` empty (Compose) or `postgres` (Helm) to run the
+bundled database. Point it at an existing server to skip creating one.
+`./up.sh` only starts bundled Postgres when the host is empty.
+
+Leave `REDIS_HOST` as `redis:6379` for the bundled Redis. The Daemon BFF
+keeps device logins and rate limits there, so API hosts can scale behind
+your proxy.
+
+## Public URLs and ingress
+
+These are the origins the browser and daemons hit.
+
+Compose: set `MANAGEMENT_CLIENT_URL`, `MANAGEMENT_API_URL`,
+`DAEMON_BFF_URL`, `PIPELINES_BFF_URL`, and `SECRETS_API_URL` to the
+public URLs (after your reverse proxy in production).
+
+Helm: leave a URL empty to derive it from ingress hosts, or from
+`SERVER_IP` plus the Compose ports when ingress is off. Hosts are
+hostnames only (`kryptic.example.com`), not URLs. `tls.secretName` must
+exist in the namespace, or set `tls.enabled: false`.
+
+<DocsTable
+  columns={['Host', 'Service']}
+  rows={[
+    [<code>kryptic.example.com</code>, 'management dashboard'],
+    [<code>api.kryptic.example.com</code>, 'Management API'],
+    [<code>daemon.kryptic.example.com</code>, 'Daemon BFF'],
+    [<code>pipelines.kryptic.example.com</code>, 'Pipelines BFF'],
+    [<code>secrets.kryptic.example.com</code>, 'Secrets API v1'],
+  ]}
+/>
+
+Without ingress (single box, port-forward): `ingress.enabled: false` and
+`SERVER_IP` set to the machine IP.
+
+## Email
+
+Set `SMTP_HOST` (and usually user, password, from) so invitations and
+approval mail leave the box. First-organization signup does not send
+mail. Port `587` with `SMTP_STARTTLS=true` is the usual submission
+setup. Port `465` needs `SMTP_SSL=true` and `SMTP_STARTTLS=false`. Empty
+`SMTP_HOST` prints those messages on the API logs.
+
+## Ports
+
+<DocsTable
+  columns={['Service', 'Port']}
+  rows={[
+    ['Management Client', '8080'],
+    ['Management API', '5210'],
+    ['Daemon BFF', '5211'],
+    ['Pipelines BFF', '5212'],
+    ['Secrets API', '5213'],
+  ]}
+/>
+
+The other API hosts wait for the Management API (migrations run there).
+
+## Pull secret
+
+Create `kryptic-registry` yourself so the password never lands in Helm
+history. `imageCredentials.username` / `password` is the convenience
+alternative. The registry-access user pulls both the chart and the
+images.
+
+## Backups and upgrades
+
+PostgreSQL is the only stateful service. Use `pg_dump` on your schedule.
+Back up `MASTER_KEY` and the Emergency Kit from org-key setup, in two
+different places.
+
+Compose upgrade: `docker compose pull && docker compose up -d`.
+Helm: `helm repo update kryptic` then `helm upgrade` with the new chart
+version and the same values file. Change `KRYPTIC_VERSION` when the
+email (or a newer product tag) says to. Migrations apply on Management
+API startup.
+
+On licence expiry the deployment keeps working for 30 days, then goes
+read-only. The grace month is billed on renewal.

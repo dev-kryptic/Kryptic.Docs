@@ -15,13 +15,25 @@ Okta Integration Network for a first setup. OIN is a catalog review. You need
 
 Cloud hosts used below:
 
-| What | URL |
-| --- | --- |
-| Dashboard | `https://app.kryptic.dev` |
-| SAML metadata (entity id) | `https://api.kryptic.dev/saml/metadata` |
-| Assertion consumer service | `https://api.kryptic.dev/saml/acs` |
-| SCIM base | `https://api.kryptic.dev/scim/v2` |
-| SP-initiated sign-in | `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+<DocsTable
+  columns={['What', 'URL']}
+  rows={[
+    ['Dashboard', <code>https://app.kryptic.dev</code>],
+    [
+      'SAML metadata (entity id)',
+      <code>https://api.kryptic.dev/saml/metadata</code>,
+    ],
+    [
+      'Assertion consumer service',
+      <code>https://api.kryptic.dev/saml/acs</code>,
+    ],
+    ['SCIM base', <code>https://api.kryptic.dev/scim/v2</code>],
+    [
+      'SP-initiated sign-in',
+      <code>https://api.kryptic.dev/saml/login?domain=your-domain.com</code>,
+    ],
+  ]}
+/>
 
 Self-hosted: replace `https://api.kryptic.dev` with your Management API origin
 (`PUBLIC_API_URL`). The ACS and entity id must match that host exactly.
@@ -48,15 +60,26 @@ and an OIN team review, cancel it. That is not a test app in your org.
 
 On **Configure SAML**:
 
-| Field | Value |
-| --- | --- |
-| Single sign-on URL | `https://api.kryptic.dev/saml/acs` |
-| Use this for Recipient URL and Destination URL | checked |
-| Audience URI (SP Entity ID) | `https://api.kryptic.dev/saml/metadata` |
-| Default RelayState | leave empty |
-| Name ID format | **EmailAddress** |
-| Application username | **Email** (not Okta username) |
-| Update application username on | Create and update |
+<DocsTable
+  columns={['Field', 'Value']}
+  rows={[
+    ['Single sign-on URL', <code>https://api.kryptic.dev/saml/acs</code>],
+    ['Use this for Recipient URL and Destination URL', 'checked'],
+    [
+      'Audience URI (SP Entity ID)',
+      <code>https://api.kryptic.dev/saml/metadata</code>,
+    ],
+    ['Default RelayState', 'leave empty'],
+    ['Name ID format', <strong>EmailAddress</strong>],
+    [
+      'Application username',
+      <>
+        <strong>Email</strong> (not Okta username)
+      </>,
+    ],
+    ['Update application username on', 'Create and update'],
+  ]}
+/>
 
 Leave Advanced Settings closed unless you are mapping extra attributes. NameID
 as email is enough. We also read `email`, `emailaddress`, and `mail` if present.
@@ -109,18 +132,34 @@ in the Kryptic app:
 4. Enable API integration.
 5. Fill **SCIM Connection** using Okta's field names:
 
-| Okta field | Value |
-| --- | --- |
-| SCIM version | `2.0` |
-| SCIM connector base URL | `https://api.kryptic.dev/scim/v2` |
-| Unique identifier field for users | `userName` |
-| Import New Users and Profile Updates | leave off |
-| Push New Users | checked |
-| Push Profile Updates | checked |
-| Push Groups | checked |
-| Import Groups | leave off |
-| Authentication Mode | **HTTP Header** (not Basic Auth, not OAuth 2) |
-| Authorization | the token Kryptic showed once (no `Bearer` prefix) |
+<DocsTable
+  columns={['Okta field', 'Value']}
+  rows={[
+    ['SCIM version', <code>2.0</code>],
+    [
+      'SCIM connector base URL',
+      <code>https://api.kryptic.dev/scim/v2</code>,
+    ],
+    ['Unique identifier field for users', <code>userName</code>],
+    ['Import New Users and Profile Updates', 'leave off'],
+    ['Push New Users', 'checked'],
+    ['Push Profile Updates', 'checked'],
+    ['Push Groups', 'checked'],
+    ['Import Groups', 'leave off'],
+    [
+      'Authentication Mode',
+      <>
+        <strong>HTTP Header</strong> (not Basic Auth, not OAuth 2)
+      </>,
+    ],
+    [
+      'Authorization',
+      <>
+        the token Kryptic showed once (no <code>Bearer</code> prefix)
+      </>,
+    ],
+  ]}
+/>
 
 6. **Test Connector Configuration**, then **Save**.
 7. Open **Provisioning → To App** and enable **Create Users**, **Update User

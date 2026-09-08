@@ -27,14 +27,78 @@ Anything that can see a secret in plaintext is open source and lives under
 proprietary: it stores ciphertext it has no path to open. See
 [Encryption](/encryption).
 
-| What | GitHub | Published as | License |
-| --- | --- | --- | --- |
-| Daemon and CLI | [Kryptic.Daemon](https://github.com/dev-kryptic/Kryptic.Daemon) | `kryptic` binary | GPL-3.0 |
-| Encryption engine (.NET) | [Kryptic.Encryption.Net](https://github.com/dev-kryptic/Kryptic.Encryption.Net) | NuGet `Kryptic.Encryption` | Apache-2.0 |
-| Encryption engine (TypeScript) | [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.NPM) | npm `@krypticdev/encryption` | Apache-2.0 |
-| Encryption engine (Go) | [Kryptic.Encryption.Go](https://github.com/dev-kryptic/Kryptic.Encryption.Go) | Go module `github.com/dev-kryptic/Kryptic.Encryption.Go` | Apache-2.0 |
-| Kubernetes operator | [Kryptic.K8s.Operator](https://github.com/dev-kryptic/Kryptic.K8s.Operator) | GitHub Release + `ghcr.io/dev-kryptic/kryptic-operator` | Apache-2.0 |
-| Language SDKs | [Kryptic.Net](https://github.com/dev-kryptic/Kryptic.Net), [Node](https://github.com/dev-kryptic/Kryptic.Node), [Python](https://github.com/dev-kryptic/Kryptic.Python), [Java](https://github.com/dev-kryptic/Kryptic.Java), [Go](https://github.com/dev-kryptic/Kryptic.Go), [Ruby](https://github.com/dev-kryptic/Kryptic.Ruby), [Cpp](https://github.com/dev-kryptic/Kryptic.Cpp), [Rust](https://github.com/dev-kryptic/Kryptic.Rust) | `Kryptic.Daemon.Client` / `@krypticdev/daemon-client` / `kryptic-daemon-client` | Apache-2.0 |
+<DocsTable
+  columns={['What', 'GitHub', 'Published as', 'License']}
+  rows={[
+    [
+      'Daemon and CLI',
+      <a href="https://github.com/dev-kryptic/Kryptic.Daemon">Kryptic.Daemon</a>,
+      <>
+        <code>kryptic</code> binary
+      </>,
+      'GPL-3.0',
+    ],
+    [
+      'Encryption engine (.NET)',
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Net">
+        Kryptic.Encryption.Net
+      </a>,
+      <>
+        NuGet <code>Kryptic.Encryption</code>
+      </>,
+      'Apache-2.0',
+    ],
+    [
+      'Encryption engine (TypeScript)',
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.NPM">
+        Kryptic.Encryption.NPM
+      </a>,
+      <>
+        npm <code>@krypticdev/encryption</code>
+      </>,
+      'Apache-2.0',
+    ],
+    [
+      'Encryption engine (Go)',
+      <a href="https://github.com/dev-kryptic/Kryptic.Encryption.Go">
+        Kryptic.Encryption.Go
+      </a>,
+      <>
+        Go module <code>github.com/dev-kryptic/Kryptic.Encryption.Go</code>
+      </>,
+      'Apache-2.0',
+    ],
+    [
+      'Kubernetes operator',
+      <a href="https://github.com/dev-kryptic/Kryptic.K8s.Operator">
+        Kryptic.K8s.Operator
+      </a>,
+      <>
+        GitHub Release + <code>ghcr.io/dev-kryptic/kryptic-operator</code>
+      </>,
+      'Apache-2.0',
+    ],
+    [
+      'Language SDKs',
+      <>
+        <a href="https://github.com/dev-kryptic/Kryptic.Net">Kryptic.Net</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Node">Node</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Python">Python</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Java">Java</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Go">Go</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Ruby">Ruby</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Cpp">Cpp</a>,{' '}
+        <a href="https://github.com/dev-kryptic/Kryptic.Rust">Rust</a>
+      </>,
+      <>
+        <code>Kryptic.Daemon.Client</code> /{' '}
+        <code>@krypticdev/daemon-client</code> /{' '}
+        <code>kryptic-daemon-client</code>
+      </>,
+      'Apache-2.0',
+    ],
+  ]}
+/>
 
 Each Kryptic SDK is intentionally thin: one entry point that talks to the local
 daemon. It contains no authentication or secret-storage logic.

@@ -22,11 +22,20 @@ The daemon/SDK contract is [PROTOCOL.md](https://github.com/dev-kryptic/Kryptic.
 v1. Newline-delimited JSON, one request, one reply, then the connection
 closes.
 
-| Platform | Endpoint |
-| --- | --- |
-| macOS | `/tmp/kryptic-daemon.sock` |
-| Linux | `$XDG_RUNTIME_DIR/kryptic-daemon.sock`, fallback `/tmp/kryptic-daemon.sock` |
-| Windows | `\\.\pipe\kryptic-daemon` |
+<DocsTable
+  columns={['Platform', 'Endpoint']}
+  rows={[
+    ['macOS', <code>/tmp/kryptic-daemon.sock</code>],
+    [
+      'Linux',
+      <>
+        <code>$XDG_RUNTIME_DIR/kryptic-daemon.sock</code>, fallback{' '}
+        <code>/tmp/kryptic-daemon.sock</code>
+      </>,
+    ],
+    ['Windows', <code>{'\\\\.\\pipe\\kryptic-daemon'}</code>],
+  ]}
+/>
 
 `KRYPTIC_SOCKET_PATH` overrides the path (how tests point a package at a
 mock). `0600` on the unix socket is a second layer. The primary gate is
@@ -41,12 +50,47 @@ win. Packages are automatic no-ops in production and staging.
 
 They all speak envelopes. None returns a secret value.
 
-| Caller | Host | Auth | Decrypts with |
-| --- | --- | --- | --- |
-| Dashboard | Management API | Member session | `@krypticdev/encryption` in the browser |
-| Daemon | Daemon BFF (`daemon.kryptic.dev`) | Device session | `Kryptic.Encryption.Go` in the daemon |
-| `kryptic ci export` | Pipelines BFF (`pipelines.kryptic.dev`) | Machine token | Go engine on the runner |
-| REST clients | Secrets API (`secrets.kryptic.dev`) | Machine token | Whatever engine *you* run. The API will not. |
+<DocsTable
+  columns={['Caller', 'Host', 'Auth', 'Decrypts with']}
+  rows={[
+    [
+      'Dashboard',
+      'Management API',
+      'Member session',
+      <>
+        <code>@krypticdev/encryption</code> in the browser
+      </>,
+    ],
+    [
+      'Daemon',
+      <>
+        Daemon BFF (<code>daemon.kryptic.dev</code>)
+      </>,
+      'Device session',
+      <>
+        <code>Kryptic.Encryption.Go</code> in the daemon
+      </>,
+    ],
+    [
+      <code>kryptic ci export</code>,
+      <>
+        Pipelines BFF (<code>pipelines.kryptic.dev</code>)
+      </>,
+      'Machine token',
+      'Go engine on the runner',
+    ],
+    [
+      'REST clients',
+      <>
+        Secrets API (<code>secrets.kryptic.dev</code>)
+      </>,
+      'Machine token',
+      <>
+        Whatever engine <em>you</em> run. The API will not.
+      </>,
+    ],
+  ]}
+/>
 
 Reads return `wrappedOrgKey` plus envelopes that include `definitionId` and
 `environmentId` so the caller can rebuild associated data. Writes accept an

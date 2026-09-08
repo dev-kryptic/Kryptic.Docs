@@ -1,0 +1,53 @@
+export const description = 'Install self-hosted Kryptic with Helm on a fresh k3s machine.'
+
+# Helm (fresh k3s)
+
+One empty machine. k3s brings Kubernetes and Traefik.
+
+```bash
+curl -sfL https://get.k3s.io | sh -
+
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+mkdir -p "$HOME/.kube"
+sudo cp /etc/rancher/k3s/k3s.yaml "$HOME/.kube/config"
+sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
+```
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+cp values.example.yaml kryptic-values.yaml
+```
+
+Edit `kryptic-values.yaml` in this folder. Set `KRYPTIC_VERSION` to the
+image tag from the email, fill `TOKEN_KEY`, `MASTER_KEY`,
+`POSTGRES_PASSWORD`, `Licensing__LicenseKey`, and the ingress hosts.
+See [Settings and options](/self-hosting/settings).
+
+```bash
+kubectl create namespace kryptic
+
+kubectl create secret docker-registry kryptic-registry \
+  --namespace kryptic \
+  --docker-server='<registry-host-from-email>' \
+  --docker-username='<username from the email>' \
+  --docker-password='<password you set>'
+
+helm repo add kryptic \
+  <helm-repo-url-from-email> \
+  --username '<username from the email>' \
+  --password '<password you set>'
+
+helm repo update kryptic
+
+helm install kryptic kryptic/kryptic \
+  --version <chart-version-from-email> \
+  --namespace kryptic \
+  -f kryptic-values.yaml
+```
+
+`helm repo add` is required. Helm does not reuse `docker login`. Leave
+`ingress.className` empty so k3s Traefik is used.
+
+Then [create your organization](/self-hosting#create-your-organization).

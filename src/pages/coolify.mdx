@@ -115,13 +115,24 @@ as a Docker build-arg and does not land in image metadata. Lock them (Normal
 view) and enable **Literal** on the secret so Coolify does not expand `$` inside
 the value.
 
-| Variable | Example | Required |
-| --- | --- | --- |
-| `KRYPTIC_CLIENT_ID` | `kmi_…` | yes |
-| `KRYPTIC_CLIENT_SECRET` | the one-time secret | yes |
-| `KRYPTIC_PROJECT_ID` | `proj_a1b2c3d4e5f6` | yes |
-| `KRYPTIC_ENV` | `production` | no (defaults to `production` in the entrypoint) |
-| `KRYPTIC_PIPELINES_API` | `https://pipelines.kryptic.example.com` | self-hosted only |
+<DocsTable
+  columns={['Variable', 'Example', 'Required']}
+  rows={[
+    [<code>KRYPTIC_CLIENT_ID</code>, <code>kmi_…</code>, 'yes'],
+    [<code>KRYPTIC_CLIENT_SECRET</code>, 'the one-time secret', 'yes'],
+    [<code>KRYPTIC_PROJECT_ID</code>, <code>proj_a1b2c3d4e5f6</code>, 'yes'],
+    [
+      <code>KRYPTIC_ENV</code>,
+      <code>production</code>,
+      'no (defaults to production in the entrypoint)',
+    ],
+    [
+      <code>KRYPTIC_PIPELINES_API</code>,
+      <code>https://pipelines.kryptic.example.com</code>,
+      'self-hosted only',
+    ],
+  ]}
+/>
 
 Do not paste your application secrets (`DATABASE_URL`, API keys, and so on) into
 Coolify. Those come from Kryptic at start.
@@ -146,14 +157,45 @@ You should see your application logs, not a dotenv dump.
 
 If export fails, the container exits before the app starts. Typical causes:
 
-| Error | Fix |
-| --- | --- |
-| `set KRYPTIC_CLIENT_ID and KRYPTIC_CLIENT_SECRET` | Variables are missing, build-only, or not marked Runtime |
-| `credential exchange failed` / 401 | Wrong secret, identity deactivated, or you need to rotate |
-| `fetching secrets bundle` / 403 | Identity is not scoped to this project |
-| `could not unwrap the org key` | Unlock the vault and grant the identity the organization key on **Approvals** |
-| `KRYPTIC_PROJECT_ID is not set` | Missing from Coolify, or the start command is not going through the entrypoint |
-| connection / TLS errors | The container cannot reach `https://pipelines.kryptic.dev` (or your `KRYPTIC_PIPELINES_API`) on port 443 |
+<DocsTable
+  columns={['Error', 'Fix']}
+  rows={[
+    [
+      <code>set KRYPTIC_CLIENT_ID and KRYPTIC_CLIENT_SECRET</code>,
+      'Variables are missing, build-only, or not marked Runtime',
+    ],
+    [
+      <>
+        <code>credential exchange failed</code> / 401
+      </>,
+      'Wrong secret, identity deactivated, or you need to rotate',
+    ],
+    [
+      <>
+        <code>fetching secrets bundle</code> / 403
+      </>,
+      'Identity is not scoped to this project',
+    ],
+    [
+      <code>could not unwrap the org key</code>,
+      <>
+        Unlock the vault and grant the identity the organization key on{' '}
+        <strong>Approvals</strong>
+      </>,
+    ],
+    [
+      <code>KRYPTIC_PROJECT_ID is not set</code>,
+      'Missing from Coolify, or the start command is not going through the entrypoint',
+    ],
+    [
+      'connection / TLS errors',
+      <>
+        The container cannot reach <code>https://pipelines.kryptic.dev</code>{' '}
+        (or your <code>KRYPTIC_PIPELINES_API</code>) on port 443
+      </>,
+    ],
+  ]}
+/>
 
 ## Nixpacks
 
@@ -214,8 +256,8 @@ dashboard host, not the app container.
 KRYPTIC_PIPELINES_API=https://pipelines.kryptic.example.com
 ```
 
-See [Self-hosting](/self-hosting) for the compose ports. The Pipelines BFF is
-port 5212.
+See [Settings and options](/self-hosting/settings) for the compose ports.
+The Pipelines BFF is port 5212.
 
 ## Build-time secrets
 

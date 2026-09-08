@@ -16,13 +16,25 @@ or the SSO add-on.
 
 Cloud hosts used below:
 
-| What | URL |
-| --- | --- |
-| Dashboard | `https://app.kryptic.dev` |
-| SAML metadata (entity id) | `https://api.kryptic.dev/saml/metadata` |
-| Assertion consumer service | `https://api.kryptic.dev/saml/acs` |
-| SCIM base | `https://api.kryptic.dev/scim/v2` |
-| SP-initiated sign-in | `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+<DocsTable
+  columns={['What', 'URL']}
+  rows={[
+    ['Dashboard', <code>https://app.kryptic.dev</code>],
+    [
+      'SAML metadata (entity id)',
+      <code>https://api.kryptic.dev/saml/metadata</code>,
+    ],
+    [
+      'Assertion consumer service',
+      <code>https://api.kryptic.dev/saml/acs</code>,
+    ],
+    ['SCIM base', <code>https://api.kryptic.dev/scim/v2</code>],
+    [
+      'SP-initiated sign-in',
+      <code>https://api.kryptic.dev/saml/login?domain=your-domain.com</code>,
+    ],
+  ]}
+/>
 
 Self-hosted: replace `https://api.kryptic.dev` with your Management API origin
 (`PUBLIC_API_URL`). The ACS and entity id must match that host exactly.
@@ -56,16 +68,49 @@ On the SSO tab you can **Upload Metadata** from
 field names below match
 [SSO Application Connector Fields](https://jumpcloud.com/support/sso-application-connector-fields).
 
-| JumpCloud field | Value |
-| --- | --- |
-| SP Entity ID (Audience) | `https://api.kryptic.dev/saml/metadata` |
-| ACS URL | `https://api.kryptic.dev/saml/acs` |
-| SAMLSubject NameID | **email** (the default). Do not change it. |
-| SAMLSubject NameID Format | **EmailAddress** if JumpCloud asks you to pick a format |
-| Signature Algorithm | **RSA-SHA256** (the default). Do not switch to SHA-1. |
-| Sign | **Response** is the default. **Assertion and Response** is also fine. |
-| Default RelayState | leave empty |
-| Login URL | optional. For SP-initiated only, use `https://api.kryptic.dev/saml/login?domain=your-domain.com` |
+<DocsTable
+  columns={['JumpCloud field', 'Value']}
+  rows={[
+    [
+      'SP Entity ID (Audience)',
+      <code>https://api.kryptic.dev/saml/metadata</code>,
+    ],
+    ['ACS URL', <code>https://api.kryptic.dev/saml/acs</code>],
+    [
+      'SAMLSubject NameID',
+      <>
+        <strong>email</strong> (the default). Do not change it.
+      </>,
+    ],
+    [
+      'SAMLSubject NameID Format',
+      <>
+        <strong>EmailAddress</strong> if JumpCloud asks you to pick a format
+      </>,
+    ],
+    [
+      'Signature Algorithm',
+      <>
+        <strong>RSA-SHA256</strong> (the default). Do not switch to SHA-1.
+      </>,
+    ],
+    [
+      'Sign',
+      <>
+        <strong>Response</strong> is the default.{' '}
+        <strong>Assertion and Response</strong> is also fine.
+      </>,
+    ],
+    ['Default RelayState', 'leave empty'],
+    [
+      'Login URL',
+      <>
+        optional. For SP-initiated only, use{' '}
+        <code>https://api.kryptic.dev/saml/login?domain=your-domain.com</code>
+      </>,
+    ],
+  ]}
+/>
 
 Leave **Replace SP Certificate** alone. We do not sign AuthnRequests, so no
 service-provider certificate is required.
@@ -114,11 +159,29 @@ Still in the Kryptic app:
 2. Leave **Use mTLS** off. Kryptic authenticates with a bearer token.
 3. Fill the required fields:
 
-| JumpCloud field | Value |
-| --- | --- |
-| Base URL | `https://api.kryptic.dev/scim/v2` (no trailing slash) |
-| Token (Token Key) | the token Kryptic showed once (no `Bearer` prefix) |
-| Test User Email | an address that does **not** already exist in Kryptic |
+<DocsTable
+  columns={['JumpCloud field', 'Value']}
+  rows={[
+    [
+      'Base URL',
+      <>
+        <code>https://api.kryptic.dev/scim/v2</code> (no trailing slash)
+      </>,
+    ],
+    [
+      'Token (Token Key)',
+      <>
+        the token Kryptic showed once (no <code>Bearer</code> prefix)
+      </>,
+    ],
+    [
+      'Test User Email',
+      <>
+        an address that does <strong>not</strong> already exist in Kryptic
+      </>,
+    ],
+  ]}
+/>
 
 4. **Test Connection**. JumpCloud sends `GET /Users` to check the URL and
    token. On success, the rest of the form appears.

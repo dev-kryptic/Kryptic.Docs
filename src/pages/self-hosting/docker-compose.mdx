@@ -1,0 +1,28 @@
+export const description = 'Install self-hosted Kryptic with Docker Compose on one host.'
+
+# Docker Compose
+
+On one host with Docker Compose v2 (about 2 GB of RAM).
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+cp .env.example .env
+```
+
+Edit `.env`. Set `KRYPTIC_VERSION` to the image tag from the email, add the
+licence key, and generate `TOKEN_KEY`, `MASTER_KEY`, and
+`POSTGRES_PASSWORD`. See [Settings and options](/self-hosting/settings).
+
+```bash
+docker login <registry-host-from-email>
+# username from the email, password you set at
+# https://kryptic.dev/registry-access?token=...
+
+./up.sh up -d
+```
+
+Dashboard is `http://localhost:8080`. APIs are `5210` (management),
+`5211` (daemon), `5212` (pipelines), `5213` (secrets).
+
+Then [create your organization](/self-hosting#create-your-organization).

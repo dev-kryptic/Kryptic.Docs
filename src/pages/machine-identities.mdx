@@ -47,11 +47,26 @@ kryptic ci export --project proj_x --env production --format dotenv > .env
 
 `--format` accepts:
 
-| Value | Output |
-| --- | --- |
-| `dotenv` (default) | `KEY=value` lines, quoted where needed |
-| `shell` | `export KEY='value'` lines, correctly escaped |
-| `json` | A flat JSON object |
+<DocsTable
+  columns={['Value', 'Output']}
+  rows={[
+    [
+      <>
+        <code>dotenv</code> (default)
+      </>,
+      <>
+        <code>KEY=value</code> lines, quoted where needed
+      </>,
+    ],
+    [
+      <code>shell</code>,
+      <>
+        <code>export KEY='value'</code> lines, correctly escaped
+      </>,
+    ],
+    [<code>json</code>, 'A flat JSON object'],
+  ]}
+/>
 
 The [Kubernetes operator](/kubernetes) uses the same identity. The recommended
 production path is a credentials Secret in each application namespace. For
@@ -88,10 +103,19 @@ runner; that script configures a desktop daemon.
 
 ## Lifecycle
 
-| Action | Effect |
-| --- | --- |
-| **Rotate** | Issues a new secret and **invalidates the old one immediately**. The vault must be unlocked |
-| **Deactivate** | Token exchange starts returning 401 |
+<DocsTable
+  columns={['Action', 'Effect']}
+  rows={[
+    [
+      <strong>Rotate</strong>,
+      <>
+        Issues a new secret and <strong>invalidates the old one immediately</strong>.
+        The vault must be unlocked
+      </>,
+    ],
+    [<strong>Deactivate</strong>, 'Token exchange starts returning 401'],
+  ]}
+/>
 
 Every read is audit-logged with the machine identity as the actor, so a CI
 pipeline's access is as reviewable as a person's.

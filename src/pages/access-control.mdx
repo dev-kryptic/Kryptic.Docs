@@ -10,12 +10,24 @@ which are per project and per environment.
 
 ## Roles
 
-| Role | Can |
-| --- | --- |
-| **Owner** | Everything, including billing, organization settings, key rotation, and deleting the organization |
-| **Admin** | Manage members, projects, groups, shared secrets and machine identities; export secrets; read the audit log |
-| **Developer** | Work with the projects they are granted; request access to others; propose secret changes (including org references) that an owner or admin must approve |
-| **Viewer** | Read-only within granted projects |
+<DocsTable
+  columns={['Role', 'Can']}
+  rows={[
+    [
+      <strong>Owner</strong>,
+      'Everything, including billing, organization settings, key rotation, and deleting the organization',
+    ],
+    [
+      <strong>Admin</strong>,
+      'Manage members, projects, groups, shared secrets and machine identities; export secrets; read the audit log',
+    ],
+    [
+      <strong>Developer</strong>,
+      'Work with the projects they are granted; request access to others; propose secret changes (including org references) that an owner or admin must approve',
+    ],
+    [<strong>Viewer</strong>, 'Read-only within granted projects'],
+  ]}
+/>
 
 Roles alone do not grant access to a project's secrets - a Developer with no
 grant sees no projects at all.
@@ -27,11 +39,14 @@ grant sees no projects at all.
 A grant ties a **user or a group** to a **project**, with a level chosen **per
 environment**. The common shape:
 
-| Environment | Everyone | Senior engineers | Release managers |
-| --- | --- | --- | --- |
-| development | read | read/write | read/write |
-| staging | - | read | read/write |
-| production | - | read | read/write |
+<DocsTable
+  columns={['Environment', 'Everyone', 'Senior engineers', 'Release managers']}
+  rows={[
+    ['development', 'read', 'read/write', 'read/write'],
+    ['staging', '-', 'read', 'read/write'],
+    ['production', '-', 'read', 'read/write'],
+  ]}
+/>
 
 Effective access resolves in order: role -> direct grant -> group grant.
 
@@ -91,13 +106,25 @@ continue to write directly.
 
 ## Sessions and revocation
 
-| Control | Effect |
-| --- | --- |
-| Deactivate a member | Immediately revokes their browser and daemon sessions; login refused |
-| Revoke all sessions | Same, without deactivating the account |
-| Revoke one daemon | That machine stops receiving secrets |
-| Session expiry policy | Caps the absolute age of any login, regardless of refreshes |
-| SCIM deprovisioning | Deactivates and revokes everything, driven by your IdP |
+<DocsTable
+  columns={['Control', 'Effect']}
+  rows={[
+    [
+      'Deactivate a member',
+      'Immediately revokes their browser and daemon sessions; login refused',
+    ],
+    ['Revoke all sessions', 'Same, without deactivating the account'],
+    ['Revoke one daemon', 'That machine stops receiving secrets'],
+    [
+      'Session expiry policy',
+      'Caps the absolute age of any login, regardless of refreshes',
+    ],
+    [
+      'SCIM deprovisioning',
+      'Deactivates and revokes everything, driven by your IdP',
+    ],
+  ]}
+/>
 
 <Note>
   Access changes take effect on the daemon's next fetch. Secrets are cached in

@@ -34,12 +34,23 @@ curl -X POST https://<your-api-host>/api/enterprise/idp/scim/{connectionId}/toke
 
 **2. In your identity provider**, configure SCIM provisioning with:
 
-| Okta field | Value |
-| --- | --- |
-| SCIM connector base URL | `https://<your-api-host>/scim/v2` |
-| Unique identifier field for users | `userName` |
-| Authentication Mode | HTTP Header |
-| Authorization | the value from step 1 (no `Bearer` prefix) |
+<DocsTable
+  columns={['Okta field', 'Value']}
+  rows={[
+    [
+      'SCIM connector base URL',
+      <code>{'https://<your-api-host>/scim/v2'}</code>,
+    ],
+    ['Unique identifier field for users', <code>userName</code>],
+    ['Authentication Mode', 'HTTP Header'],
+    [
+      'Authorization',
+      <>
+        the value from step 1 (no <code>Bearer</code> prefix)
+      </>,
+    ],
+  ]}
+/>
 
 Enable *Create Users*, *Update User Attributes* and *Deactivate Users*.
 
@@ -51,11 +62,32 @@ Enable *Create Users*, *Update User Attributes* and *Deactivate Users*.
 
 ## What is supported
 
-| Endpoint | Operations |
-| --- | --- |
-| `/Users` | `GET` (list, `userName eq`), `GET /{id}`, `POST`, `PUT`, `PATCH`, `DELETE` |
-| `/Groups` | `GET` (list, `displayName eq`), `GET /{id}`, `POST`, `PUT`, `PATCH`, `DELETE` |
-| `/ServiceProviderConfig`, `/ResourceTypes`, `/Schemas` | `GET` |
+<DocsTable
+  columns={['Endpoint', 'Operations']}
+  rows={[
+    [
+      <code>/Users</code>,
+      <>
+        <code>GET</code> (list, <code>userName eq</code>), <code>GET /{'{id}'}</code>,{' '}
+        <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>
+      </>,
+    ],
+    [
+      <code>/Groups</code>,
+      <>
+        <code>GET</code> (list, <code>displayName eq</code>), <code>GET /{'{id}'}</code>,{' '}
+        <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>
+      </>,
+    ],
+    [
+      <>
+        <code>/ServiceProviderConfig</code>, <code>/ResourceTypes</code>,{' '}
+        <code>/Schemas</code>
+      </>,
+      <code>GET</code>,
+    ],
+  ]}
+/>
 
 ## Behavior that matters
 

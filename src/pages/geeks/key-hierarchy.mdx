@@ -13,13 +13,43 @@ The server stores it inside sealed boxes it cannot open. Click a layer.
 
 ## Where each key lives
 
-| Key | At rest | In memory | At the server |
-| --- | --- | --- | --- |
-| Vault passphrase / recovery code / machine client secret | Nowhere (customer-held) | Client, during derivation | No (machine secret stored as an Argon2id hash) |
-| Party private keys | Database or OS store, wrapped | Client only | Only wrapped |
-| Org key | Database, sealed-box grants only | Browser, daemon, or CI process | Only sealed to recipients |
-| Secret plaintext | Never | Client memory and the requesting process | Never |
-| Server org data key | Database, wrapped under `MASTER_KEY` | Server, SSO and similar | Yes, and it cannot open secret values |
+<DocsTable
+  columns={['Key', 'At rest', 'In memory', 'At the server']}
+  rows={[
+    [
+      'Vault passphrase / recovery code / machine client secret',
+      'Nowhere (customer-held)',
+      'Client, during derivation',
+      'No (machine secret stored as an Argon2id hash)',
+    ],
+    [
+      'Party private keys',
+      'Database or OS store, wrapped',
+      'Client only',
+      'Only wrapped',
+    ],
+    [
+      'Org key',
+      'Database, sealed-box grants only',
+      'Browser, daemon, or CI process',
+      'Only sealed to recipients',
+    ],
+    [
+      'Secret plaintext',
+      'Never',
+      'Client memory and the requesting process',
+      'Never',
+    ],
+    [
+      'Server org data key',
+      <>
+        Database, wrapped under <code>MASTER_KEY</code>
+      </>,
+      'Server, SSO and similar',
+      'Yes, and it cannot open secret values',
+    ],
+  ]}
+/>
 
 ## Grants
 

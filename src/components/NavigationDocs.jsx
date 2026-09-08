@@ -60,10 +60,20 @@ export const docsNavigation = [
     title: 'PLATFORM',
     links: [
       { title: 'Encryption', href: '/encryption' },
-      { title: 'Self-hosting', href: '/self-hosting' },
       { title: 'Kubernetes operator', href: '/kubernetes' },
       { title: 'Coolify', href: '/coolify' },
       { title: 'Versions', href: '/versions' },
+    ],
+  },
+  {
+    title: 'SELF-HOSTING',
+    links: [
+      { title: 'Overview', href: '/self-hosting' },
+      { title: 'Docker Compose', href: '/self-hosting/docker-compose' },
+      { title: 'Helm (fresh k3s)', href: '/self-hosting/helm-k3s' },
+      { title: 'Helm (existing cluster)', href: '/self-hosting/helm' },
+      { title: 'Air-gapped', href: '/self-hosting/air-gapped' },
+      { title: 'Settings and options', href: '/self-hosting/settings' },
     ],
   },
   {

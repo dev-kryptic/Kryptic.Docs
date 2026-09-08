@@ -1,0 +1,45 @@
+export const description = 'Install self-hosted Kryptic on an air-gapped host.'
+
+# Air-gapped
+
+Licence checks are offline. The signed key and public PEM are enough.
+
+The registry-access email attaches `kryptic-airgap.tar.gz` (images) and
+`kryptic-selfhost.zip` (Compose, `.env.example`, `up.sh`, and
+`values.example.yaml`). Copy both files to the offline host.
+
+```bash
+unzip kryptic-selfhost.zip -d kryptic
+cd kryptic
+docker load -i /path/to/kryptic-airgap.tar.gz
+
+cp values.example.yaml kryptic-values.yaml
+# set KRYPTIC_VERSION and DOCKER_REGISTRY from the email
+```
+
+On Kubernetes nodes, load the tarball into each node's containerd / k3s.
+
+[Docker Compose](/self-hosting/docker-compose):
+
+```bash
+./up.sh up -d
+```
+
+[Helm](/self-hosting/helm) from a chart file on disk (no `helm repo`).
+Pull the chart on a machine that can reach the Helm repo from the email,
+then copy the `.tgz` to the offline host:
+
+```bash
+helm pull kryptic/kryptic --version <chart-version-from-email>
+```
+
+```bash
+helm upgrade --install kryptic ./kryptic-<chart-version-from-email>.tgz \
+  --namespace kryptic --create-namespace \
+  -f kryptic-values.yaml
+```
+
+If the offline registry uses different names, set `DOCKER_REGISTRY` to
+that mirror and retag the images to match.
+
+Then [create your organization](/self-hosting#create-your-organization).

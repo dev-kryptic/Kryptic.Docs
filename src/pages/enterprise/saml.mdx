@@ -61,18 +61,61 @@ roles inside Kryptic, not in the IdP.
 Every item below is an authentication bypass if it is missing. Each has an
 automated test that constructs the actual attack.
 
-| Check | Attack it closes |
-| --- | --- |
-| Every signature verifies against the certificate from your metadata, and each must cover the response or the assertion (Okta signs both, which is fine) | Forged or attacker-signed assertions |
-| The assertion used is the one the signature **covers**, and the document has exactly one assertion | XML signature wrapping |
-| SHA-1 and MD5 refused | Algorithm downgrade |
-| `InResponseTo` matches a login we started | Replay of a captured assertion |
-| `Destination` is our ACS URL | Assertion minted for a different service provider |
-| `Audience` is our entity id | Same |
-| `Issuer` is your configured IdP | Assertion from an unrelated IdP |
-| `Conditions` within `NotBefore`/`NotOnOrAfter` (±3 min skew) | Expired assertion reuse |
-| `Status` is Success before anything else is read | Treating a failed login as a success |
-| DTDs and external entities disabled | XXE |
+<DocsTable
+  columns={['Check', 'Attack it closes']}
+  rows={[
+    [
+      'Every signature verifies against the certificate from your metadata, and each must cover the response or the assertion (Okta signs both, which is fine)',
+      'Forged or attacker-signed assertions',
+    ],
+    [
+      <>
+        The assertion used is the one the signature <strong>covers</strong>, and
+        the document has exactly one assertion
+      </>,
+      'XML signature wrapping',
+    ],
+    ['SHA-1 and MD5 refused', 'Algorithm downgrade'],
+    [
+      <>
+        <code>InResponseTo</code> matches a login we started
+      </>,
+      'Replay of a captured assertion',
+    ],
+    [
+      <>
+        <code>Destination</code> is our ACS URL
+      </>,
+      'Assertion minted for a different service provider',
+    ],
+    [
+      <>
+        <code>Audience</code> is our entity id
+      </>,
+      'Same',
+    ],
+    [
+      <>
+        <code>Issuer</code> is your configured IdP
+      </>,
+      'Assertion from an unrelated IdP',
+    ],
+    [
+      <>
+        <code>Conditions</code> within <code>NotBefore</code>/
+        <code>NotOnOrAfter</code> (±3 min skew)
+      </>,
+      'Expired assertion reuse',
+    ],
+    [
+      <>
+        <code>Status</code> is Success before anything else is read
+      </>,
+      'Treating a failed login as a success',
+    ],
+    ['DTDs and external entities disabled', 'XXE'],
+  ]}
+/>
 
 Rejections are audit-logged as `auth.saml_rejected` with the reason, so a
 misconfiguration is diagnosable without turning on debug logging.

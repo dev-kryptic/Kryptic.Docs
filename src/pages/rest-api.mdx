@@ -117,12 +117,21 @@ Authorization: Bearer <token>
 
 ## Errors
 
-| Status | Meaning |
-| --- | --- |
-| 401 | Missing/expired token, or wrong client credentials |
-| 403 | The machine identity's scopes exclude this project, or it has no org-key grant yet |
-| 404 | Unknown project public id, environment slug, or secret key |
-| 400 | Invalid secret key (must look like an environment variable name) or invalid envelope |
+<DocsTable
+  columns={['Status', 'Meaning']}
+  rows={[
+    ['401', 'Missing/expired token, or wrong client credentials'],
+    [
+      '403',
+      "The machine identity's scopes exclude this project, or it has no org-key grant yet",
+    ],
+    ['404', 'Unknown project public id, environment slug, or secret key'],
+    [
+      '400',
+      'Invalid secret key (must look like an environment variable name) or invalid envelope',
+    ],
+  ]}
+/>
 
 <Note>
   For CI jobs that just need secrets as a `.env` or shell exports, the Pipelines BFF's

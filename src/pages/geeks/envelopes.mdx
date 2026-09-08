@@ -18,12 +18,15 @@ Click a segment.
 v1.<keyId>.<base64url nonce>.<base64url ciphertext||tag>
 ```
 
-| Field | Size / rule |
-| --- | --- |
-| Version | `v1` |
-| `keyId` | `[a-zA-Z0-9_-]{1,64}` |
-| Nonce | 12 bytes, CSPRNG, base64url no padding |
-| Body | AES-256-GCM ciphertext with a 16-byte tag appended |
+<DocsTable
+  columns={['Field', 'Size / rule']}
+  rows={[
+    ['Version', <code>v1</code>],
+    [<code>keyId</code>, <code>{'[a-zA-Z0-9_-]{1,64}'}</code>],
+    ['Nonce', '12 bytes, CSPRNG, base64url no padding'],
+    ['Body', 'AES-256-GCM ciphertext with a 16-byte tag appended'],
+  ]}
+/>
 
 Implementations: .NET `AesGcm`, WebCrypto `AES-GCM`, Go `crypto/aes` + GCM.
 The engine refuses a caller-supplied nonce.
