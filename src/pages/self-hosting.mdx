@@ -6,9 +6,9 @@ export const description = 'Run the full Kryptic platform yourself with Docker C
 
 The management dashboard and the four product APIs run from
 `Kryptic.Self.Hosting/compose/docker-compose.yml`. Images come from the Kryptic Nexus registry as
-`nexus.webservices.theka.io/docker/kryptic/<name>:<version>`. Pin the version
-tag (for example `1.3.0`). Docs, the public site, Public API, and Internal
-API are not in this stack.
+`nexus.webservices.theka.io/docker/kryptic/<name>:<version>`. Pin the compat
+band (`1.3`). Every `1.3.Z` works with every other `1.3.Z`. Docs, the public
+site, Public API, and Internal API are not in this stack.
 
 Self-hosting requires a **Business or Enterprise licence key**. There is no free
 self-hosted tier: the Free and Team plans are cloud-only. If you are still evaluating,
@@ -45,7 +45,7 @@ DAEMON_BFF_URL=https://daemon.kryptic.example.com
 PIPELINES_BFF_URL=https://pipelines.kryptic.example.com
 SECRETS_API_URL=https://secrets.kryptic.example.com
 DOCKER_REGISTRY=nexus.webservices.theka.io/docker
-KRYPTIC_VERSION=1.3.0
+KRYPTIC_VERSION=1.3
 Deployment__SelfHosted=true
 Licensing__LicenseKey=KRYPTIC-...
 Licensing__PublicKeyPem="-----BEGIN PUBLIC KEY-----..."
@@ -139,15 +139,16 @@ CI runners use `KRYPTIC_PIPELINES_API` (compose: `http://localhost:5212`) with
 The chart is published under `kryptic-selfhost/helm` in Nexus. Use the same
 `kryptic_…` registry-access user for `helm install --repo` and for the
 image pull secret. Copy `helm/values.example.yaml` to a local file, fill
-the keys, and pass it with `-f`. Helm `--version` is the compat band
-(`1.3.3`). Pin a 4th-digit image tag in that file as `KRYPTIC_VERSION`.
+the keys, and pass it with `-f`. Helm `--version` is the chart release
+(`1.3.4`). Pin images with `KRYPTIC_VERSION` (`1.3` follows the latest
+`1.3.Z`).
 
 ```bash
 helm install kryptic \
   --repo https://nexus.webservices.theka.io/repository/kryptic-selfhost/helm \
   --username <registry-access username> \
   --password <password> \
-  --version 1.3.3 \
+  --version 1.3.4 \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```
