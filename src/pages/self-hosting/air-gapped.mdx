@@ -4,12 +4,25 @@ export const description = 'Install self-hosted Kryptic on an air-gapped host.'
 
 Licence checks are offline. The signed key and public PEM are enough.
 
-The registry-access email attaches `kryptic-airgap.tar.gz` (images) and
-`kryptic-selfhost.zip` (Compose, `.env.example`, `up.sh`, and
-`values.example.yaml`). Copy both files to the offline host.
+The registry-access email attaches `kryptic-selfhost.zip` (Compose,
+`.env.example`, `up.sh`, `values.example.yaml`, and the Helm chart
+`kryptic-<version>.tgz`) and links the air-gapped image bundle. The
+bundle is too large to attach to the mail.
+
+On a machine with internet access, download the bundle from the link in
+the email with your registry username and the password you set:
 
 ```bash
+curl -fL -u '<username from the email>:<password you set>' \
+  -o kryptic-airgap.tar.gz \
+  '<air-gap-bundle-link-from-email>'
+
 unzip kryptic-selfhost.zip -d kryptic
+```
+
+Copy `kryptic-airgap.tar.gz` and the unzipped kit to the offline host.
+
+```bash
 cd kryptic
 docker load -i /path/to/kryptic-airgap.tar.gz
 
@@ -19,25 +32,29 @@ cp values.example.yaml kryptic-values.yaml
 
 On Kubernetes nodes, load the tarball into each node's containerd / k3s.
 
-[Docker Compose](/self-hosting/docker-compose):
+[Docker Compose](/self-hosting/docker-compose). Set the pull policy to
+`missing` in `.env` so Compose uses the loaded images instead of calling
+the registry (kits up to 1.3.9 default to `always`; newer kits default
+to `missing`):
 
 ```bash
+echo 'KRYPTIC_PULL_POLICY=missing' >> .env
 ./up.sh up -d
 ```
 
-[Helm](/self-hosting/helm) from a chart file on disk (no `helm repo`).
-Pull the chart on a machine that can reach the Helm repo from the email,
-then copy the `.tgz` to the offline host:
-
-```bash
-helm pull kryptic/kryptic --version <chart-version-from-email>
-```
+[Helm](/self-hosting/helm) from the chart file in the kit (no
+`helm repo`). Set `KRYPTIC_PULL_POLICY: IfNotPresent` in your values
+file (charts up to 1.3.9 default to `Always`).
 
 ```bash
 helm upgrade --install kryptic ./kryptic-<chart-version-from-email>.tgz \
   --namespace kryptic --create-namespace \
   -f kryptic-values.yaml
 ```
+
+Kits up to 1.3.9 do not include the chart tgz. Pull it on a machine that
+can reach the Helm repo from the email, then copy it to the offline
+host: `helm pull kryptic/kryptic --version <chart-version-from-email>`.
 
 If the offline registry uses different names, set `DOCKER_REGISTRY` to
 that mirror and retag the images to match.

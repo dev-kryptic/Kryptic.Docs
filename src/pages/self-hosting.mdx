@@ -48,12 +48,20 @@ Your registry-access email has:
         <code>helm install --version</code>
       </>,
     ],
+    [
+      'Air-gap bundle link',
+      <>
+        <code>docker load</code> on offline hosts, see{' '}
+        <a href="/self-hosting/air-gapped">Air-gapped</a>
+      </>,
+    ],
   ]}
 />
 
 The attached `kryptic-selfhost.zip` has Compose, `.env.example`, `up.sh`,
-and `values.example.yaml`. `kryptic-airgap.tar.gz` has the images for an
-[air-gapped](/self-hosting/air-gapped) host.
+`values.example.yaml`, and the Helm chart (`kryptic-<version>.tgz`). The
+same email links the air-gap image tarball, downloadable with your
+registry credentials. See [Air-gapped](/self-hosting/air-gapped).
 
 Pick an install path:
 
