@@ -4,11 +4,20 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.3.5**. New tags are `X.Y.Z`
+secrets from. The latest release is **1.3.6**. New tags are `X.Y.Z`
 only. `Y` is the compat band: any `1.3.Z` works with any other `1.3.Z`.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.3.6
+
+Licence 402s reach the dashboard toast.
+
+### Fixed
+
+- Self-host licence 402 responses include CORS headers, so the dashboard
+  toasts the expiry message instead of "Failed to fetch".
 
 ## 1.3.5
 
