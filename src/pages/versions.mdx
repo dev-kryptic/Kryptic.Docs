@@ -4,13 +4,48 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.3.12**. Platform and Management
+secrets from. The latest release is **1.3.15**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.3.15
+
+Signup can start on `kryptic.dev/register` and hand the session to the app.
+
+### Added
+
+- OAuth register from `kryptic.dev` may use `/oauth/callback` on the public
+  site, then hands the session to the management app.
+
+## 1.3.14
+
+Registry-access mail links the newest published air-gap tarball, and
+heartbeat alerts wait 30 seconds before paging.
+
+### Fixed
+
+- Registry-access mail links the newest `kryptic-airgap-X.Y.Z.tar.gz` on
+  `https://nexus.webservices.theka.io`. It lists Nexus for the latest
+  published tarball instead of using the Internal API image tag or the
+  in-cluster Nexus URL.
+
+### Changed
+
+- Internal heartbeat alerts wait 30 seconds and re-probe before emailing a
+  slow or down service, so a short rollout blip does not page.
+
+## 1.3.13
+
+Successful `/health` probes no longer fill the console.
+
+### Changed
+
+- Console request logs skip successful `/health` probes. Information lines
+  for real requests stay. Failed health checks still log.
 
 ## 1.3.12
 
