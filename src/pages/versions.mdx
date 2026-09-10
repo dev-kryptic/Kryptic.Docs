@@ -4,13 +4,19 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.5.1**. Platform and Management
+secrets from. The latest release is **1.5.2**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.5.2
+
+Device approve works with the session cookie: the Daemon BFF uses the same
+CORS rules as the Management API. Each API host logs a `TokenKey`
+fingerprint at startup so a mismatched signing key is obvious.
 
 ## 1.5.1
 
@@ -270,7 +276,7 @@ Self-host registry pull accounts, and tag-only image releases.
 ### Changed
 
 - Platform and management-client images publish from a `vX.Y.Z` git tag.
-  A patch on an older line (for example `v1.2.2` while `main` is `1.5.1`)
+  A patch on an older line (for example `v1.2.2` while `main` is `1.5.2`)
   still lands on Nexus under that version, and does not move production
   GitOps or `:latest`.
 

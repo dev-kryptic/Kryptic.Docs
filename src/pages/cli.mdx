@@ -50,8 +50,9 @@ kryptic config reset-api       # return to https://daemon.kryptic.dev
 ```
 
 Changing the saved URL signs you out, because tokens belong to one server.
-`KRYPTIC_API` overrides the saved value without writing it, which is how local
-development points at `http://localhost:5211`.
+`KRYPTIC_API` overrides the saved value without writing it. Point it at
+`http://localhost:5237` when the Daemon BFF is running from the IDE, or
+`http://localhost:5211` when you are using the compose kit.
 
 ## Secrets
 

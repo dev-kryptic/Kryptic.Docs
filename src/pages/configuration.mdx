@@ -72,7 +72,8 @@ Every language SDK honors the same set. Environment variables always win over
   <Property name="KRYPTIC_API" type="string">
     Point the daemon at a self-hosted (or local) Daemon BFF. Overrides the URL saved
     by `kryptic config set-api`. Default `https://daemon.kryptic.dev`. Local compose
-    uses `http://localhost:5211`.
+    uses `http://localhost:5211`. `dotnet run` / the IDE listens on
+    `http://localhost:5237`.
   </Property>
   <Property name="KRYPTIC_CLIENT_ID" type="string">
     Machine identity client id (`kmi_…`). Required by `kryptic ci export`.
