@@ -41,9 +41,9 @@ Every language SDK honors the same set. Environment variables always win over
     Override the environment to fetch (e.g. `staging`).
   </Property>
   <Property name="KRYPTIC_SOCKET_PATH" type="string">
-    Override the daemon endpoint. Default: `/tmp/kryptic-daemon.sock` on macOS,
-    `$XDG_RUNTIME_DIR/kryptic-daemon.sock` on Linux, `\\.\pipe\kryptic-daemon` on
-    Windows. Tests use this to point SDKs at a mock daemon.
+    Override the daemon endpoint. Default: `~/Library/Application Support/kryptic/kryptic-daemon.sock` on macOS,
+    `$XDG_RUNTIME_DIR/kryptic-daemon.sock` on Linux (fallback `~/.config/kryptic/kryptic-daemon.sock`),
+    `\\.\pipe\kryptic-daemon` on Windows. Tests use this to point SDKs at a mock daemon.
   </Property>
   <Property name="KRYPTIC_TIMEOUT_MS" type="number">
     Daemon connection timeout in milliseconds. Default `2000`.
