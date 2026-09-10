@@ -49,6 +49,12 @@ and omit `spec.auth` on every `KrypticSecret`. Create the Secret once in
 `KRYPTIC_CLIENT_ID`, `KRYPTIC_CLIENT_SECRET`, and optional `KRYPTIC_API_URL`
 (the commented block in `operator.yaml`).
 
+The cluster identity is opt-in per namespace: list the namespaces that may use
+it in `KRYPTIC_CLUSTER_NAMESPACES` (comma-separated; `"*"` allows all; empty or
+unset allows none). A `KrypticSecret` without `spec.auth` in a namespace outside
+the list fails with a status message. `apiUrl` values must be https; for local
+development only, `KRYPTIC_ALLOW_INSECURE_API_URL=true` permits http.
+
 ```bash
 kubectl create secret generic kryptic-machine-credentials \
   --namespace kryptic-system \

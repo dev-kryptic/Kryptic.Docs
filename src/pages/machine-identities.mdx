@@ -24,10 +24,13 @@ are approved on **Approvals** (the identity cannot decrypt bundles until that
 grant exists).
 
 <Warning>
-  The client secret is displayed **exactly once**, at creation. It is stored only
-  as an Argon2id hash and cannot be recovered - copy it into your CI secret store
-  before closing the dialog. If you lose it, rotate the identity.
+  The client secret is displayed **exactly once**, at creation. The server keeps
+  only a hashed, derived form and cannot recover it - copy it into your CI secret
+  store before closing the dialog. If you lose it, rotate the identity.
 </Warning>
+
+Client secrets created from now on start with a `ksm2_` prefix. Older secrets
+keep working unchanged; rotating an identity moves it to the new format.
 
 ## Using it
 

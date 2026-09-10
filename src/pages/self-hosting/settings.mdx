@@ -16,6 +16,7 @@ can differ. A values file you pass with `-f` overrides the chart default.
 TOKEN_KEY=$(openssl rand -hex 64)          # JWT signing, 64+ hex chars
 MASTER_KEY=$(openssl rand -base64 32)      # exactly 32 bytes
 POSTGRES_PASSWORD=$(openssl rand -hex 24)
+REDIS_PASSWORD=$(openssl rand -hex 24)
 ```
 
 <Warning>
@@ -23,9 +24,10 @@ POSTGRES_PASSWORD=$(openssl rand -hex 24)
   sync). Losing it means those settings cannot be read back. Customer
   secret values are end-to-end encrypted under a client-held organization
   key and are not recoverable via `MASTER_KEY`. See [Encryption](/encryption).
-  Rotation: set a new `MASTER_KEY`, keep the old value as
-  `OldMasterKeys__` plus the previous `MASTER_KEY_ID`, then restart.
-  The platform rewraps operational data keys.
+  Rotation: set a new `MASTER_KEY`, keep the old value under the previous
+  `MASTER_KEY_ID` (Compose: env `OldMasterKeys__` plus that id; Helm: the
+  `OldMasterKeys` values map, stored in the chart's Kubernetes Secret),
+  then restart. The platform rewraps operational data keys.
 </Warning>
 
 ## Licence
@@ -43,7 +45,10 @@ bundled database. Point it at an existing server to skip creating one.
 
 Leave `REDIS_HOST` as `redis:6379` for the bundled Redis. The Daemon BFF
 keeps device logins and rate limits there, so API hosts can scale behind
-your proxy.
+your proxy. `REDIS_PASSWORD` is required: the bundled Redis starts with
+it as `requirepass` and the Daemon BFF authenticates with it. For an
+existing Redis keep `REDIS_HOST` as `host:port` only and put that
+server's password in `REDIS_PASSWORD`.
 
 ## Public URLs and ingress
 
