@@ -4,13 +4,25 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.4.0**. Platform and Management
+secrets from. The latest release is **1.5.0**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.5.0
+
+Security updates across sign-in, sessions, and machine identities.
+
+### Changed
+
+- Web sessions now live in an httpOnly cookie instead of browser storage.
+  Existing sessions migrate on first load; you stay signed in.
+- New machine identity client secrets use a `ksm2_` prefix. Existing
+  secrets keep working; rotating an identity moves it to the new format.
+- Security updates and hardening across the APIs.
 
 ## 1.4.0
 
