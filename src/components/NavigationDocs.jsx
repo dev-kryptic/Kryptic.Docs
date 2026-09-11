@@ -41,7 +41,7 @@ export const docsNavigation = [
     title: 'USING KRYPTIC',
     links: [
       { title: 'The dashboard', href: '/dashboard' },
-      { title: 'Shared secrets', href: '/shared-secrets' },
+      { title: 'Org shared secrets', href: '/shared-secrets' },
       { title: 'Access control', href: '/access-control' },
       { title: 'Machine identities', href: '/machine-identities' },
       { title: 'CI/CD', href: '/ci' },

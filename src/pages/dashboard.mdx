@@ -35,16 +35,17 @@ the team after you are in.
 ## Chrome, roles, and the vault
 
 The sidebar is split into **Workspace** (Dashboard, Projects, Secret scanning)
-and **Organization** (Members, Groups, Shared secrets, Machine identities,
-Daemon sessions, Approvals, Audit log, Integrations, Settings). Owners and
-Admins see the full Organization block. Everyone else sees **My daemons** and
-**Settings** (Account if they sign in with a local password, General if they
-are Admin+, then Encryption).
+and **Organization** (Members, Groups, Org shared secrets, Machine identities,
+Daemon sessions, Approvals, Audit log, Roles, Integrations, Settings). Nav
+items follow the caller's permissions. Everyone can open **My daemons**,
+**My requests**, and **Settings** (Account if they sign in with a local
+password, General if they can update the organization, then Encryption).
 
 The top bar has jump-to-project search, a notifications bell, and the theme
 toggle.
 
-Roles are Owner, Admin, Developer, and Viewer. There are no custom roles.
+Roles are Owner, Admin, Developer, and Viewer. Enterprise can edit the last
+three and create custom roles. Owner is locked.
 
 Reveal, import, export, creating a machine identity, and sealing the
 organization key all need the vault unlocked. Enroll, unlock, and rotate under
@@ -100,11 +101,11 @@ Three secret types ship today:
 - **Org reference** - a pointer at one key in the organization catalog. You
   map each project environment to a catalog environment (or leave it unlinked).
   Reads resolve the binding at read time. New links need Business or
-  Enterprise. See [Shared secrets](/shared-secrets).
+  Enterprise. See [Org shared secrets](/shared-secrets).
 
 A calendar control on each key sets a **rotation reminder** (one-time or
 recurring). Shared catalog keys have the same control on
-[Shared secrets](/shared-secrets). Due reminders appear on the dashboard
+[Org shared secrets](/shared-secrets). Due reminders appear on the dashboard
 **Expiring soon** card. If no recipients are selected, owners and admins are
 notified.
 
@@ -145,14 +146,14 @@ combine. Admin only.
 Rename the project, copy its `kryptic.json`, or delete it. Deletion requires
 typing the project name. Admin only.
 
-## Shared secrets
+## Org shared secrets
 
-**Shared secrets** is the organization catalog: keys that many projects can
+**Org shared secrets** is the organization catalog: keys that many projects can
 point at (AWS, Stripe, and similar). Owners and Admins author it. Developers
 see key names and catalog environments when they add an **Org reference** on
 a project. Managing the catalog and creating new project links is Business
 and Enterprise. Existing links keep resolving after a fallback to Free or
-Team. The full rules are on [Shared secrets](/shared-secrets).
+Team. The full rules are on [Org shared secrets](/shared-secrets).
 
 ## Members
 
@@ -160,7 +161,8 @@ Team. The full rules are on [Shared secrets](/shared-secrets).
 
 Invite several emails at once (one per line or comma-separated), assign a
 built-in role (Admin, Developer, or Viewer), deactivate or reactivate people,
-and revoke sessions. There is no CSV import and no custom roles. Pending
+and revoke sessions. There is no CSV import. Enterprise can assign custom
+roles. Pending
 invitations can be resent (which issues a fresh token and invalidates the old
 one) or cancelled. Invitees accept at `/invitations/accept` by setting a name
 and a password.
@@ -296,7 +298,7 @@ the Owner and up to two Admins stay active; other members are disabled until you
 subscribe again and re-enable them. Shared-secret catalog rows and existing
 project org references stay and keep resolving; new catalog writes and new
 project links wait until you are on Business or Enterprise again. Unlink stays
-allowed. See [Shared secrets](/shared-secrets).
+allowed. See [Org shared secrets](/shared-secrets).
 
 **Invoices** lists every tax invoice as a downloadable PDF.
 
