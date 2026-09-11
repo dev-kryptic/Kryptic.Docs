@@ -4,13 +4,39 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.5.2**. Platform and Management
+secrets from. The latest release is **1.6.0**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.6.0
+
+Action-level permissions and organization roles. Owner, Admin, Developer,
+and Viewer are seeded on signup. Owner is immutable and always has the
+full catalog. Custom roles and edited default bags need Enterprise on
+cloud, or `advanced-rbac` on a self-hosted licence.
+
+### Added
+
+- `[AuthorizeKryptic]` checks action permissions. `GET/POST/PUT/DELETE
+  /api/roles` manages the bags.
+- `/api/auth/me` returns `roleId`, `roleName`, `permissions`, and
+  `advancedRbac`.
+- Staff can cancel or delete a customer's Stripe subscription from the
+  Internal console (Admin staff role).
+
+### Changed
+
+- Environment update and delete need ReadWrite on the target environment.
+  Reorder and set-default need it on every environment in the project.
+
+### Fixed
+
+- Microsoft sign-in accepts accounts whose id_token omits
+  `email_verified`. An explicit `false` still blocks linking and signup.
 
 ## 1.5.2
 
