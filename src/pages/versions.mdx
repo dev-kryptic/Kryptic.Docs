@@ -4,13 +4,30 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.6.0**. Platform and Management
+secrets from. The latest release is **1.7.0**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.7.0
+
+Organization authentication policy, MFA enrollment and remembered browsers,
+and durable daemon device trust. Owners set these under Settings.
+
+### Added
+
+- `PUT /api/organization/authentication` sets require-MFA, remember-browser
+  for MFA, login expiry, and durable daemon device trust.
+- Password login can require TOTP before a session exists. Disable is
+  blocked while the org requires MFA.
+- Remember-browser cookie skips TOTP for 30 days on that user after a
+  successful challenge.
+- Known daemon devices with proof of possession skip Approvals when
+  durable device trust is on.
+- `GET /api/roles/assignable` lists roles that can be invited or assigned.
 
 ## 1.6.0
 

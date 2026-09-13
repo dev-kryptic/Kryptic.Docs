@@ -27,8 +27,19 @@ After the installer finishes, open a new terminal and sign in (or use the menu b
 kryptic login
 ```
 
-Approve the code in your browser. The rotating session token is stored in your OS credential
-store (Keychain, Credential Manager, or libsecret). Access tokens live in daemon memory only.
+Approve the code in your browser. The first time, an admin seals the organization key
+to this machine. Later logins after idle expiry only need the browser step, not a
+new grant, unless you run `kryptic reset-device`, uninstall, or sign in as a
+different OS user. The rotating session token and device keys live in your OS
+credential store (Keychain, Credential Manager, or libsecret). Access tokens
+live in daemon memory only. The menu-bar and tray icon shows green when secrets
+can be served, amber while connecting or waiting for that grant, and gray when
+signed out. Add a second account (personal and work) with `kryptic login --add`
+or **Add Account** in **Open Kryptic** (you pick that account's server
+URI first). Switching does not sign the other out. Each profile keeps its own
+config, so a self-hosted work account and a cloud account can live together.
+Choose **Open Kryptic** from the menu-bar or tray menu. The window uses native
+controls on each OS, with the same account, operations, settings, and help actions.
 
 Optional, download from the terminal instead:
 

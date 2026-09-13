@@ -32,25 +32,36 @@ bar and tray also have **Reveal Diagnostics Log**.
 ## Authentication
 
 ```bash
-kryptic login    # browser device flow - prints a code, you approve it in the browser
-kryptic whoami   # the signed-in user and organization (asks the platform directly)
-kryptic logout   # revoke this device's session
+kryptic login                 # browser device flow - prints a code, you approve it in the browser
+kryptic login --add           # sign in another account without leaving the current one
+kryptic login --add --api URL # new account on a different Daemon BFF (self-host vs cloud)
+kryptic profile               # list saved accounts on this install
+kryptic profile switch EMAIL  # switch the active account (email or profile id)
+kryptic profile delete EMAIL  # remove an account from this install
+kryptic whoami                # the signed-in user and organization (asks the platform directly)
+kryptic logout                # revoke the active account's session
+kryptic reset-device          # wipe the active profile's keys
+kryptic reset-device --all    # wipe every profile on this install
+kryptic panel                 # Open Kryptic (Windows/Linux; on macOS use the menu)
 ```
 
 `login` stores the rotating refresh token in the OS credential store: macOS Keychain,
 Windows Credential Manager, or libsecret on Linux (0600 file fallback when no store
-is available).
+is available). One install can hold personal and work accounts at the same time.
+Switching the active profile does not sign the other out. The menu bar and tray
+icon shows a green, amber, or gray status dot: connected, connecting / awaiting
+approval, or signed out.
 
 ## Server URL
 
 ```bash
-kryptic config                 # show the Daemon BFF URL and where it came from
-kryptic config set-api URL     # point this machine at a self-hosted (or local) BFF
-kryptic config reset-api       # return to https://daemon.kryptic.dev
+kryptic config                 # show the active profile's Daemon BFF URL
+kryptic config set-api URL     # point this profile at a self-hosted (or local) BFF
+kryptic config reset-api       # return this profile to https://daemon.kryptic.dev
 ```
 
-Changing the saved URL signs you out, because tokens belong to one server.
-`KRYPTIC_API` overrides the saved value without writing it. Point it at
+Each profile stores its own server URL. Changing one signs that profile out
+only. `KRYPTIC_API` overrides every profile for that process. Point it at
 `http://localhost:5237` when the Daemon BFF is running from the IDE, or
 `http://localhost:5211` when you are using the compose kit.
 

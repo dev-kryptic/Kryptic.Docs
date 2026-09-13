@@ -39,7 +39,7 @@ and **Organization** (Members, Groups, Org shared secrets, Machine identities,
 Daemon sessions, Approvals, Audit log, Roles, Integrations, Settings). Nav
 items follow the caller's permissions. Everyone can open **My daemons**,
 **My requests**, and **Settings** (Account if they sign in with a local
-password, General if they can update the organization, then Encryption).
+password, General and Authentication if they can update the organization, then Encryption).
 
 The top bar has jump-to-project search, a notifications bell, and the theme
 toggle.
@@ -256,14 +256,20 @@ data key, not the client-held org key.
 ## Settings
 
 **Account** is only for members who sign in with a local password: change that
-password. Display name and email are not editable here. SSO, SAML, and SCIM
-members do not see Account. This is not the vault passphrase.
+password and manage optional TOTP, recovery codes, and remembered browsers.
+Display name and email are not editable here. SSO, SAML, and SCIM members do
+not see Account. This is not the vault passphrase.
 
 <img className="imagewrapper-big" src="/screenshots/settings-general.png" alt="Organization settings" />
 
-**General** (Admin+) is above Encryption. It holds the organization name, slug,
-and the session expiry policy that caps how long any login stays valid. Billing
-email lives on **Billing details**, not here.
+**General** requires `organization.update` (Owner in the stock roles). It holds
+the organization name and slug. Billing email lives on **Billing details**,
+not here.
+
+**Authentication** is the same permission. Owners can require MFA for password
+accounts, allow remembering a browser for 30 days after TOTP, set login expiry,
+and choose whether daemon machines keep a durable org-key grant after the first
+approval. SSO and SAML stay on the identity provider.
 
 <img className="imagewrapper-big" src="/screenshots/settings-encryption.png" alt="Encryption settings" />
 

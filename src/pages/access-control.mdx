@@ -103,17 +103,32 @@ continue to write directly.
   rows={[
     [
       'Deactivate a member',
-      'Immediately revokes their browser and daemon sessions; login refused',
+      'Immediately revokes their browser sessions, daemon sessions, durable devices, org-key grants, and remembered MFA browsers; login refused',
     ],
-    ['Revoke all sessions', 'Same, without deactivating the account'],
-    ['Revoke one daemon', 'That machine stops receiving secrets'],
+    ['Revoke all sessions', 'Revokes browser and daemon refresh tokens without deactivating the account or durable devices'],
+    [
+      'Revoke one daemon',
+      'If the session belongs to a durable device, the device, its org-key grant, and every session on it go together',
+    ],
     [
       'Session expiry policy',
-      'Caps the absolute age of any login, regardless of refreshes',
+      'Caps the absolute age of any login, regardless of refreshes. Set under Settings → Authentication',
+    ],
+    [
+      'Require MFA',
+      'Password accounts must enroll TOTP before a session is issued. SSO stays on the IdP',
+    ],
+    [
+      'Remember browser for MFA',
+      'After TOTP, that browser can skip the code for 30 days. Cleared on password change, MFA disable, and deactivate',
+    ],
+    [
+      'Durable daemon device trust',
+      'First admin grant still required. Later logins on the same OS-user install reuse the grant. Off means approve every new daemon session',
     ],
     [
       'SCIM deprovisioning',
-      'Deactivates and revokes everything, driven by your IdP',
+      'Deactivates and revokes sessions, durable devices, and org-key grants, driven by your IdP',
     ],
   ]}
 />
