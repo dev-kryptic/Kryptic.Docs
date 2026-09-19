@@ -1,0 +1,29 @@
+export const description = 'PostgreSQL dynamic secret template: create, grant, renew, drop role.'
+
+# PostgreSQL dynamic secrets
+
+Default statements (edit the GRANT):
+
+```sql
+CREATE USER "{{username}}" WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
+GRANT CONNECT ON DATABASE "{{database}}" TO "{{username}}";
+```
+
+Revoke:
+
+```sql
+REASSIGN OWNED BY "{{username}}" TO CURRENT_USER;
+DROP OWNED BY "{{username}}";
+DROP ROLE "{{username}}";
+```
+
+Renew:
+
+```sql
+ALTER ROLE "{{username}}" VALID UNTIL '{{expiration}}';
+```
+
+Connection fields: host, port (5432), admin user, password, database, Require TLS.
+Local Postgres often has SSL off; uncheck Require TLS or the connector fails with
+`server refused TLS connection`. The connector uses `pgx`. Tokens in statements:
+`{{username}}`, `{{password}}`, `{{expiration}}`, `{{database}}`.

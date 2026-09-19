@@ -98,6 +98,26 @@ them with the [Go encryption engine](/encryption). Ready-to-paste snippets for
 GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose, and the rest live in
 the dashboard Client generator and in [CI/CD](/ci).
 
+Dynamic keys are requested as leases at export time. A connector must be online
+in that VPC, or the job itself can run `kryptic connector run` if it can reach
+the database. See [Dynamic secrets](/enterprise/dynamic-secrets).
+
+## Connector
+
+```bash
+kryptic connector run [--name NAME]
+```
+
+Always-on minter for Enterprise dynamic secrets. Uses the signed-in daemon
+session, or `KRYPTIC_CLIENT_ID` / `KRYPTIC_CLIENT_SECRET` against the Secrets
+API (`KRYPTIC_SECRETS_API` overrides `https://secrets.kryptic.dev`). The
+connector decrypts provider config locally and never sends a password back in
+the clear.
+
+From the menu bar or tray, **Operations → Start "Dynamic-Secrets" Connector** (same button in
+Open Kryptic) opens a terminal that runs `kryptic connector run --name local`
+and keeps the mint and revoke traffic on screen.
+
 ## Secret scanning
 
 ```bash

@@ -1,0 +1,16 @@
+export const description = 'Cassandra / Scylla dynamic secret template and cluster flags.'
+
+# Cassandra dynamic secrets
+
+Needs `PasswordAuthenticator` and `CassandraAuthorizer`. Connection fields:
+comma-separated hosts, port (9042), admin user, password, local DC, optional
+keyspace.
+
+```cql
+CREATE ROLE '{{username}}' WITH PASSWORD = '{{password}}' AND LOGIN = true;
+GRANT SELECT ON KEYSPACE {{database}} TO '{{username}}';
+```
+
+Revoke: `DROP ROLE '{{username}}';`
+
+`{{database}}` is the keyspace name.

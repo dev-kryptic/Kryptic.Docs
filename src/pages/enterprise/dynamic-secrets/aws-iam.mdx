@@ -1,0 +1,18 @@
+export const description = 'AWS IAM dynamic secrets: IAM users or STS. Duration caps apply.'
+
+# AWS IAM dynamic secrets
+
+Auth on the connector: stored access key, Assume Role, or the host chain
+(IRSA / instance role). IRSA only makes sense on the connector host, not on
+Kryptic Cloud.
+
+Credential type:
+
+- **IAM user:** create user, optional policy, create access key. Revoke deletes
+  keys then the user.
+- **Temporary credentials (STS):** AssumeRole (max 1 hour) or GetSessionToken
+  (max 12 hours). These expire without a revoke call.
+
+Lease values: username (when an IAM user was created), access key id, secret,
+and session token for STS. The app sees `{KEY}_USERNAME`, `{KEY}_PASSWORD`
+(the secret), `{KEY}_ACCESS_KEY_ID`, and `{KEY}_SESSION_TOKEN` when present.

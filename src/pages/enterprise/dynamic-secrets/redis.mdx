@@ -1,0 +1,14 @@
+export const description = 'Redis ACL dynamic secret template.'
+
+# Redis dynamic secrets
+
+Default ACL statements (edit the permissions):
+
+```
+ACL SETUSER {{username}} on >{{password}} ~* &* +@all
+```
+
+Revoke: `ACL DELUSER {{username}}`
+
+Connection fields: host, port (6379), admin user (often `default`), password,
+optional TLS.

@@ -91,7 +91,7 @@ history can reveal a past value when the vault is unlocked (or after the usual
 unlock dialog). The toolbar handles `.env` import and per-environment export.
 Import encrypts in the browser before upload.
 
-Three secret types ship today:
+Four secret types ship today:
 
 - **String** - a normal encrypted value per environment.
 - **Reference** - an alias for another String secret in the same project. The
@@ -102,6 +102,9 @@ Three secret types ship today:
   map each project environment to a catalog environment (or leave it unlinked).
   Reads resolve the binding at read time. New links need Business or
   Enterprise. See [Org shared secrets](/shared-secrets).
+- **Dynamic** - leased credentials, Enterprise only. **Generate lease** needs
+  the daemon running and signed in on this machine. App and CI leases still
+  use a connector in the VPC. See [Dynamic secrets](/enterprise/dynamic-secrets).
 
 A calendar control on each key sets a **rotation reminder** (one-time or
 recurring). Shared catalog keys have the same control on

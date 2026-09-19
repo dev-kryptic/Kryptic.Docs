@@ -1,0 +1,14 @@
+export const description = 'MySQL dynamic secret template. Quote style is the usual failure.'
+
+# MySQL dynamic secrets
+
+```sql
+CREATE USER '{{username}}'@'%' IDENTIFIED BY '{{password}}';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `{{database}}`.* TO '{{username}}'@'%';
+```
+
+Revoke: `DROP USER '{{username}}'@'%';`
+
+MySQL quoting is not Postgres quoting. If create fails, check the quotes on
+user and database first. Connection fields: host, port (3306), admin user,
+password, database, TLS.

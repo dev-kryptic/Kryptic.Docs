@@ -92,6 +92,18 @@ export const docsNavigation = [
       { title: 'Set up Okta', href: '/enterprise/okta' },
       { title: 'Set up JumpCloud', href: '/enterprise/jumpcloud' },
       { title: 'SCIM provisioning', href: '/enterprise/scim' },
+      {
+        title: 'Dynamic secrets',
+        href: '/enterprise/dynamic-secrets',
+        links: [
+          { title: 'PostgreSQL', href: '/enterprise/dynamic-secrets/postgresql' },
+          { title: 'MySQL', href: '/enterprise/dynamic-secrets/mysql' },
+          { title: 'Cassandra', href: '/enterprise/dynamic-secrets/cassandra' },
+          { title: 'Oracle', href: '/enterprise/dynamic-secrets/oracle' },
+          { title: 'Redis', href: '/enterprise/dynamic-secrets/redis' },
+          { title: 'AWS IAM', href: '/enterprise/dynamic-secrets/aws-iam' },
+        ],
+      },
     ],
   },
   {

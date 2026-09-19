@@ -1,0 +1,14 @@
+export const description = 'Oracle dynamic secret template. Port 1521, service name FREEPDB1 on Oracle Free.'
+
+# Oracle dynamic secrets
+
+```sql
+CREATE USER {{username}} IDENTIFIED BY "{{password}}";
+GRANT CONNECT TO {{username}};
+```
+
+Revoke: `DROP USER {{username}} CASCADE;`
+
+The connector talks to Oracle with a pure-Go driver. No Instant Client, no
+special build tag. Port default is 1521. Service name is the Easy Connect
+service (FREEPDB1 on Oracle Free).

@@ -115,6 +115,23 @@ Authorization: Bearer <token>
   </Property>
 </Properties>
 
+## Dynamic secrets
+
+Enterprise leases use the same machine token:
+
+```bash
+POST /v1/dynamic-secrets/leases?projectPublicId=proj_x&environment=production&key=APP_DB
+GET  /v1/dynamic-secrets/leases/{leaseId}
+GET  /v1/dynamic-secrets/leases/{leaseId}/envelope
+POST /v1/dynamic-secrets/connectors
+GET  /v1/dynamic-secrets/work
+POST /v1/dynamic-secrets/work/complete
+```
+
+Work items include the provider-config envelope and the machine's wrapped org
+key. Minting happens on `kryptic connector run`, not on this host. See
+[Dynamic secrets](/enterprise/dynamic-secrets).
+
 ## Errors
 
 <DocsTable
