@@ -4,13 +4,44 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.7.1**. Platform and Management
+secrets from. The latest release is **1.8.0**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.8.0
+
+Enterprise dynamic secrets. The requester (signed-in daemon, CI job,
+pipeline, or Kubernetes operator) mints and revokes the lease. The
+platform stores encrypted provider config and lease metadata only.
+
+### Added
+
+- Templates on a project key for Postgres, MySQL, Oracle, Cassandra,
+  Redis, and AWS IAM. Cloud Enterprise, or a self-hosted licence with
+  `dynamic-secrets`.
+- Dashboard Generate lease talks to the local daemon on
+  `127.0.0.1:5278`. If the daemon is down, the drawer refuses.
+- `kryptic ci export` / `kryptic ci revoke`, and the operator mints on
+  reconcile.
+
+### Changed
+
+- `GET .../work` is leftover renew and revoke for that principal only.
+  It no longer serves pending creates for the org.
+
+### Removed
+
+- Management API connector queue endpoints
+  (`POST /api/ee/dynamic-secrets/connectors`, heartbeat, work, complete).
+
+### Fixed
+
+- Machine tokens cannot read dashboard (`RequiresLocalDaemon`) leases.
+- Empty connector polls no longer write audit rows.
 
 ## 1.7.1
 

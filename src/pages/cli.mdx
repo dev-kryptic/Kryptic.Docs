@@ -98,9 +98,14 @@ them with the [Go encryption engine](/encryption). Ready-to-paste snippets for
 GitHub Actions, GitLab CI, Azure DevOps, Docker, Compose, and the rest live in
 the dashboard Client generator and in [CI/CD](/ci).
 
-Dynamic keys are requested as leases at export time. A connector must be online
-in that VPC, or the job itself can run `kryptic connector run` if it can reach
-the database. See [Dynamic secrets](/enterprise/dynamic-secrets).
+Dynamic keys are minted on the runner at export time. The job does not wait
+for a desktop connector. End the job with `kryptic ci revoke` (export writes
+`KRYPTIC_DYNAMIC_LEASES`) so the role is dropped. See
+[Dynamic secrets](/enterprise/dynamic-secrets).
+
+```bash
+kryptic ci revoke [--lease ID]...
+```
 
 ## Connector
 
@@ -108,15 +113,13 @@ the database. See [Dynamic secrets](/enterprise/dynamic-secrets).
 kryptic connector run [--name NAME]
 ```
 
-Always-on minter for Enterprise dynamic secrets. Uses the signed-in daemon
-session, or `KRYPTIC_CLIENT_ID` / `KRYPTIC_CLIENT_SECRET` against the Secrets
-API (`KRYPTIC_SECRETS_API` overrides `https://secrets.kryptic.dev`). The
-connector decrypts provider config locally and never sends a password back in
-the clear.
+Optional leftover reaper for leases this identity created and did not revoke
+(crash, missed `ci revoke`). Uses the signed-in daemon session, or
+`KRYPTIC_CLIENT_ID` / `KRYPTIC_CLIENT_SECRET` against the Secrets API
+(`KRYPTIC_SECRETS_API` overrides `https://secrets.kryptic.dev`).
 
-From the menu bar or tray, **Operations → Start "Dynamic-Secrets" Connector** (same button in
-Open Kryptic) opens a terminal that runs `kryptic connector run --name local`
-and keeps the mint and revoke traffic on screen.
+From the menu bar or tray, **Operations → Start "Dynamic-Secrets" Connector**
+(same button in Open Kryptic) opens that reaper in a terminal.
 
 ## Secret scanning
 
