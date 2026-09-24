@@ -28,6 +28,7 @@ const ADMIN_STOCK = [
   'reminders.admin',
   'encryption.admin',
   'roles.admin',
+  'approvals.admin',
 ]
 
 const DEVELOPER_STOCK = [
@@ -296,6 +297,14 @@ const CATEGORIES = [
       { name: 'roles.create', label: 'Create' },
       { name: 'roles.update', label: 'Update' },
       { name: 'roles.delete', label: 'Delete' },
+    ],
+  },
+  {
+    id: 'approvals',
+    label: 'Approvals',
+    actions: [
+      { name: 'approvals.admin', label: 'Approvals admin', admin: true },
+      { name: 'approvals.approve', label: 'Approve protected changes' },
     ],
   },
 ]

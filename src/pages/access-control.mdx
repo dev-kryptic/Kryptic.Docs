@@ -85,7 +85,12 @@ unlocking the vault, then approve, deny, or cancel. An org-reference request
 shows the catalog key and environment mappings instead of a value. Cancelling
 removes the admin notification. Pending requests (and access requests) expire
 after 7 days, and stale notifications are cleared with them. Owners and admins
-continue to write directly.
+continue to write directly on environments that are not protected.
+
+Enterprise can protect an environment. That change then waits for a role or a
+list of people who hold `approvals.approve`. When more than one person can
+approve, the author cannot apply their own change. See
+[Approval workflows](/enterprise/approval-workflows).
 
 ## Organization isolation
 

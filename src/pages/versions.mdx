@@ -4,13 +4,27 @@ export const description =
 # Versions
 
 What changed in each release of Kryptic: the product you sign into and run
-secrets from. The latest release is **1.8.0**. Platform and Management
+secrets from. The latest release is **1.8.1**. Platform and Management
 Client share the same `vX.Y.Z` tag (or `vX.Y.Z-NN` on a support hotfix).
 The self-host chart versions on its own. `KRYPTIC_VERSION` selects the
 product images.
 
 Language SDKs, the daemon, the Kubernetes operator, and the encryption
 libraries version on their own. Their notes live with each of those products.
+
+## 1.8.1
+
+Enterprise approval workflows. A protected environment names a role or a
+list of people who hold `approvals.approve`. One protector applies their
+own change. Two or more cannot approve their own. Cloud Enterprise, or a
+self-hosted licence with `approval-workflows`.
+
+### Added
+
+- `PUT /api/projects/{projectId}/environments/{environmentId}/approval`
+  and `GET /api/roles/approver-candidates`. The candidates list includes
+  each role's active member count.
+- Protect on each environment in the dashboard.
 
 ## 1.8.0
 

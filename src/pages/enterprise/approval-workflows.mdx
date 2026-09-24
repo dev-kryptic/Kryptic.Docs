@@ -1,0 +1,57 @@
+export const description =
+  'Protect an environment so a role or a named list of people applies the change. Enterprise only.'
+
+# Approval workflows
+
+Available on **Enterprise** (cloud) and on self-hosted keys that carry
+`approval-workflows`. Free, Team, and Business keep the usual rule: a Developer
+proposes a secret change, and anyone with `change_requests.decide` applies it.
+Owners and Admins write those environments directly.
+
+A protected environment names either a role or a list of people. Both have to
+hold `approvals.approve`. Owner and Admin do. Developer and Viewer do not,
+unless you grant that permission on a custom role.
+
+<Diagram name="entitlement" />
+
+Open requests keep the role or the people they were created with if the org
+leaves Enterprise. New writes stop enforcing protection until the org returns.
+The Protect setting stays on the environment and applies again on the way back.
+
+## What a save does
+
+Each environment in the save is decided on its own. Unprotected values follow
+the usual rule. Protected values apply immediately only when the caller is the
+only protector. Otherwise they wait.
+
+<Diagram name="save" />
+
+An Admin who saves `development` and `production` together, with only
+production protected, writes `development` now. Production waits. If the
+protected environments in one save name different roles or different people,
+each group becomes its own request.
+
+A role with more than one member, or a list of several people, rejects the
+author. One approval applies the value. Deny or cancel ends it. The request
+expires after 7 days.
+
+<Diagram name="sequence" />
+
+Org-reference changes use the same split. If the protected environments in
+that change do not share the same approvers, save them separately. Access
+requests, organization-key grants, and dynamic secrets are not part of this.
+
+## One protector, or several
+
+The author is blocked only when someone else can approve. A role is counted by
+its current members. A list of people is the list you named.
+
+<Diagram name="protectors" />
+
+The role or the person list is copied onto the request. Changing Protect later
+does not retarget an open request. Owner does not skip the role or the list.
+
+On the Environments tab, **Protect** opens the setting. Off clears it. On, pick
+**People** or **Role**. The lists only include roles and members whose bag
+includes `approvals.approve`. Deleting a role that still protects an
+environment, or an open request, is refused.

@@ -92,6 +92,7 @@ export const docsNavigation = [
       { title: 'Set up Okta', href: '/enterprise/okta' },
       { title: 'Set up JumpCloud', href: '/enterprise/jumpcloud' },
       { title: 'SCIM provisioning', href: '/enterprise/scim' },
+      { title: 'Approval workflows', href: '/enterprise/approval-workflows' },
       {
         title: 'Dynamic secrets',
         href: '/enterprise/dynamic-secrets',
