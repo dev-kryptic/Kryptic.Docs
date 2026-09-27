@@ -244,6 +244,7 @@ const CATEGORIES = [
       { name: 'change_requests.admin', label: 'Change requests admin', admin: true },
       { name: 'change_requests.read_pending', label: 'Read pending' },
       { name: 'change_requests.decide', label: 'Decide' },
+      { name: 'change_requests.set_expiry', label: 'Set expiration' },
     ],
   },
   {

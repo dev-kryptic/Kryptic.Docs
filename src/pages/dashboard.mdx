@@ -116,7 +116,8 @@ Developers who edit a value or create an org reference submit a **change
 request**. Owners and admins approve or deny it on Approvals. Value changes
 are revealed in the browser (vault unlocked). Org-reference requests show the
 catalog key and environment mappings instead. The requester can cancel, which
-clears the admin notification. Pending approvals expire after 7 days.
+clears the admin notification. How long a pending change stays open is set
+on the organization. The default is 7 days, and no expiration is an option.
 
 ### Client generator
 
@@ -214,8 +215,9 @@ without a grant cannot serve a single secret.
 1. **Change requests.** A developer-proposed secret write or org-reference
    link. For a value, reveal decrypts the proposed ciphertext in the browser.
    For an org reference, Approvals shows the catalog key and the environment
-   mappings. Approving applies the change. The requester can cancel; pending
-   requests expire after 7 days and their notifications are removed.
+   mappings. Approving applies the change. The requester can cancel. Pending
+   requests follow the organization's expiration setting (default 7 days, or
+   no expiration) and their notifications are removed when they expire.
 2. **Access requests** (per project and environment). Approving creates the
    grant. Pending requests also expire after 7 days.
 3. **Organization-key grants** (org-wide). Members, devices, and CI machines

@@ -83,8 +83,11 @@ is held as a **change request** until an owner or admin approves it on
 Approvals. The requester and reviewers can reveal the proposed value after
 unlocking the vault, then approve, deny, or cancel. An org-reference request
 shows the catalog key and environment mappings instead of a value. Cancelling
-removes the admin notification. Pending requests (and access requests) expire
-after 7 days, and stale notifications are cleared with them. Owners and admins
+removes the admin notification. How long a pending change stays open is an
+organization setting (Settings, permission `change_requests.set_expiry`):
+1, 3, 7, 14, 30, or 90 days, or no expiration. The default is 7 days. Access
+requests still expire after 7 days. Stale notifications are cleared when a
+request expires. Owners and admins
 continue to write directly on environments that are not protected.
 
 Enterprise can protect an environment. That change then waits for a role or a

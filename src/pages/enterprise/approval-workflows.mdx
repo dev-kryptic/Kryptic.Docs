@@ -32,8 +32,11 @@ protected environments in one save name different roles or different people,
 each group becomes its own request.
 
 A role with more than one member, or a list of several people, rejects the
-author. One approval applies the value. Deny or cancel ends it. The request
-expires after 7 days.
+author. One approval applies the value. Deny or cancel ends it. How long the
+request stays open is an organization setting: 1, 3, 7, 14, 30, or 90 days,
+or no expiration. The default is 7 days. `change_requests.set_expiry` controls
+who can change it, under Settings. A request already waiting keeps the expiry
+it was given.
 
 <Diagram name="sequence" />
 
@@ -49,7 +52,9 @@ its current members. A list of people is the list you named.
 <Diagram name="protectors" />
 
 The role or the person list is copied onto the request. Changing Protect later
-does not retarget an open request. Owner does not skip the role or the list.
+does not retarget an open request. The organization owner can apply a protected
+change even when they are not that role and not on the list. The author still
+cannot apply their own.
 
 On the Environments tab, **Protect** opens the setting. Off clears it. On, pick
 **People** or **Role**. The lists only include roles and members whose bag
